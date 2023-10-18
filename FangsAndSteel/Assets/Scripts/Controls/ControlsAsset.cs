@@ -28,6 +28,15 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
             ""id"": ""948ed058-8702-43bd-8788-ae08f6467f5a"",
             ""actions"": [
                 {
+                    ""name"": ""TargetSelectedUnits"",
+                    ""type"": ""Button"",
+                    ""id"": ""b6af82cf-1a79-405f-87c9-21e7aac9fc9c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""MoveCamera"",
                     ""type"": ""Value"",
                     ""id"": ""50284be7-1343-4b20-bb2a-a873263e8f9b"",
@@ -154,6 +163,17 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
                     ""action"": ""ZoomCamera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""21fbdd43-dfa7-4463-b06b-b15c1338ed42"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TargetSelectedUnits"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -162,6 +182,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
 }");
         // Game
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
+        m_Game_TargetSelectedUnits = m_Game.FindAction("TargetSelectedUnits", throwIfNotFound: true);
         m_Game_MoveCamera = m_Game.FindAction("MoveCamera", throwIfNotFound: true);
         m_Game_RotateCamera = m_Game.FindAction("RotateCamera", throwIfNotFound: true);
         m_Game_ZoomCamera = m_Game.FindAction("ZoomCamera", throwIfNotFound: true);
@@ -226,6 +247,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
     // Game
     private readonly InputActionMap m_Game;
     private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
+    private readonly InputAction m_Game_TargetSelectedUnits;
     private readonly InputAction m_Game_MoveCamera;
     private readonly InputAction m_Game_RotateCamera;
     private readonly InputAction m_Game_ZoomCamera;
@@ -233,6 +255,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
     {
         private @ControlsAsset m_Wrapper;
         public GameActions(@ControlsAsset wrapper) { m_Wrapper = wrapper; }
+        public InputAction @TargetSelectedUnits => m_Wrapper.m_Game_TargetSelectedUnits;
         public InputAction @MoveCamera => m_Wrapper.m_Game_MoveCamera;
         public InputAction @RotateCamera => m_Wrapper.m_Game_RotateCamera;
         public InputAction @ZoomCamera => m_Wrapper.m_Game_ZoomCamera;
@@ -245,6 +268,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_GameActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_GameActionsCallbackInterfaces.Add(instance);
+            @TargetSelectedUnits.started += instance.OnTargetSelectedUnits;
+            @TargetSelectedUnits.performed += instance.OnTargetSelectedUnits;
+            @TargetSelectedUnits.canceled += instance.OnTargetSelectedUnits;
             @MoveCamera.started += instance.OnMoveCamera;
             @MoveCamera.performed += instance.OnMoveCamera;
             @MoveCamera.canceled += instance.OnMoveCamera;
@@ -258,6 +284,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
 
         private void UnregisterCallbacks(IGameActions instance)
         {
+            @TargetSelectedUnits.started -= instance.OnTargetSelectedUnits;
+            @TargetSelectedUnits.performed -= instance.OnTargetSelectedUnits;
+            @TargetSelectedUnits.canceled -= instance.OnTargetSelectedUnits;
             @MoveCamera.started -= instance.OnMoveCamera;
             @MoveCamera.performed -= instance.OnMoveCamera;
             @MoveCamera.canceled -= instance.OnMoveCamera;
@@ -286,6 +315,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
     public GameActions @Game => new GameActions(this);
     public interface IGameActions
     {
+        void OnTargetSelectedUnits(InputAction.CallbackContext context);
         void OnMoveCamera(InputAction.CallbackContext context);
         void OnRotateCamera(InputAction.CallbackContext context);
         void OnZoomCamera(InputAction.CallbackContext context);

@@ -28,7 +28,9 @@ public partial struct MovementSystem : ISystem
 
 }
 
-
+/// <summary>
+/// Moves all entities with MovementComponent to their target over the terrain
+/// </summary>
 [BurstCompile]
 public partial struct MovementJob : IJobEntity
 {

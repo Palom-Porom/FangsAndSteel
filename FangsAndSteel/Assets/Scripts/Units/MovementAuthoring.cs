@@ -8,7 +8,7 @@ public class MovementAuthoring : MonoBehaviour
 {
     public float speed;
     public float3 target;
-    public bool isMoving = true;
+    public bool isMoving = false;
     public class Baker : Baker<MovementAuthoring>
     {
         public override void Bake(MovementAuthoring authoring)
@@ -17,6 +17,7 @@ public class MovementAuthoring : MonoBehaviour
         }
     }
 }
+
 
 public struct MovementComponent : IComponentData
 {
