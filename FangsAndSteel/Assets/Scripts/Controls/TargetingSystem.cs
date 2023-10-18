@@ -9,7 +9,7 @@ using UnityEngine;
 
 public partial struct TargetingSystem : ISystem, ISystemStartStop
 {
-    private InputData inputData;
+    private RefRW<InputData> inputData;
 
     public void OnCreate (ref SystemState state)
     {
@@ -29,15 +29,16 @@ public partial struct TargetingSystem : ISystem, ISystemStartStop
 
     public void OnUpdate(ref SystemState state)
     {
-        inputData = SystemAPI.GetSingleton<InputData>();
+        inputData = SystemAPI.GetSingletonRW<InputData>();
 
-        if (!inputData.neededTargeting)
+        if (!inputData.ValueRO.neededTargeting)
             return;
+        inputData.ValueRW.neededTargeting = false;
 
         RaycastInput raycastInput = new RaycastInput
         {
-            Start = inputData.cameraPosition,
-            End = inputData.cameraPosition + inputData.mouseDirection * 1000,
+            Start = inputData.ValueRO.cameraPosition,
+            End = inputData.ValueRO.mouseTargetingPoint,
             Filter = new CollisionFilter
             {
                 BelongsTo = (uint)layers.Everything,
@@ -71,7 +72,7 @@ public partial struct ChangeTargetJob : IJobEntity
 {
     [ReadOnly]
     public NativeReference<RaycastResult> raycastResult;
-    public void Execute (ref MovementComponent movementComponent)
+    public void Execute (ref MovementComponent movementComponent, in SelectTag selectTag)
     {
         var result = raycastResult.Value;
         if (!result.hasHit)

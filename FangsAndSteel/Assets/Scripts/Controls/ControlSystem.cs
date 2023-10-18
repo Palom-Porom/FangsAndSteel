@@ -12,7 +12,7 @@ public partial class ControlSystem : SystemBase
 
     //Targeting
     private float3 cameraPosition;
-    private float3 mouseDirection;
+    private float3 mouseTargetingPoint;
     private bool neededTargeting = false;
 
 
@@ -42,7 +42,7 @@ public partial class ControlSystem : SystemBase
         if (neededTargeting)
         {
             inputDataSingleton.ValueRW.cameraPosition = cameraPosition;
-            inputDataSingleton.ValueRW.mouseDirection = mouseDirection;
+            inputDataSingleton.ValueRW.mouseTargetingPoint = mouseTargetingPoint;
             inputDataSingleton.ValueRW.neededTargeting = true;
             neededTargeting = false;
         }
@@ -51,7 +51,7 @@ public partial class ControlSystem : SystemBase
     private void CollectTargetingInfo(InputAction.CallbackContext context)
     {
         var ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
-        mouseDirection = ray.direction;
+        mouseTargetingPoint = ray.GetPoint(1000f);
         cameraPosition = Camera.main.transform.position;
         neededTargeting = true;
     }
@@ -69,7 +69,7 @@ public struct InputData : IComponentData
 
     //Targeting
     public float3 cameraPosition;
-    public float3 mouseDirection;
+    public float3 mouseTargetingPoint;
     public bool neededTargeting;
     
 
