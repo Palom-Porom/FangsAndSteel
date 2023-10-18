@@ -5,6 +5,8 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
+[UpdateInGroup(typeof(InitializationSystemGroup), OrderLast = true)]
 public partial class ControlSystem : SystemBase
 {
     private ControlsAsset controlsAssetClass;

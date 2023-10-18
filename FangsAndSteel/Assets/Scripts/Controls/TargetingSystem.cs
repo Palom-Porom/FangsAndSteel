@@ -7,10 +7,13 @@ using Unity.Jobs;
 using Unity.Physics;
 using UnityEngine;
 
+[UpdateBefore(typeof(MovementSystem))]
+[BurstCompile]
 public partial struct TargetingSystem : ISystem, ISystemStartStop
 {
     private RefRW<InputData> inputData;
 
+    [BurstCompile]
     public void OnCreate (ref SystemState state)
     {
         state.RequireForUpdate<PhysicsWorldSingleton>();
@@ -18,15 +21,18 @@ public partial struct TargetingSystem : ISystem, ISystemStartStop
         state.RequireForUpdate<MovementComponent>();
     }
 
+    [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
         new PutAllOnTerrainJob { collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld }.Schedule();
     }
 
+    [BurstCompile]
     public void OnStopRunning(ref SystemState state)
     {
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         inputData = SystemAPI.GetSingletonRW<InputData>();
