@@ -9,7 +9,7 @@ using UnityEngine;
 
 [UpdateBefore(typeof(MovementSystem))]
 [BurstCompile]
-public partial struct TargetingSystem : ISystem, ISystemStartStop
+public partial struct MoveTargetingSystem : ISystem, ISystemStartStop
 {
     private RefRW<InputData> inputData;
 
