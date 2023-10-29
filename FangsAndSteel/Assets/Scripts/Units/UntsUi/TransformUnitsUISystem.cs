@@ -41,12 +41,22 @@ public partial struct TransformUnitsUIJob : IJobEntity
     public ComponentLookup<LocalTransform> componentLookUp;
     public void Execute(in UnitsIconsComponent unitsIconsComponent)
     {
-        RefRW <LocalTransform> localTransform = componentLookUp.GetRefRW(unitsIconsComponent.infoQuadsEntity);
+        RefRW<LocalTransform> localTransform = componentLookUp.GetRefRW(unitsIconsComponent.infoQuadsEntity);
         float3 forward = localTransform.ValueRW.Position - position;
         forward = math.normalize(forward);
         float3 up = math.cross(forward, camRight);
-        localTransform.ValueRW.Rotation = quaternion.LookRotationSafe(forward,up);
-        
+        localTransform.ValueRW.Rotation = quaternion.LookRotationSafe(forward, up);
+
     }
 
+}
+
+public partial struct UpdateBarsJob : IJobEntity
+{
+    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackComponent attackComponent)
+    {
+
+       
+        
+    }
 }
