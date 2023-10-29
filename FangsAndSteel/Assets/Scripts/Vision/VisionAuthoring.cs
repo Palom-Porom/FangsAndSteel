@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class VisionAuthoring : MonoBehaviour
 {
-    public float VisionRadius;
+    public int VisionRadius;
     public class Baker : Baker<VisionAuthoring>
     {
         public override void Bake(VisionAuthoring authoring)
@@ -19,7 +19,7 @@ public class VisionAuthoring : MonoBehaviour
 
 public struct VisionCharsComponent : IComponentData
 {
-    public float radius;
+    public int radius;
 }
 public struct VisibiliyComponent : IComponentData
 {

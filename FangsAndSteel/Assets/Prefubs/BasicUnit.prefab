@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 4613903502469656764}
   - component: {fileID: -4987006446476087827}
   - component: {fileID: 8959894913835320473}
+  - component: {fileID: 2485282885799056084}
   m_Layer: 7
   m_Name: BasicUnit
   m_TagString: Untagged
@@ -305,3 +306,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   VisionRadius: 0
+--- !u!114 &2485282885799056084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7064979545767166671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 714b0d36d27555147ae2160ef840efc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teamInd: 0
