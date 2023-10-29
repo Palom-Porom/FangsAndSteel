@@ -48,7 +48,8 @@ public partial struct AttackTargetingSystem : ISystem
             localToWorldLookup = localToWorldLookup,
             teamLookup = teamLookup,
             potentialTargetsArr = potentialTargetsArr,
-            ecb = ecb
+            ecb = ecb,
+            deltaTime = Time.deltaTime  
         };
         state.Dependency = attackTargetingJob.Schedule(state.Dependency);
 
@@ -71,19 +72,33 @@ public partial struct AttackTargetingJob : IJobEntity
 
     public EntityCommandBuffer.ParallelWriter ecb;
 
+    public float deltaTime;
+
     public void Execute(ref AttackComponent attack, in LocalToWorld localToWorld, in TeamComponent team, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
+        //For now put the reloading here, but maybe then it is a good idea to put it in another Job with updating all units characteristics (MAYBE for example hp from healing)
+        attack.curReload += deltaTime;
+        if (attack.curReload - attack.reloadLen > float.Epsilon)
+            attack.curReload = attack.reloadLen;
+
         //If not reloaded yet then no need for search for target
-        if (attack.curReload != attack.reloadLen)
+        if (math.abs(attack.curReload - attack.reloadLen) > float.Epsilon)
             return;
 
-        //If has valid target -> return
+        //If has valid target -> create an attackRequest and return
         if (attack.target != Entity.Null
-            && math.distancesq(localToWorld.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq)
-                return;
+            && math.distancesq(localToWorld.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq
+            && hpLookup[attack.target].curHp > 0)
+        {
+            Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
+            ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = attack.target, damage = attack.damage });
+            attack.curReload = 0;
+            return;
+        }
 
         //else -> find new target
-        
+        attack.target = Entity.Null;
+
         float bestScore = float.MinValue;
         Entity bestScoreEntity = Entity.Null;
         foreach(Entity potentialTarget in potentialTargetsArr)
@@ -93,6 +108,11 @@ public partial struct AttackTargetingJob : IJobEntity
                 continue;
 
             float curScore = 0;
+
+            //Temporary check if the target is already dead
+            //I suppose it will be removed after we make a processing of dead units (destroying them)
+            if (hpLookup[potentialTarget].curHp <= 0)
+                continue;
 
             float distanceScore = attack.radiusSq - math.distancesq(localToWorld.Position, localToWorldLookup[potentialTarget].Position)/* * distScoreMultiplier*/;
             //Check if target is not in the attack radius

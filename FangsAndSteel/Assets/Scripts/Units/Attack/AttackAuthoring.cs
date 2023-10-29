@@ -6,7 +6,7 @@ using UnityEngine;
 public class AttackAuthoring : MonoBehaviour
 {
     public int damage = 0;
-    public int realodLen = 1;
+    public float realodLen = 1;
     public int attackRadius = 0;
     public class Baker : Baker<AttackAuthoring>
     {
@@ -25,8 +25,8 @@ public class AttackAuthoring : MonoBehaviour
 public struct AttackComponent : IComponentData
 {
     public int damage;
-    public int reloadLen;
-    public int curReload;
+    public float reloadLen;
+    public float curReload;
     public int radiusSq;
     public Entity target;
 }
