@@ -16,7 +16,7 @@ public class TeamComponentAuthoring : MonoBehaviour
         }
     }
 }
-public struct TeamComponent : IComponentData 
+public struct TeamComponent : IComponentData
 {
     public int teamInd;
 }

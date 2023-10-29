@@ -1,36 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 
+[UpdateInGroup(typeof(SimulationSystemGroup),OrderFirst = true)]
+[BurstCompile]
 public partial struct AttackTargetingSystem : ISystem
 {
+    ComponentLookup<HpComponent> hpLookup;
+    ComponentLookup<LocalToWorld> localToWorldLookup;
+    ComponentLookup<TeamComponent> teamLookup;
+
+    EntityQuery potentialTargetsQuery;
+
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<AttackComponent>();
         state.RequireForUpdate<HpComponent>();
+
+        hpLookup = state.GetComponentLookup<HpComponent>(true);
+        localToWorldLookup = state.GetComponentLookup<LocalToWorld>(true);
+        teamLookup = state.GetComponentLookup<TeamComponent>(true);
+
+        potentialTargetsQuery = new EntityQueryBuilder(Allocator.TempJob).WithAll<HpComponent, LocalToWorld, TeamComponent>().Build(ref state);
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        ComponentLookup<HpComponent> hpLookup = state.GetComponentLookup<HpComponent>(true);
-        ComponentLookup<LocalToWorld> localToWorldLookup = state.GetComponentLookup<LocalToWorld>(true);
-        ComponentLookup<TeamComponent> teamLookup = state.GetComponentLookup<TeamComponent>(true);
-        NativeArray<Entity> potentialTargetsArr = 
-            new EntityQueryBuilder(Allocator.TempJob).WithAll<HpComponent, LocalToWorld, TeamComponent>().Build(ref state).ToEntityArray(Allocator.TempJob);
+        hpLookup.Update(ref state);
+        localToWorldLookup.Update(ref state);
+        teamLookup.Update(ref state);
+        NativeArray<Entity> potentialTargetsArr = potentialTargetsQuery.ToEntityArray(Allocator.TempJob);
+
+        var ecb =  SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
         AttackTargetingJob attackTargetingJob = new AttackTargetingJob
         {
             hpLookup = hpLookup,
             localToWorldLookup = localToWorldLookup,
             teamLookup = teamLookup,
-            potentialTargetsArr = potentialTargetsArr
+            potentialTargetsArr = potentialTargetsArr,
+            ecb = ecb
         };
         state.Dependency = attackTargetingJob.Schedule(state.Dependency);
+
+        //World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>().AddJobHandleForProducer(state.Dependency);
     }
 }
 
@@ -38,15 +60,18 @@ public partial struct AttackTargetingSystem : ISystem
 /// <summary>
 /// Checks all current attack targets and searches for new ones
 /// </summary>
+[BurstCompile]
 public partial struct AttackTargetingJob : IJobEntity
 {
     [ReadOnly] public ComponentLookup<HpComponent> hpLookup;
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
     [ReadOnly] public ComponentLookup<TeamComponent> teamLookup;
+
     [ReadOnly] public NativeArray<Entity> potentialTargetsArr;
 
+    public EntityCommandBuffer.ParallelWriter ecb;
 
-    public void Execute(ref AttackComponent attack, in LocalToWorld localToWorld, in TeamComponent team)
+    public void Execute(ref AttackComponent attack, in LocalToWorld localToWorld, in TeamComponent team, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
         //If not reloaded yet then no need for search for target
         if (attack.curReload != attack.reloadLen)
@@ -83,5 +108,19 @@ public partial struct AttackTargetingJob : IJobEntity
             }
         }
         attack.target = bestScoreEntity;
+
+        if (bestScoreEntity != Entity.Null)
+        {
+            Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
+            ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = bestScoreEntity, damage = attack.damage });
+            attack.curReload = 0;
+        }
     }
+}
+
+
+public struct AttackRequestComponent : IComponentData
+{
+    public Entity target;
+    public int damage;
 }
