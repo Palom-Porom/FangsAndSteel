@@ -1,19 +1,24 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+
 public partial class TransformUnitsUISystem : SystemBase
 {
     Transform cameraTransform;
+    ComponentLookup<LocalTransform> localTransformLookup;
+
     protected override void OnCreate()
-    { 
-        
+    {
+        localTransformLookup = GetComponentLookup<LocalTransform>();
     }
 
     protected override void OnStartRunning()
@@ -25,8 +30,12 @@ public partial class TransformUnitsUISystem : SystemBase
     {
         float3 position = cameraTransform.position;
         float3 camRight = cameraTransform.right;
-        ComponentLookup<LocalTransform> componentLookup = GetComponentLookup<LocalTransform>();
-        TransformUnitsUIJob transformUnitsUIJob = new TransformUnitsUIJob { position = position, camRight = camRight, componentLookUp = componentLookup };
+        localTransformLookup.Update(this);
+        TransformUnitsUIJob transformUnitsUIJob = new TransformUnitsUIJob 
+        {
+            camPosition = position, camRight = camRight,
+            localTransformLookup = localTransformLookup
+        };
         transformUnitsUIJob.Schedule();
         
     
@@ -36,17 +45,19 @@ public partial class TransformUnitsUISystem : SystemBase
 
 public partial struct TransformUnitsUIJob : IJobEntity
 {
-    public float3 position;
+    public float3 camPosition;
     public float3 camRight;
-    public ComponentLookup<LocalTransform> componentLookUp;
-    public void Execute(in UnitsIconsComponent unitsIconsComponent)
+
+    public ComponentLookup<LocalTransform> localTransformLookup;
+    public void Execute(in UnitsIconsComponent unitsIconsComponent, in LocalToWorld unitL2W)
     {
-        RefRW<LocalTransform> localTransform = componentLookUp.GetRefRW(unitsIconsComponent.infoQuadsEntity);
-        float3 forward = localTransform.ValueRW.Position - position;
+        RefRW<LocalTransform> localTransform = localTransformLookup.GetRefRW(unitsIconsComponent.infoQuadsEntity);
+
+        float3 forward = localTransform.ValueRO.Position - camPosition;
         forward = math.normalize(forward);
         float3 up = math.cross(forward, camRight);
-        localTransform.ValueRW.Rotation = quaternion.LookRotationSafe(forward, up);
 
+        localTransform.ValueRW.Rotation = unitL2W.Value.InverseTransformRotation(quaternion.LookRotationSafe(forward, up));
     }
 
 }
