@@ -10,7 +10,7 @@ public class FillFloatOverrideAuthoring : MonoBehaviour
         public override void Bake(FillFloatOverrideAuthoring authoring)
         {
             var e = GetEntity(TransformUsageFlags.None);
-            AddComponent(e, new FillFloatOverride { Value = 1});
+            AddComponent(e, new FillFloatOverride { Value = 0.5f});
         }
     }
 }
