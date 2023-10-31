@@ -228,8 +228,6 @@ GameObject:
   - component: {fileID: 1014067441436641096}
   - component: {fileID: -4987006446476087827}
   - component: {fileID: 2363500150128954630}
-  - component: {fileID: 510706356430527832}
-  - component: {fileID: 6194097715218391043}
   m_Layer: 7
   m_Name: BasicUnit
   m_TagString: Untagged
@@ -484,35 +482,6 @@ MonoBehaviour:
   infoQuadsEntity: {fileID: 6593118440820444270}
   healthBarEntity: {fileID: 4948704777112598906}
   reloadBarEntity: {fileID: 8462255765766358663}
---- !u!114 &510706356430527832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7064979545767166671}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31d917889f3da864ab5b66aa17ecd85d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHp: 0
-  curHp: 0
---- !u!114 &6194097715218391043
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7064979545767166671}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb1c4ac4b24dbe04eba3ef115611f707, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 0
-  realodLen: 1
-  attackRadius: 0
 --- !u!1 &8462255765766358663
 GameObject:
   m_ObjectHideFlags: 0
