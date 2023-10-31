@@ -1,11 +1,9 @@
-Shader"Unlit/HealthShader"
+Shader"Unlit/OldHealthShader"
 {
     Properties
     {
-        _Health ("Health", Range(0, 1)) = 0
+        _Fill ("Fill", Range(0, 1)) = 0
         [MainTexture]_Texture ("Texture", 2D) = "white" {}
-        _LowColor ("Low Health Color", Color) = (1, 0, 0, 1)
-        _HighColor ("High Health Color", Color) = (0, 1, 0, 1)
     }
     SubShader
     {
@@ -52,7 +50,7 @@ Shader"Unlit/HealthShader"
             TEXTURE2D(_Texture); SAMPLER(sampler_Texture);
             CBUFFER_START(UnityPerMaterial)
                 float4 _Texture_ST;
-                half _Health;
+                half _Fill;
             CBUFFER_END
 
             Interpolator vert (VertexInput input)
@@ -64,7 +62,7 @@ Shader"Unlit/HealthShader"
 
                 
                 output.positionCS = GetVertexPositionInputs(input.positionOS).positionCS;
-                input.uv.x += 0.5 - _Health;
+                input.uv.x += 0.5 - _Fill;
                 output.uv = TRANSFORM_TEX(input.uv, _Texture);
                 return output;
             }
