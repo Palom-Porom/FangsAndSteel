@@ -16,6 +16,7 @@ public partial struct AttackTargetingSystem : ISystem
     ComponentLookup<HpComponent> hpLookup;
     ComponentLookup<LocalToWorld> localToWorldLookup;
     ComponentLookup<TeamComponent> teamLookup;
+    ComponentLookup<FillFloatOverride> fillBarLookup;
 
     EntityQuery potentialTargetsQuery;
 
@@ -28,6 +29,7 @@ public partial struct AttackTargetingSystem : ISystem
         hpLookup = state.GetComponentLookup<HpComponent>(true);
         localToWorldLookup = state.GetComponentLookup<LocalToWorld>(true);
         teamLookup = state.GetComponentLookup<TeamComponent>(true);
+        fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
 
         potentialTargetsQuery = new EntityQueryBuilder(Allocator.TempJob).WithAll<HpComponent, LocalToWorld, TeamComponent>().Build(ref state);
     }
@@ -38,6 +40,7 @@ public partial struct AttackTargetingSystem : ISystem
         hpLookup.Update(ref state);
         localToWorldLookup.Update(ref state);
         teamLookup.Update(ref state);
+        fillBarLookup.Update(ref state);
         NativeArray<Entity> potentialTargetsArr = potentialTargetsQuery.ToEntityArray(Allocator.TempJob);
 
         var ecb =  SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
@@ -47,7 +50,10 @@ public partial struct AttackTargetingSystem : ISystem
             hpLookup = hpLookup,
             localToWorldLookup = localToWorldLookup,
             teamLookup = teamLookup,
+            fillBarLookup = fillBarLookup,
+
             potentialTargetsArr = potentialTargetsArr,
+
             ecb = ecb,
             deltaTime = Time.deltaTime  
         };
@@ -67,6 +73,7 @@ public partial struct AttackTargetingJob : IJobEntity
     [ReadOnly] public ComponentLookup<HpComponent> hpLookup;
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
     [ReadOnly] public ComponentLookup<TeamComponent> teamLookup;
+    public ComponentLookup<FillFloatOverride> fillBarLookup;
 
     [ReadOnly] public NativeArray<Entity> potentialTargetsArr;
 
@@ -74,12 +81,13 @@ public partial struct AttackTargetingJob : IJobEntity
 
     public float deltaTime;
 
-    public void Execute(ref AttackComponent attack, in LocalToWorld localToWorld, in TeamComponent team, [ChunkIndexInQuery] int chunkIndexInQuery)
+    public void Execute(ref AttackComponent attack, in LocalToWorld localToWorld, in TeamComponent team, in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
         //For now put the reloading here, but maybe then it is a good idea to put it in another Job with updating all units characteristics (MAYBE for example hp from healing)
         attack.curReload += deltaTime;
         if (attack.curReload - attack.reloadLen > float.Epsilon)
             attack.curReload = attack.reloadLen;
+        fillBarLookup.GetRefRW(unitsIcons.reloadBarEntity).ValueRW.Value = attack.curReload / attack.reloadLen;
 
         //If not reloaded yet then no need for search for target
         if (math.abs(attack.curReload - attack.reloadLen) > float.Epsilon)

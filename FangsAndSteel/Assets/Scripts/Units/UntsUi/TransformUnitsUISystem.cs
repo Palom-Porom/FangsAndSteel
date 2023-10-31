@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -18,12 +19,18 @@ public partial class TransformUnitsUISystem : SystemBase
 
     protected override void OnCreate()
     {
+        EntityQuery q = new EntityQueryBuilder(Allocator.TempJob).WithAny<AttackComponent, HpComponent>().Build(this);
+        RequireAnyForUpdate(q);
+        RequireForUpdate<UnitsIconsComponent>();
+
+
         localTransformLookup = GetComponentLookup<LocalTransform>();
     }
 
     protected override void OnStartRunning()
     {
         cameraTransform = Camera.main.transform;
+        new UpdateBarsJob { fillBarLookup = GetComponentLookup<FillFloatOverride>() }.Schedule();
 
     }
     protected override void OnUpdate()
@@ -64,10 +71,12 @@ public partial struct TransformUnitsUIJob : IJobEntity
 
 public partial struct UpdateBarsJob : IJobEntity
 {
+    public ComponentLookup<FillFloatOverride> fillBarLookup;
     public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackComponent attackComponent)
     {
-
-       
-        
+        //Update HealthBar
+        fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity).ValueRW.Value = hpComponent.curHp / hpComponent.maxHp;
+        //Update ReloadBar
+        fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = attackComponent.curReload / attackComponent.reloadLen;
     }
 }

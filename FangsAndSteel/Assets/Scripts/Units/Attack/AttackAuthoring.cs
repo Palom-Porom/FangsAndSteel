@@ -16,7 +16,7 @@ public class AttackAuthoring : MonoBehaviour
             AddComponent(entity, new AttackComponent { 
                 damage = authoring.damage,
                 reloadLen = authoring.realodLen,
-                curReload = authoring.realodLen,
+                curReload = 0,
                 radiusSq = authoring.attackRadius * authoring.attackRadius,
                 target = Entity.Null });
         }
