@@ -67,7 +67,7 @@ public partial struct TurnSystem : ISystem, ISystemStartStop
     private void EnableEngageSystems (ref SystemState systemState, bool enable)
     {
         systemState.WorldUnmanaged.GetExistingSystemState<MovementSystem>().Enabled = enable;
-        systemState.WorldUnmanaged.GetExistingSystemState<AttackTargetingSystem>().Enabled = enable;
+        systemState.WorldUnmanaged.GetExistingSystemState<TargetingAttackSystem>().Enabled = enable;
         systemState.WorldUnmanaged.GetExistingSystemState<AttackSystem>().Enabled = enable;
     }
 }

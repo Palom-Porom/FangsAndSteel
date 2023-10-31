@@ -9,7 +9,7 @@ using UnityEngine;
 
 [UpdateBefore(typeof(MovementSystem))]
 [BurstCompile]
-public partial struct MoveTargetingSystem : ISystem, ISystemStartStop
+public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 {
     private InputData inputData;
 
@@ -68,7 +68,7 @@ public partial struct MoveTargetingSystem : ISystem, ISystemStartStop
 }
 
 
-//TODO: Redo with ChunkIteration optimization (so that it doesn't go through all selected units if raycastResult.Value.hasHit == false)
+///TODO: Redo with ChunkIteration optimization (so that it doesn't go through all selected units if raycastResult.Value.hasHit == false)
 /// <summary>
 /// Changes targets for all selected units if raycast of new target was succesfull
 /// </summary>

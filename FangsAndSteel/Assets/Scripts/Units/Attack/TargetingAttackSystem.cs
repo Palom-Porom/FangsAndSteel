@@ -11,7 +11,7 @@ using UnityEngine;
 
 [UpdateInGroup(typeof(SimulationSystemGroup),OrderFirst = true)]
 [BurstCompile]
-public partial struct AttackTargetingSystem : ISystem
+public partial struct TargetingAttackSystem : ISystem
 {
     ComponentLookup<HpComponent> hpLookup;
     ComponentLookup<LocalToWorld> localToWorldLookup;
