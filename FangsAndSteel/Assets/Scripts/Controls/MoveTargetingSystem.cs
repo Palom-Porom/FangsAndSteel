@@ -11,7 +11,7 @@ using UnityEngine;
 [BurstCompile]
 public partial struct MoveTargetingSystem : ISystem, ISystemStartStop
 {
-    private RefRW<InputData> inputData;
+    private InputData inputData;
 
     [BurstCompile]
     public void OnCreate (ref SystemState state)
@@ -35,16 +35,15 @@ public partial struct MoveTargetingSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        inputData = SystemAPI.GetSingletonRW<InputData>();
+        inputData = SystemAPI.GetSingleton<InputData>();
 
-        if (!inputData.ValueRO.neededTargeting)
+        if (!inputData.neededTargeting)
             return;
-        inputData.ValueRW.neededTargeting = false;
 
         RaycastInput raycastInput = new RaycastInput
         {
-            Start = inputData.ValueRO.cameraPosition,
-            End = inputData.ValueRO.mouseTargetingPoint,
+            Start = inputData.cameraPosition,
+            End = inputData.mouseTargetingPoint,
             Filter = new CollisionFilter
             {
                 BelongsTo = (uint)layers.Everything,

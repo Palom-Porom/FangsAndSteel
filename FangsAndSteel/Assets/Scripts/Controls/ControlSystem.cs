@@ -45,9 +45,9 @@ public partial class ControlSystem : SystemBase
         {
             inputDataSingleton.ValueRW.cameraPosition = cameraPosition;
             inputDataSingleton.ValueRW.mouseTargetingPoint = mouseTargetingPoint;
-            inputDataSingleton.ValueRW.neededTargeting = true;
-            neededTargeting = false;
         }
+        inputDataSingleton.ValueRW.neededTargeting = neededTargeting;
+        neededTargeting = false;
     }
 
     private void CollectTargetingInfo(InputAction.CallbackContext context)
