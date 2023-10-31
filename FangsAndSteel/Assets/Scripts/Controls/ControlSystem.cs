@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 
-[UpdateInGroup(typeof(InitializationSystemGroup), OrderLast = true)]
+[UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
 public partial class ControlSystem : SystemBase
 {
     private ControlsAsset controlsAssetClass;
