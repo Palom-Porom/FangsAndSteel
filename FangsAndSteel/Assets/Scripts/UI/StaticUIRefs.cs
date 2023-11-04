@@ -13,4 +13,5 @@ public class StaticUIRefs : MonoBehaviour
 
     [SerializeField] public bool endTurnBut;
     [SerializeField] public bool stopMoveBut;
+    [SerializeField] public bool changeSpeedBut;
 }
