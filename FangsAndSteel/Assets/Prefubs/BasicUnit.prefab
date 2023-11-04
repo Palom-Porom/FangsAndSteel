@@ -222,12 +222,12 @@ GameObject:
   m_Component:
   - component: {fileID: 5824819134941424039}
   - component: {fileID: 4613903502469656764}
-  - component: {fileID: 4242124373926402225}
   - component: {fileID: 7487308957241620955}
   - component: {fileID: 5973439578278865204}
   - component: {fileID: 1014067441436641096}
   - component: {fileID: -4987006446476087827}
   - component: {fileID: 2363500150128954630}
+  - component: {fileID: 3774675015547847942}
   m_Layer: 7
   m_Name: BasicUnit
   m_TagString: Untagged
@@ -395,19 +395,6 @@ MonoBehaviour:
         Tag07: 0
     m_SerializedVersion: 1
   m_SerializedVersion: 1
---- !u!114 &4242124373926402225
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7064979545767166671}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eec12b9a34ea0da48b0fa8988aba43ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  teamInd: 0
 --- !u!114 &7487308957241620955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -482,6 +469,19 @@ MonoBehaviour:
   infoQuadsEntity: {fileID: 6593118440820444270}
   healthBarEntity: {fileID: 4948704777112598906}
   reloadBarEntity: {fileID: 8462255765766358663}
+--- !u!114 &3774675015547847942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7064979545767166671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 714b0d36d27555147ae2160ef840efc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teamInd: 0
 --- !u!1 &8462255765766358663
 GameObject:
   m_ObjectHideFlags: 0
