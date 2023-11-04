@@ -9,9 +9,9 @@ using UnityEngine;
 
 [UpdateBefore(typeof(MovementSystem))]
 [BurstCompile]
-public partial struct TargetingSystem : ISystem, ISystemStartStop
+public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 {
-    private RefRW<InputData> inputData;
+    private InputData inputData;
 
     [BurstCompile]
     public void OnCreate (ref SystemState state)
@@ -35,16 +35,15 @@ public partial struct TargetingSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        inputData = SystemAPI.GetSingletonRW<InputData>();
+        inputData = SystemAPI.GetSingleton<InputData>();
 
-        if (!inputData.ValueRO.neededTargeting)
+        if (!inputData.neededTargeting)
             return;
-        inputData.ValueRW.neededTargeting = false;
 
         RaycastInput raycastInput = new RaycastInput
         {
-            Start = inputData.ValueRO.cameraPosition,
-            End = inputData.ValueRO.mouseTargetingPoint,
+            Start = inputData.cameraPosition,
+            End = inputData.mouseTargetingPoint,
             Filter = new CollisionFilter
             {
                 BelongsTo = (uint)layers.Everything,
@@ -69,7 +68,7 @@ public partial struct TargetingSystem : ISystem, ISystemStartStop
 }
 
 
-//TODO: Redo with ChunkIteration optimization (so that it doesn't go through all selected units if raycastResult.Value.hasHit == false)
+///TODO: Redo with ChunkIteration optimization (so that it doesn't go through all selected units if raycastResult.Value.hasHit == false)
 /// <summary>
 /// Changes targets for all selected units if raycast of new target was succesfull
 /// </summary>

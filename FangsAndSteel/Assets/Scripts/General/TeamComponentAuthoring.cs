@@ -12,7 +12,7 @@ public class TeamComponentAuthoring : MonoBehaviour
         public override void Bake(TeamComponentAuthoring authoring)
         {
             Entity entity = GetEntity(TransformUsageFlags.None);
-            AddComponent(entity, new TeamComponent { teamInd = authoring.teamInd });
+            AddComponent(entity, new TeamComponent { teamInd = authoring.teamInd});
         }
     }
 }
@@ -20,4 +20,3 @@ public struct TeamComponent : IComponentData
 {
     public int teamInd;
 }
-

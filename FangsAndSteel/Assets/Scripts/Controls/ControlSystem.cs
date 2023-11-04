@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 
-[UpdateInGroup(typeof(InitializationSystemGroup), OrderLast = true)]
+[UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
 public partial class ControlSystem : SystemBase
 {
     private ControlsAsset controlsAssetClass;
@@ -45,9 +45,9 @@ public partial class ControlSystem : SystemBase
         {
             inputDataSingleton.ValueRW.cameraPosition = cameraPosition;
             inputDataSingleton.ValueRW.mouseTargetingPoint = mouseTargetingPoint;
-            inputDataSingleton.ValueRW.neededTargeting = true;
-            neededTargeting = false;
         }
+        inputDataSingleton.ValueRW.neededTargeting = neededTargeting;
+        neededTargeting = false;
     }
 
     private void CollectTargetingInfo(InputAction.CallbackContext context)
