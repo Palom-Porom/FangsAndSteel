@@ -60,7 +60,7 @@ public partial struct TransformUnitsUIJob : IJobEntity
     {
         RefRW<LocalTransform> localTransform = localTransformLookup.GetRefRW(unitsIconsComponent.infoQuadsEntity);
 
-        float3 forward = localTransform.ValueRO.Position - camPosition;
+        float3 forward = unitL2W.Position + localTransform.ValueRO.Position - camPosition;
         forward = math.normalize(forward);
         float3 up = math.cross(forward, camRight);
 
@@ -72,8 +72,11 @@ public partial struct TransformUnitsUIJob : IJobEntity
 public partial struct UpdateBarsJob : IJobEntity
 {
     public ComponentLookup<FillFloatOverride> fillBarLookup;
+
     public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackComponent attackComponent)
     {
+        //RefRW<FillFloatOverride> fillComponent = fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity);
+        //fillComponent.ValueRW.Value = hpComponent.curHp / hpComponent.maxHp;
         //Update HealthBar
         fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity).ValueRW.Value = hpComponent.curHp / hpComponent.maxHp;
         //Update ReloadBar
