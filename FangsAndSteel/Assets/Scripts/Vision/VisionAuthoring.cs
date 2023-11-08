@@ -12,7 +12,7 @@ public class VisionAuthoring : MonoBehaviour
         {
             Entity entity = GetEntity(TransformUsageFlags.None);
             AddComponent(entity, new VisionCharsComponent { radius = authoring.VisionRadius });
-            AddComponent(entity, new VisibiliyComponent { });
+            AddComponent(entity, new VisibilityComponent { });
         }
     }
 }
@@ -21,7 +21,7 @@ public struct VisionCharsComponent : IComponentData
 {
     public int radius;
 }
-public struct VisibiliyComponent : IComponentData
+public struct VisibilityComponent : IComponentData
 {
-
+    public int visibleToTeams;
 }
