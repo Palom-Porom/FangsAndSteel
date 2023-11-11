@@ -14,6 +14,8 @@ public partial struct VisionMapSystem : ISystem
    public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<VisionMapBuffer>();
+        state.RequireForUpdate<TeamComponent>();
+        state.RequireForUpdate<VisionCharsComponent>();
     }
     public void OnUpdate(ref SystemState state)
     {

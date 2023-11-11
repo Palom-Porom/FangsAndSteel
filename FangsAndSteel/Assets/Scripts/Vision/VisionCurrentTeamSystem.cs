@@ -9,8 +9,16 @@ using UnityEngine;
 public partial struct VisionCurrentTeamSystem : ISystem 
 {
     public void OnCreate(ref SystemState state)
-    { 
-
+    {
+        state.RequireForUpdate<VisionMapBuffer>();
+        state.RequireForUpdate<TeamComponent>();
+        state.RequireForUpdate<VisibilityComponent>();
+    }
+    public void OnUpdate(ref SystemState state)
+    {
+        DynamicBuffer<VisionMapBuffer> visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>();
+        VisionCurrentTeamJob visionCurrentTeamJob = new VisionCurrentTeamJob { visionMap = visionMap };
+        visionCurrentTeamJob.Schedule();
     }
 }
 
