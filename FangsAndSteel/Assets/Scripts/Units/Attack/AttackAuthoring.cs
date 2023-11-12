@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
@@ -19,6 +20,11 @@ public class AttackAuthoring : MonoBehaviour
                 curReload = 0,
                 radiusSq = authoring.attackRadius * authoring.attackRadius,
                 target = Entity.Null });
+
+            AddComponent(entity, new AttackSettingsComponent
+            {
+                targettingMinHP = false
+            });
         }
     }
 }
@@ -29,4 +35,9 @@ public struct AttackComponent : IComponentData
     public float curReload;
     public int radiusSq;
     public Entity target;
+}
+
+public struct AttackSettingsComponent : IComponentData
+{
+    public bool targettingMinHP;
 }

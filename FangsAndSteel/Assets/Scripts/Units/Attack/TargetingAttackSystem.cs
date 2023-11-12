@@ -81,7 +81,10 @@ public partial struct AttackTargetingJob : IJobEntity
 
     public float deltaTime;
 
-    public void Execute(ref AttackComponent attack, in LocalToWorld localToWorld, in TeamComponent team, in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery)
+    private float modHp;
+    private float modDist;
+
+    public void Execute(ref AttackComponent attack, in AttackSettingsComponent attackSettings, in LocalToWorld localToWorld, in TeamComponent team, in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
         //For now put the reloading here, but maybe then it is a good idea to put it in another Job with updating all units characteristics (MAYBE for example hp from healing)
         attack.curReload += deltaTime;
@@ -109,6 +112,13 @@ public partial struct AttackTargetingJob : IJobEntity
 
         float bestScore = float.MinValue;
         Entity bestScoreEntity = Entity.Null;
+
+        if (attackSettings.targettingMinHP)
+        {
+            modHp = 10000;
+            modDist = 0.1f;
+        }
+
         foreach(Entity potentialTarget in potentialTargetsArr)
         {
             //Check if they are in different teams
@@ -117,18 +127,16 @@ public partial struct AttackTargetingJob : IJobEntity
 
             float curScore = 0;
 
-            //Temporary check if the target is already dead
-            //I suppose it will be removed after we make a processing of dead units (destroying them)
-            if (hpLookup[potentialTarget].curHp <= 0)
-                continue;
-
             float distanceScore = attack.radiusSq - math.distancesq(localToWorld.Position, localToWorldLookup[potentialTarget].Position)/* * distScoreMultiplier*/;
             //Check if target is not in the attack radius
             if (distanceScore < 0) 
                 continue;
-            curScore += distanceScore;
+            curScore += distanceScore * modDist;
+
+            float hpScore = -(hpLookup[potentialTarget].curHp);
+            curScore += hpScore * modHp;
             ///TODO Other score affectors
-            
+
             if (curScore > bestScore)
             {
                 bestScore = curScore;
