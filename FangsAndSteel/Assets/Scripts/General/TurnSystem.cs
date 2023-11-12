@@ -42,9 +42,9 @@ public partial class TurnSystem : SystemBase
                 //Set Timer
                 timeToRun = TURN_LEN;
 
-                orderPhase = false;
                 StaticUIRefs.Instance.TurnIndicator.color = Color.green;
-           
+
+                orderPhase = false;
             }
         }
         //If Engage phase
@@ -56,8 +56,9 @@ public partial class TurnSystem : SystemBase
                 //Stop all Engage systems
                 EnableEngageSystems(false);
 
-                orderPhase = true;
                 StaticUIRefs.Instance.TurnIndicator.color = Color.red;
+
+                orderPhase = true;
             }
         }
     }
