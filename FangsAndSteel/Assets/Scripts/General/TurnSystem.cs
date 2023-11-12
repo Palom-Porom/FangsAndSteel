@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Entities.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 [UpdateInGroup(typeof(SimulationSystemGroup), OrderLast = true)]
 public partial class TurnSystem : SystemBase
 {
-    const float TURN_LEN = 10; 
 
+    const float TURN_LEN = 10; 
     StaticUIData uIData;
     float timeToRun;
     bool orderPhase;
@@ -27,6 +28,7 @@ public partial class TurnSystem : SystemBase
 
     public void OnStopRunning(ref SystemState state) { }
 
+    
     protected override void OnUpdate()
     {
         //If Order phase
@@ -41,6 +43,8 @@ public partial class TurnSystem : SystemBase
                 timeToRun = TURN_LEN;
 
                 orderPhase = false;
+                StaticUIRefs.Instance.TurnIndicator.color = Color.green;
+           
             }
         }
         //If Engage phase
@@ -53,6 +57,7 @@ public partial class TurnSystem : SystemBase
                 EnableEngageSystems(false);
 
                 orderPhase = true;
+                StaticUIRefs.Instance.TurnIndicator.color = Color.red;
             }
         }
     }
