@@ -5,7 +5,7 @@ using Unity.Entities.UI;
 using UnityEngine;
 
 [UpdateInGroup(typeof(SimulationSystemGroup), OrderLast = true)]
-public partial struct TurnSystem : ISystem, ISystemStartStop
+public partial class TurnSystem : SystemBase
 {
     const float TURN_LEN = 10; 
 
@@ -13,29 +13,22 @@ public partial struct TurnSystem : ISystem, ISystemStartStop
     float timeToRun;
     bool orderPhase;
 
-    public void OnCreate(ref SystemState state)
+    protected override void OnCreate()
     {
-        state.RequireForUpdate<StaticUIData>();
-
-        //state.RequireForUpdate<MovementSystem>();
-        //state.RequireForUpdate<AttackTargetingSystem>();
-        //state.RequireForUpdate<AttackSystem>();
-
+        RequireForUpdate<StaticUIData>();
         timeToRun = 0;
         orderPhase = true;
     }
 
-    public void OnStartRunning(ref SystemState state)
+    protected override void OnStartRunning()
     {
-        EnableEngageSystems(ref state, !orderPhase);
-        //Debug.Log(state.WorldUnmanaged.GetExistingSystemState<MovementSystem>().Enabled);
+        EnableEngageSystems(!orderPhase);
     }
 
     public void OnStopRunning(ref SystemState state) { }
 
-    public void OnUpdate(ref SystemState state)
+    protected override void OnUpdate()
     {
-        //Debug.Log(state.WorldUnmanaged.GetExistingSystemState<MovementSystem>().Enabled);
         //If Order phase
         if (orderPhase)
         {
@@ -43,7 +36,7 @@ public partial struct TurnSystem : ISystem, ISystemStartStop
             if (uIData.endTurnBut)
             {
                 //Start all Engage systems
-                EnableEngageSystems(ref state, true);
+                EnableEngageSystems(true);
                 //Set Timer
                 timeToRun = TURN_LEN;
 
@@ -53,21 +46,21 @@ public partial struct TurnSystem : ISystem, ISystemStartStop
         //If Engage phase
         else
         {
-            timeToRun -= Time.deltaTime;
+            timeToRun -= SystemAPI.Time.DeltaTime;
             if (timeToRun <= 0)
             {
                 //Stop all Engage systems
-                EnableEngageSystems(ref state, false);
+                EnableEngageSystems(false);
 
                 orderPhase = true;
             }
         }
     }
 
-    private void EnableEngageSystems (ref SystemState systemState, bool enable)
+    private void EnableEngageSystems (bool enable)
     {
-        systemState.WorldUnmanaged.GetExistingSystemState<MovementSystem>().Enabled = enable;
-        systemState.WorldUnmanaged.GetExistingSystemState<TargetingAttackSystem>().Enabled = enable;
-        systemState.WorldUnmanaged.GetExistingSystemState<AttackSystem>().Enabled = enable;
+        World.Unmanaged.GetExistingSystemState<MovementSystem>().Enabled = enable;
+        World.Unmanaged.GetExistingSystemState<TargetingAttackSystem>().Enabled = enable;
+        World.Unmanaged.GetExistingSystemState<AttackSystem>().Enabled = enable;
     }
 }
