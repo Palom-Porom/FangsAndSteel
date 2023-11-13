@@ -14,19 +14,38 @@ using Unity.Rendering;
 
 public partial class SelectionSystem : SystemBase
 {
-    private float2 mouseStartPos;
-    private bool isDragging;
+    /// <summary>
+    /// How much distance cursor need to move for dragging state
+    /// </summary>
     private const float SQRD_DISTANCE_TO_DRAG = 0.25f;
 
-    EntityCommandBuffer.ParallelWriter ecb;
-    ComponentLookup<SelectTag> selectLookup;
+    private float2 mouseStartPos;
+    private bool isDragging;
+
+    private ComponentLookup<SelectTag> selectLookup;
+
+    private EntityCommandBuffer.ParallelWriter ecb;
+
+    /// <summary>
+    /// All selected units
+    /// </summary>
+    private EntityQuery allSelected;
+    /// <summary>
+    /// All units that can be selected (and also have LocalTransform)
+    /// </summary>
+    private EntityQuery allSelectable;
+
 
     protected override void OnStartRunning()
     {
-        ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
         selectLookup = GetComponentLookup<SelectTag>();
-        EntityQuery entityQuery = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
-        new DeselectAllUnitsJob { ecb = ecb, selectLookup = selectLookup }.Schedule(entityQuery);
+
+        ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
+
+        allSelected = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
+        allSelectable = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
+
+        new DeselectAllUnitsJob { ecb = ecb, selectLookup = selectLookup }.Schedule(allSelected);
     }
 
     protected override void OnUpdate()
@@ -36,7 +55,7 @@ public partial class SelectionSystem : SystemBase
             mouseStartPos = Mouse.current.position.value;
         }
 
-        if (Mouse.current.leftButton.isPressed)
+        else if (Mouse.current.leftButton.isPressed)
         {
             if (!isDragging && math.distancesq(mouseStartPos, Mouse.current.position.value) > SQRD_DISTANCE_TO_DRAG)
             {
@@ -46,10 +65,12 @@ public partial class SelectionSystem : SystemBase
             }
         }
 
-        if (Mouse.current.leftButton.wasReleasedThisFrame)
+        else if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
-            ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
+            //Update containers
             selectLookup.Update(this);
+            ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
+
             if (isDragging)
             {
                 isDragging = false;
@@ -60,22 +81,19 @@ public partial class SelectionSystem : SystemBase
                 float2 curMousePosition = Mouse.current.position.value;
                 curMousePosition.y = Screen.height - curMousePosition.y;
 
-                EntityQuery entityQuery = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform>()
-                                                        .WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
-
                 new MultipleSelectJob
                 {
                     worldToScreen = WorldToScreen.Create(Camera.main),
                     rect = GUI_Utilities.GetScreenRect(mouseStartPos, curMousePosition),
-                    ecb = ecb,
+
                     selectTagLookup = selectLookup,
-                }.Schedule(entityQuery);
+                    ecb = ecb
+                }.Schedule(allSelectable);
             }
+
             else
             {
-                EntityQuery entityQuery = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
-
-                new DeselectAllUnitsJob { ecb = ecb, selectLookup = selectLookup }.Schedule(entityQuery);
+                new DeselectAllUnitsJob { ecb = ecb, selectLookup = selectLookup }.Schedule(allSelected);
 
                 var ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
                 RaycastInput raycastInput = new RaycastInput
@@ -94,6 +112,7 @@ public partial class SelectionSystem : SystemBase
                 {
                     collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld,
                     raycastInput = raycastInput,
+
                     selectTagLookup = selectLookup,
                     ecb = ecb
                 }.Schedule(Dependency);
@@ -115,14 +134,13 @@ public partial struct DeselectAllUnitsJob : IJobEntity
     public ComponentLookup<SelectTag> selectLookup;
     public void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
-        ecb.AddComponent<DisableRendering>(chunkIndexInQuery, selectLookup[entity].selectionRing);
         selectLookup.SetComponentEnabled(entity, false);
+        ecb.AddComponent<DisableRendering>(chunkIndexInQuery, selectLookup[entity].selectionRing);
     }
 }
 
 /// <summary>
-/// Raycasts with the given RaycastInput and enables a SelectionTag if selectable is hit. 
-/// Deselects all units (even if something unselectable was raycast-ed)
+/// Raycasts with the given RaycastInput and enables a SelectionTag if Selectable is hit
 /// </summary>
 [BurstCompile]
 public partial struct SingleSelectJob : IJob
@@ -141,7 +159,7 @@ public partial struct SingleSelectJob : IJob
             if (selectTagLookup.HasComponent(raycastHit.Entity))
             {
                 selectTagLookup.SetComponentEnabled(raycastHit.Entity, true);
-                ecb.RemoveComponent<DisableRendering>(0, selectTagLookup[raycastHit.Entity].selectionRing);
+                ecb.RemoveComponent<DisableRendering>(-1, selectTagLookup[raycastHit.Entity].selectionRing);
             }
         }
     }
@@ -149,6 +167,10 @@ public partial struct SingleSelectJob : IJob
 }
 
 
+/// <summary>
+/// Selects all units, which are inside of the rect (which is in the screen coordinates)
+/// All other units are deselected
+/// </summary>
 [BurstCompile]
 public partial struct MultipleSelectJob : IJobEntity
 {
@@ -167,8 +189,8 @@ public partial struct MultipleSelectJob : IJobEntity
         }
         else
         {
-            ecb.AddComponent<DisableRendering>(chunkIndexInQuery, selectTagLookup[entity].selectionRing);
             selectTagLookup.SetComponentEnabled(entity, false);
+            ecb.AddComponent<DisableRendering>(chunkIndexInQuery, selectTagLookup[entity].selectionRing);
         }
     }
 }
