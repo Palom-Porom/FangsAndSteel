@@ -36,6 +36,11 @@ public partial class SelectionSystem : SystemBase
     private EntityQuery allSelectable;
 
 
+    protected override void OnCreate()
+    {
+        RequireForUpdate<SelectTag>();
+    }
+
     protected override void OnStartRunning()
     {
         selectLookup = GetComponentLookup<SelectTag>();
