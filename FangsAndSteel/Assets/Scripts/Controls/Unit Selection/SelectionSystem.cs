@@ -10,6 +10,7 @@ using Unity.Collections;
 using UnityEngine.InputSystem;
 using RaycastHit = Unity.Physics.RaycastHit;
 using Unity.Transforms;
+using Unity.Rendering;
 
 public partial class SelectionSystem : SystemBase
 {
@@ -17,9 +18,15 @@ public partial class SelectionSystem : SystemBase
     private bool isDragging;
     private const float SQRD_DISTANCE_TO_DRAG = 0.25f;
 
+    EntityCommandBuffer.ParallelWriter ecb;
+    ComponentLookup<SelectTag> selectLookup;
+
     protected override void OnStartRunning()
     {
-        new DeselectAllUnitsJob().Schedule();
+        ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
+        selectLookup = GetComponentLookup<SelectTag>();
+        EntityQuery entityQuery = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
+        new DeselectAllUnitsJob { ecb = ecb, selectLookup = selectLookup }.Schedule(entityQuery);
     }
 
     protected override void OnUpdate()
@@ -41,6 +48,8 @@ public partial class SelectionSystem : SystemBase
 
         if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
+            ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
+            selectLookup.Update(this);
             if (isDragging)
             {
                 isDragging = false;
@@ -51,18 +60,22 @@ public partial class SelectionSystem : SystemBase
                 float2 curMousePosition = Mouse.current.position.value;
                 curMousePosition.y = Screen.height - curMousePosition.y;
 
-                EntityQuery entityQuery = GetEntityQuery(new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform>()
-                                                        .WithOptions(EntityQueryOptions.IgnoreComponentEnabledState));
+                EntityQuery entityQuery = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform>()
+                                                        .WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
 
                 new MultipleSelectJob
                 {
                     worldToScreen = WorldToScreen.Create(Camera.main),
-                    rect = GUI_Utilities.GetScreenRect(mouseStartPos, curMousePosition)
+                    rect = GUI_Utilities.GetScreenRect(mouseStartPos, curMousePosition),
+                    ecb = ecb,
+                    selectTagLookup = selectLookup,
                 }.Schedule(entityQuery);
             }
             else
             {
-                new DeselectAllUnitsJob().Schedule();
+                EntityQuery entityQuery = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
+
+                new DeselectAllUnitsJob { ecb = ecb, selectLookup = selectLookup }.Schedule(entityQuery);
 
                 var ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
                 RaycastInput raycastInput = new RaycastInput
@@ -81,7 +94,8 @@ public partial class SelectionSystem : SystemBase
                 {
                     collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld,
                     raycastInput = raycastInput,
-                    selectTagLookup = SystemAPI.GetComponentLookup<SelectTag>()
+                    selectTagLookup = selectLookup,
+                    ecb = ecb
                 }.Schedule(Dependency);
             }
         }
@@ -97,9 +111,12 @@ public partial class SelectionSystem : SystemBase
 [BurstCompile]
 public partial struct DeselectAllUnitsJob : IJobEntity
 {
-    public void Execute(EnabledRefRW<SelectTag> selectTag)
+    public EntityCommandBuffer.ParallelWriter ecb;
+    public ComponentLookup<SelectTag> selectLookup;
+    public void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
-        selectTag.ValueRW = false;
+        ecb.AddComponent<DisableRendering>(chunkIndexInQuery, selectLookup[entity].selectionRing);
+        selectLookup.SetComponentEnabled(entity, false);
     }
 }
 
@@ -115,6 +132,8 @@ public partial struct SingleSelectJob : IJob
     public RaycastInput raycastInput;
     public ComponentLookup<SelectTag> selectTagLookup;
 
+    public EntityCommandBuffer.ParallelWriter ecb;
+
     public void Execute()
     {
         if (collisionWorld.CastRay(raycastInput, out RaycastHit raycastHit))
@@ -122,6 +141,7 @@ public partial struct SingleSelectJob : IJob
             if (selectTagLookup.HasComponent(raycastHit.Entity))
             {
                 selectTagLookup.SetComponentEnabled(raycastHit.Entity, true);
+                ecb.RemoveComponent<DisableRendering>(0, selectTagLookup[raycastHit.Entity].selectionRing);
             }
         }
     }
@@ -135,15 +155,20 @@ public partial struct MultipleSelectJob : IJobEntity
     public WorldToScreen worldToScreen;
     public Rect rect;
 
-    public void Execute(EnabledRefRW<SelectTag> selectTag, in LocalTransform transform)
+    public ComponentLookup<SelectTag> selectTagLookup;
+    public EntityCommandBuffer.ParallelWriter ecb;
+
+    public void Execute(Entity entity, in LocalTransform transform, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
         if (rect.Contains(transform.Position.WorldToScreenCoordinatesNative(worldToScreen)))
         {
-            selectTag.ValueRW = true;
+            selectTagLookup.SetComponentEnabled(entity, true);
+            ecb.RemoveComponent<DisableRendering>(chunkIndexInQuery, selectTagLookup[entity].selectionRing);
         }
         else
         {
-            selectTag.ValueRW = false;
+            ecb.AddComponent<DisableRendering>(chunkIndexInQuery, selectTagLookup[entity].selectionRing);
+            selectTagLookup.SetComponentEnabled(entity, false);
         }
     }
 }
