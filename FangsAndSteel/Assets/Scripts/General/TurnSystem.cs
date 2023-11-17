@@ -40,19 +40,21 @@ public partial class TurnSystem : SystemBase
                 //Start all Engage systems
                 EnableEngageSystems(true);
                 //Set Timer
-                timeToRun = TURN_LEN;
-
+                timeToRun = TURN_LEN;               
                 orderPhase = false;
+                
                 StaticUIRefs.Instance.TurnIndicator.color = Color.green;
-           
+                           
             }
         }
         //If Engage phase
         else
         {
             timeToRun -= SystemAPI.Time.DeltaTime;
+            StaticUIRefs.Instance.TurnTimer.text = $"0:{(int)timeToRun:D2}";
             if (timeToRun <= 0)
             {
+                StaticUIRefs.Instance.TurnTimer.text = "0:00";
                 //Stop all Engage systems
                 EnableEngageSystems(false);
 

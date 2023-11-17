@@ -12,7 +12,6 @@ public class SettingsButtonScript : MonoBehaviour
     public void OpenSettingWindow()
     {
         settingsWindow.SetActive(true);
-        mainButtons.SetActive(false);
     }
 
     private void Awake()

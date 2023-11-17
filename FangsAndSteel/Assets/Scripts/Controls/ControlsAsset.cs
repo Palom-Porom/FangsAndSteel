@@ -62,6 +62,15 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""OpenCloseEscMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""b0ed22d0-1a5e-48f3-8306-6dfdacb9dcd0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -174,6 +183,17 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
                     ""action"": ""TargetSelectedUnits"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5caf310b-36f4-43ee-ac92-35616aea365b"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenCloseEscMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -186,6 +206,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
         m_Game_MoveCamera = m_Game.FindAction("MoveCamera", throwIfNotFound: true);
         m_Game_RotateCamera = m_Game.FindAction("RotateCamera", throwIfNotFound: true);
         m_Game_ZoomCamera = m_Game.FindAction("ZoomCamera", throwIfNotFound: true);
+        m_Game_OpenCloseEscMenu = m_Game.FindAction("OpenCloseEscMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -251,6 +272,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
     private readonly InputAction m_Game_MoveCamera;
     private readonly InputAction m_Game_RotateCamera;
     private readonly InputAction m_Game_ZoomCamera;
+    private readonly InputAction m_Game_OpenCloseEscMenu;
     public struct GameActions
     {
         private @ControlsAsset m_Wrapper;
@@ -259,6 +281,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
         public InputAction @MoveCamera => m_Wrapper.m_Game_MoveCamera;
         public InputAction @RotateCamera => m_Wrapper.m_Game_RotateCamera;
         public InputAction @ZoomCamera => m_Wrapper.m_Game_ZoomCamera;
+        public InputAction @OpenCloseEscMenu => m_Wrapper.m_Game_OpenCloseEscMenu;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -280,6 +303,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
             @ZoomCamera.started += instance.OnZoomCamera;
             @ZoomCamera.performed += instance.OnZoomCamera;
             @ZoomCamera.canceled += instance.OnZoomCamera;
+            @OpenCloseEscMenu.started += instance.OnOpenCloseEscMenu;
+            @OpenCloseEscMenu.performed += instance.OnOpenCloseEscMenu;
+            @OpenCloseEscMenu.canceled += instance.OnOpenCloseEscMenu;
         }
 
         private void UnregisterCallbacks(IGameActions instance)
@@ -296,6 +322,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
             @ZoomCamera.started -= instance.OnZoomCamera;
             @ZoomCamera.performed -= instance.OnZoomCamera;
             @ZoomCamera.canceled -= instance.OnZoomCamera;
+            @OpenCloseEscMenu.started -= instance.OnOpenCloseEscMenu;
+            @OpenCloseEscMenu.performed -= instance.OnOpenCloseEscMenu;
+            @OpenCloseEscMenu.canceled -= instance.OnOpenCloseEscMenu;
         }
 
         public void RemoveCallbacks(IGameActions instance)
@@ -319,5 +348,6 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
         void OnMoveCamera(InputAction.CallbackContext context);
         void OnRotateCamera(InputAction.CallbackContext context);
         void OnZoomCamera(InputAction.CallbackContext context);
+        void OnOpenCloseEscMenu(InputAction.CallbackContext context);
     }
 }

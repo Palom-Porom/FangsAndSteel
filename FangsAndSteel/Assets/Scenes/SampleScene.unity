@@ -428,8 +428,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa4714b785e7396468afba65acd107d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  escMenu: {fileID: 1946966670}
-  gameOnUI: {fileID: 594368670}
 --- !u!1 &512193350
 GameObject:
   m_ObjectHideFlags: 0
@@ -915,51 +913,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Static UI
-      objectReference: {fileID: 0}
-    - target: {fileID: 920220239006109908, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 940729174954748449, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -0.9055786
-      objectReference: {fileID: 0}
-    - target: {fileID: 940729174954748449, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0.88386536
-      objectReference: {fileID: 0}
-    - target: {fileID: 1786221974615986342, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -0.5999756
-      objectReference: {fileID: 0}
-    - target: {fileID: 1786221974615986342, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -1.699997
-      objectReference: {fileID: 0}
-    - target: {fileID: 2954321213369051329, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2957836529623515427, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7103201347881672531, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -0.14904785
-      objectReference: {fileID: 0}
-    - target: {fileID: 7103201347881672531, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 2.5705566
       objectReference: {fileID: 0}
     - target: {fileID: 8818601149653250340, guid: ecf47eede3abb274ea1e783f29462692,
         type: 3}

@@ -2,40 +2,41 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class EscButtonPush : MonoBehaviour
 {
     public static bool gameIsPaused = false;
-    public GameObject escMenuUI;
     public GameObject gameActiveUI;
-    void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            if (gameIsPaused)
-            {
-                Resume();
-            }
-            else
-            { 
-                Pause();
-            }
-        }
-    }
-
-    private void Pause()
-    {
-        escMenuUI.SetActive(true);
-        gameActiveUI.SetActive(false);
-        gameIsPaused = true;
-    }
-
-    public void Resume()
-    { 
-        escMenuUI.SetActive(false);
-        gameActiveUI.SetActive(true);
-        gameIsPaused = false;
-    }
-
+    public GameObject escUI;
+    public GameObject settingsWindow;
+    private ControlsAsset escPush;
     
+    private void Awake()
+    {
+        escPush = new ControlsAsset();
+        escPush.Game.OpenCloseEscMenu.performed += context => OpenCloseMenu();
+    }
+
+    private void OnEnable()
+    {
+        escPush.Enable();    
+    }
+
+    private void OnDisable()
+    {
+        escPush.Disable();
+    }
+
+    public void OpenCloseMenu()
+    {
+        if (settingsWindow.activeInHierarchy) { settingsWindow.SetActive(!settingsWindow.activeSelf); }
+        else
+        {
+            escUI.SetActive(!escUI.activeSelf);
+            gameActiveUI.SetActive(!gameActiveUI.activeSelf);
+        }
+     }
+
+
 }

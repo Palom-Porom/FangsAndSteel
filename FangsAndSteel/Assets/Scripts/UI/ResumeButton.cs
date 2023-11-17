@@ -1,28 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ResumeButtonScript : MonoBehaviour
 {
     Button button;
-    public GameObject escMenu;
-    public GameObject gameOnUI;
-    public void Resume()
-    {
-        escMenu.SetActive(false);
-        EscButtonPush.gameIsPaused = false;
-        gameOnUI.SetActive(true);
-        
-    }
+    private EscButtonPush escButtonPushScript;
+    
     private void Awake()
     {
+        escButtonPushScript = StaticUIRefs.Instance.gameObject.GetComponent<EscButtonPush>();
         button = GetComponent<Button>();
-        button.onClick.AddListener(Resume);
+        button.onClick.AddListener(escButtonPushScript.OpenCloseMenu);
     }
 
     private void OnDestroy()
     {
-        button.onClick.RemoveListener(Resume);
+        button.onClick.RemoveListener(escButtonPushScript.OpenCloseMenu);
     }
 }
