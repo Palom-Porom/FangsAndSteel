@@ -30,7 +30,7 @@ public class EscButtonPush : MonoBehaviour
 
     public void OpenCloseMenu()
     {
-        if (settingsWindow.activeInHierarchy) { settingsWindow.SetActive(!settingsWindow.activeSelf); }
+        if (settingsWindow.activeSelf) { settingsWindow.SetActive(!settingsWindow.activeSelf); }
         else
         {
             escUI.SetActive(!escUI.activeSelf);
