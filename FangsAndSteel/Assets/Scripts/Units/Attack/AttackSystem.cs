@@ -4,6 +4,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Transforms;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 //All attacks are processed with a latency in 1 frame. May be there is a better solution?..
@@ -19,10 +20,11 @@ public partial struct AttackSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<HpComponent>();
+        state.RequireForUpdate<AttackRequestComponent>();
         hpLookup = state.GetComponentLookup<HpComponent>();
         fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
         unitsIconsLookup = state.GetComponentLookup<UnitsIconsComponent>(true);
+
     }
 
     [BurstCompile]
@@ -33,6 +35,11 @@ public partial struct AttackSystem : ISystem
         unitsIconsLookup.Update(ref state);
         var ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
         new AttackJob { hpLookup = hpLookup, fillBarLookup = fillBarLookup, unitsIconsLookup = unitsIconsLookup, ecb = ecb }.Schedule();
+
+        foreach((MovementComponent move, Entity entity) in SystemAPI.Query<MovementComponent>().WithEntityAccess() )
+        {
+            
+        }
     }
 }
 
@@ -51,5 +58,13 @@ public partial struct AttackJob : IJobEntity
         //Update HealthBar
         fillBarLookup.GetRefRW(unitsIconsLookup[attackRequest.target].healthBarEntity).ValueRW.Value = hpComponent.ValueRO.curHp / hpComponent.ValueRO.maxHp;
         ecb.DestroyEntity(chunkIndexInQuery, requestEntity);
+        //Killing Unit
+        if (hpComponent.ValueRO.curHp <= 0)
+        {
+            ecb.RemoveComponent<HpComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<TeamComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<AttackComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<MovementComponent>(chunkIndexInQuery, attackRequest.target);
+        }
     }
 }

@@ -7,6 +7,10 @@ using UnityEngine;
 public class VisionMapsAuthoring : MonoBehaviour
 {
     public int mapSize = 500;
+    public GameObject noTeamDebugCube;
+    public GameObject firstTeamDebugCube;
+    public GameObject secondTeamDebugCube;
+    public GameObject bothTeamsDebugCube;
     public class Baker : Baker<VisionMapsAuthoring>
     {
         public override void Bake(VisionMapsAuthoring authoring)
@@ -18,6 +22,14 @@ public class VisionMapsAuthoring : MonoBehaviour
             {
                 buf.Add(0);
             }
+
+            AddComponent(entity, new DebugCube 
+            {
+                noTeamPrefub = GetEntity(authoring.noTeamDebugCube, TransformUsageFlags.Dynamic),
+                firstTeamPrefub = GetEntity(authoring.firstTeamDebugCube, TransformUsageFlags.Dynamic),
+                secondTeamPrefub = GetEntity(authoring.secondTeamDebugCube, TransformUsageFlags.Dynamic),
+                bothTeamsPrefub = GetEntity(authoring.bothTeamsDebugCube, TransformUsageFlags.Dynamic)
+            });
         }
     }
 
@@ -43,6 +55,14 @@ public struct VisionMapBuffer : IBufferElementData
     {
         return element.value;
     }
+}
+
+public struct DebugCube : IComponentData
+{
+    public Entity noTeamPrefub;
+    public Entity firstTeamPrefub;
+    public Entity secondTeamPrefub;
+    public Entity bothTeamsPrefub;
 }
 
 

@@ -45,3 +45,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapSize: 500
+  noTeamDebugCube: {fileID: 8228025864159012105, guid: 1707cc216ff9b7f48ba743deba85c0a2,
+    type: 3}
+  firstTeamDebugCube: {fileID: 8228025864159012105, guid: 222d513b50f4b8347b487446e6e17352,
+    type: 3}
+  secondTeamDebugCube: {fileID: 8228025864159012105, guid: 65b7338445a123a4ea4678cc2e4b45c2,
+    type: 3}
+  bothTeamsDebugCube: {fileID: 8228025864159012105, guid: ae3b5bb851fbe7e4a9248d6c9a13b6e0,
+    type: 3}
