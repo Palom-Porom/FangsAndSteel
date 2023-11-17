@@ -35,6 +35,11 @@ public partial struct AttackSystem : ISystem
         unitsIconsLookup.Update(ref state);
         var ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
         new AttackJob { hpLookup = hpLookup, fillBarLookup = fillBarLookup, unitsIconsLookup = unitsIconsLookup, ecb = ecb }.Schedule();
+
+        foreach((MovementComponent move, Entity entity) in SystemAPI.Query<MovementComponent>().WithEntityAccess() )
+        {
+            
+        }
     }
 }
 
@@ -61,6 +66,7 @@ public partial struct AttackJob : IJobEntity
             ecb.RemoveComponent<AttackComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.AddComponent(chunkIndexInQuery, attackRequest.target, new DieComponent { timeToDie = hpComponent.ValueRO.timeToDie });
+
         }
     }
 }

@@ -2,37 +2,62 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b2767305-6a1d-4a8e-9ac0-f203e1563207" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/TemporaryMats.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/TemporaryMats/BothTeams.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/TemporaryMats/BothTeams.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/TemporaryMats/NoTeam.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/TemporaryMats/NoTeam.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/TemporaryMats/Team1.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/TemporaryMats/Team1.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/TemporaryMats/Team2.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/TemporaryMats/Team2.mat.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Prefubs/DebugCubeBothTeams.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Prefubs/DebugCubeBothTeams.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Prefubs/DebugCubeNoTeam.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Prefubs/DebugCubeNoTeam.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Prefubs/DebugCubeTeamOne.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Prefubs/DebugCubeTeamOne.prefab.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Prefubs/DebugCubeTeamTwo.prefab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Prefubs/DebugCubeTeamTwo.prefab.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Graphics/Materials/ReloadBarMaterial 1.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Graphics/Materials/ReloadBarMaterial 1.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefubs/BasicUnit.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefubs/BasicUnit.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefubs/VisionMap.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefubs/VisionMap.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/SceneDependencyCache/2bd21af67e3d63653f2fd0f4f51f8bad.sceneWithBuildSettings" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/SceneDependencyCache/2bd21af67e3d63653f2fd0f4f51f8bad.sceneWithBuildSettings" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene/GameSubscene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene/GameSubscene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Units/Attack/AttackSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Units/Attack/AttackSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Vision/VisionMapSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Vision/VisionMapSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Vision/VisionMapsAuthoring.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Vision/VisionMapsAuthoring.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2YUxkQdtaudox23Cc98s7FZ0z6d" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "C:\\Users\\egorp\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\DecompilerCache",
-      "C:\\Users\\egorp\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\SourcesCache",
-      "C:\\Users\\egorp\\AppData\\Local\\Symbols\\src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\egorp\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\egorp\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\egorp\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="D:\Unity Editor\2022.3.11f1\Editor\Unity.exe" />
@@ -80,6 +105,7 @@
       <option name="presentableId" value="Default" />
       <updated>1700594105458</updated>
       <workItem from="1700594108979" duration="245000" />
+      <workItem from="1700595725136" duration="20000" />
     </task>
     <servers />
   </component>
