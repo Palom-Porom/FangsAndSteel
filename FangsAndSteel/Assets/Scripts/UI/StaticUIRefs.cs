@@ -5,6 +5,9 @@ using UnityEngine;
 public class StaticUIRefs : MonoBehaviour
 {
     [SerializeField] public static StaticUIRefs Instance { get; private set; }
+    [SerializeField] public static StaticUIRefs hpText { get; }
+    [SerializeField] public static StaticUIRefs attackText { get; }
+    [SerializeField] public StaticUIRefs speedText { get; }
 
     void Awake()
     {

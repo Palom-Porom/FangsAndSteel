@@ -18,9 +18,7 @@ public partial class UnitStatsUiSystem : SystemBase
     }
 
     bool initialFillDone;
-    GameObject hpText;
-    GameObject attackText;
-    GameObject moveText;
+    StaticUIData uIData;
     protected override void OnUpdate()
     {
         hpStats.Update(this);
@@ -29,7 +27,7 @@ public partial class UnitStatsUiSystem : SystemBase
         Entity entity = SystemAPI.GetSingleton<UnitStatsRequestComponent>().entity;
         if ( !initialFillDone )
         {
-            
+            StaticUIRefs.Instance.hptext
         }
     }
 }
