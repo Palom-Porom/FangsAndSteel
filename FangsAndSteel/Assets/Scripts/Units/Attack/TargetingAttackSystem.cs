@@ -9,7 +9,7 @@ using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 
-[UpdateInGroup(typeof(SimulationSystemGroup),OrderFirst = true)]
+[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [BurstCompile]
 public partial struct TargetingAttackSystem : ISystem
 {
@@ -63,7 +63,7 @@ public partial struct TargetingAttackSystem : ISystem
     }
 }
 
-
+//If ComponentLookups are heavy indeed, then it is better to rewrite as 3 jobs connected with NativeReferences<info>
 /// <summary>
 /// Checks all current attack targets and searches for new ones
 /// </summary>
