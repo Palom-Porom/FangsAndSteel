@@ -24,7 +24,7 @@ public partial class SelectionSystem : SystemBase
 
     private ComponentLookup<SelectTag> selectLookup;
 
-    private EntityCommandBuffer.ParallelWriter ecb;
+    private EntityCommandBuffer ecb;
 
     /// <summary>
     /// All selected units
@@ -35,6 +35,7 @@ public partial class SelectionSystem : SystemBase
     /// </summary>
     private EntityQuery allSelectable;
 
+    private Entity unitStatsRqstEntity;
 
     protected override void OnCreate()
     {
@@ -45,12 +46,19 @@ public partial class SelectionSystem : SystemBase
     {
         selectLookup = GetComponentLookup<SelectTag>();
 
-        ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
+        ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
         allSelected = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
         allSelectable = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
 
-        new DeselectAllUnitsJob { ecb = ecb, selectLookup = selectLookup }.Schedule(allSelected);
+        if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestComponent>(out unitStatsRqstEntity))
+            unitStatsRqstEntity = Entity.Null;
+        new DeselectAllUnitsJob 
+        { 
+            ecb = ecb.AsParallelWriter(),
+            selectLookup = selectLookup,
+            unitStatsRqstEntity = unitStatsRqstEntity
+        }.Schedule(allSelected);
     }
 
     protected override void OnUpdate()
@@ -74,7 +82,10 @@ public partial class SelectionSystem : SystemBase
         {
             //Update containers
             selectLookup.Update(this);
-            ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
+            ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+
+            if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestComponent>(out unitStatsRqstEntity))
+                unitStatsRqstEntity = Entity.Null;
 
             if (isDragging)
             {
@@ -86,19 +97,28 @@ public partial class SelectionSystem : SystemBase
                 float2 curMousePosition = Mouse.current.position.value;
                 curMousePosition.y = Screen.height - curMousePosition.y;
 
+                //removing stats for single unit selection
+                if (unitStatsRqstEntity != Entity.Null)
+                    ecb.DestroyEntity(unitStatsRqstEntity);
+
                 new MultipleSelectJob
                 {
                     worldToScreen = WorldToScreen.Create(Camera.main),
                     rect = GUI_Utilities.GetScreenRect(mouseStartPos, curMousePosition),
 
                     selectTagLookup = selectLookup,
-                    ecb = ecb
+                    ecb = ecb.AsParallelWriter()
                 }.Schedule(allSelectable);
             }
 
             else
             {
-                new DeselectAllUnitsJob { ecb = ecb, selectLookup = selectLookup }.Schedule(allSelected);
+                new DeselectAllUnitsJob 
+                { 
+                    ecb = ecb.AsParallelWriter(),
+                    selectLookup = selectLookup,
+                    unitStatsRqstEntity = unitStatsRqstEntity
+                }.Schedule(allSelected);
 
                 var ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
                 RaycastInput raycastInput = new RaycastInput
@@ -137,10 +157,16 @@ public partial struct DeselectAllUnitsJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ecb;
     public ComponentLookup<SelectTag> selectLookup;
+
+    public Entity unitStatsRqstEntity;
     public void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
         selectLookup.SetComponentEnabled(entity, false);
         ecb.AddComponent<DisableRendering>(chunkIndexInQuery, selectLookup[entity].selectionRing);
+
+        //hiding stats for single unit selection
+        if (unitStatsRqstEntity != Entity.Null)
+            ecb.DestroyEntity(chunkIndexInQuery, unitStatsRqstEntity);
     }
 }
 
@@ -155,7 +181,7 @@ public partial struct SingleSelectJob : IJob
     public RaycastInput raycastInput;
     public ComponentLookup<SelectTag> selectTagLookup;
 
-    public EntityCommandBuffer.ParallelWriter ecb;
+    public EntityCommandBuffer ecb;
 
     public void Execute()
     {
@@ -164,7 +190,11 @@ public partial struct SingleSelectJob : IJob
             if (selectTagLookup.HasComponent(raycastHit.Entity))
             {
                 selectTagLookup.SetComponentEnabled(raycastHit.Entity, true);
-                ecb.RemoveComponent<DisableRendering>(-1, selectTagLookup[raycastHit.Entity].selectionRing);
+                ecb.RemoveComponent<DisableRendering>(selectTagLookup[raycastHit.Entity].selectionRing);
+
+                //showing stats for single unit selection
+                Entity unitStatsRqstEntity = ecb.CreateEntity();
+                ecb.AddComponent(unitStatsRqstEntity, new UnitStatsRequestComponent { entity = raycastHit.Entity });
             }
         }
     }
