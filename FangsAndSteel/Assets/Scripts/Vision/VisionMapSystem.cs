@@ -94,16 +94,20 @@ public partial struct VisionMapSystem : ISystem
 [BurstCompile]
 public partial struct FillVisionMapJob : IJobEntity
 {
+    //  [NativeDisableParallelForRestriction] отвечает за разрешение записи в одну и ту же ячейку доступа
     [NativeDisableParallelForRestriction] public DynamicBuffer<VisionMapBuffer> visionMap;
 
     const int ORIG_MAP_SIZE = 1000;
     const int VIS_MAP_SIZE = 500;
     const int ORIG_TO_VIS_MAP_RATIO = 2;
 
+    // Execute - обязательный метод IJobEntity, являющийся аналогом foreach
     public void Execute(in LocalToWorld localtoworld, in VisionCharsComponent visionChars, in TeamComponent team)
     {
         float2 curpointline;
         float2 point;
+        //for (var x := ..... to visionChars.radius step ORIG_TO_....)
+        //for (int i = 0; i < size; i++) - for (int x...) но более понятным языком
         for (int x = (-visionChars.radius) - visionChars.radius % ORIG_TO_VIS_MAP_RATIO; x <= visionChars.radius; x += ORIG_TO_VIS_MAP_RATIO)
         {
             for (int y = (-visionChars.radius) - visionChars.radius % ORIG_TO_VIS_MAP_RATIO; y <= visionChars.radius; y += ORIG_TO_VIS_MAP_RATIO)
@@ -114,6 +118,7 @@ public partial struct FillVisionMapJob : IJobEntity
                 point = math.floor(localtoworld.Position.xz + curpointline + VIS_MAP_SIZE);
                 int idx = (int)(point.x / ORIG_TO_VIS_MAP_RATIO + math.floor(point.y / ORIG_TO_VIS_MAP_RATIO) * VIS_MAP_SIZE);
                 if (idx >= 0 && idx < visionMap.Length)
+                    //    |  -  побитовое "или"
                     visionMap[idx] |= team.teamInd;
             }
         }

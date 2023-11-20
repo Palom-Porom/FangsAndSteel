@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6248042341402842102}
   - component: {fileID: 5294465467418208212}
   m_Layer: 0
-  m_Name: VisionMap
+  m_Name: General
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
