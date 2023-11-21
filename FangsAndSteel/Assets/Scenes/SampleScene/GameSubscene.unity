@@ -201,6 +201,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BasicUnit3
       objectReference: {fileID: 0}
+    - target: {fileID: 8818506933466611722, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: VisionRadius
+      value: 15
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -289,12 +294,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: BasicUnit2
       objectReference: {fileID: 0}
+    - target: {fileID: 8818506933466611722, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: VisionRadius
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c743507d0fc900b45898c8e09289fb9b, type: 3}
---- !u!1001 &1692376060
+--- !u!1001 &4563692528620353605
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -302,57 +312,57 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1071577303827733915, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 1071577303827733915, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_Name
       value: General
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6248042341402842102, guid: 1d2f21906b40ded4c9d50976392378a7,
+    - target: {fileID: 6248042341402842102, guid: cadd39f4b532149448e934c1635aad97,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
@@ -360,31 +370,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1071577303827733915, guid: 1d2f21906b40ded4c9d50976392378a7,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1692376062}
-  m_SourcePrefab: {fileID: 100100000, guid: 1d2f21906b40ded4c9d50976392378a7, type: 3}
---- !u!1 &1692376061 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1071577303827733915, guid: 1d2f21906b40ded4c9d50976392378a7,
-    type: 3}
-  m_PrefabInstance: {fileID: 1692376060}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1692376062
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1692376061}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6fe0466badd5054a896cb2a421ee7d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentTeam: 1
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cadd39f4b532149448e934c1635aad97, type: 3}
 --- !u!1001 &4770188093541319626
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -468,6 +455,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BasicUnit1
       objectReference: {fileID: 0}
+    - target: {fileID: 8818506933466611722, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: VisionRadius
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 510706356430527832, guid: c743507d0fc900b45898c8e09289fb9b, type: 3}
     - {fileID: 6194097715218391043, guid: c743507d0fc900b45898c8e09289fb9b, type: 3}
@@ -482,4 +474,4 @@ SceneRoots:
   - {fileID: 4770188093541319626}
   - {fileID: 1083707843}
   - {fileID: 423722805}
-  - {fileID: 1692376060}
+  - {fileID: 4563692528620353605}
