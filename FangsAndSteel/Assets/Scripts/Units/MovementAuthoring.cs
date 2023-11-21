@@ -13,7 +13,9 @@ public class MovementAuthoring : MonoBehaviour
     {
         public override void Bake(MovementAuthoring authoring)
         {
+            Entity entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent(this.GetEntity(TransformUsageFlags.Dynamic), new MovementComponent { speed = authoring.speed, target = authoring.target, isMoving = authoring.isMoving });
+            AddBuffer<MovementCommandsBuffer>(entity);
         }
     }
 }
@@ -24,4 +26,10 @@ public struct MovementComponent : IComponentData
     public float speed;
     public float3 target;
     public bool isMoving;
+}
+
+[InternalBufferCapacity(16)]
+public struct MovementCommandsBuffer : IBufferElementData
+{
+    public float3 target;
 }
