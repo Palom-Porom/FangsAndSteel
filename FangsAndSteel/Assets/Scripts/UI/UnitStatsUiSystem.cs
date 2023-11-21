@@ -31,7 +31,6 @@ public partial class UnitStatsUiSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        Debug.Log(Dependency.ToString());
         hpStats.Update(this);
         attackStats.Update(this);
         movementStats.Update(this);
