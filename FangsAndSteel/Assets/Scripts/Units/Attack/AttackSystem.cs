@@ -60,6 +60,7 @@ public partial struct AttackJob : IJobEntity
             ecb.RemoveComponent<TeamComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<AttackComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.AddComponent(chunkIndexInQuery, attackRequest.target, new DieComponent { timeToDie = hpComponent.ValueRO.timeToDie });
         }
     }
 }

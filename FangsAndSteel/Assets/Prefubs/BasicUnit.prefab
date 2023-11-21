@@ -441,6 +441,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHp: 1
   curHp: 1
+  timeToDie: 3
 --- !u!114 &1014067441436641096
 MonoBehaviour:
   m_ObjectHideFlags: 0
