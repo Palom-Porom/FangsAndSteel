@@ -61,7 +61,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
             raycastResult = raycastResult
         }.Schedule(state.Dependency);
 
-        new ChangeTargetJob { raycastResult = raycastResult }.Schedule();
+        new ChangeTargetJob { raycastResult = raycastResult, shiftTargeting = inputData.shiftTargeting }.Schedule();
 
         raycastResult.Dispose(state.Dependency);
     }
@@ -77,12 +77,21 @@ public partial struct ChangeTargetJob : IJobEntity
 {
     [ReadOnly]
     public NativeReference<RaycastResult> raycastResult;
-    public void Execute (ref MovementComponent movementComponent, in SelectTag selectTag)
+    public bool shiftTargeting;
+    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in SelectTag selectTag)
     {
         var result = raycastResult.Value;
         if (!result.hasHit)
             return;
-        movementComponent.target = result.raycastHitInfo.Position;
-        movementComponent.isMoving = true;
+        if (shiftTargeting && movementComponent.isMoving)
+        {
+            moveComBuf.Add(new MovementCommandsBuffer { target = result.raycastHitInfo.Position });
+        }
+        else
+        {
+            moveComBuf.Clear();
+            movementComponent.target = result.raycastHitInfo.Position;
+            movementComponent.isMoving = true;
+        }
     }
 }

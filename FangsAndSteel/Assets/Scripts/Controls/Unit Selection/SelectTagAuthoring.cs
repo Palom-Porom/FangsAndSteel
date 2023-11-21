@@ -5,14 +5,18 @@ using UnityEngine;
 
 public class SelectTagAuthoring : MonoBehaviour
 {
+    public GameObject selectionRing;
     public class Baker : Baker<SelectTagAuthoring>
     {
         public override void Bake(SelectTagAuthoring authoring)
         {
             Entity entity = GetEntity(TransformUsageFlags.None);
-            AddComponent<SelectTag>(entity);
+            AddComponent(entity, new SelectTag { selectionRing = GetEntity(authoring.selectionRing, TransformUsageFlags.None) });
         }
     }
 }
 
-public struct SelectTag : IComponentData, IEnableableComponent { }
+public struct SelectTag : IComponentData, IEnableableComponent 
+{
+    public Entity selectionRing;
+}
