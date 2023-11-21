@@ -7,7 +7,6 @@ using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 using Unity.Collections;
-using System.Net.Security;
 
 [BurstCompile]
 public partial struct MovementSystem : ISystem
@@ -40,23 +39,15 @@ public partial struct MovementJob : IJobEntity
     [ReadOnly] public CollisionWorld collisionWorld;
 
 
-    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer)
+    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent)
     {
         if (!movementComponent.isMoving)
             return;
 
         if (math.distancesq(movementComponent.target, transform.Position) < (time * movementComponent.speed) / 2)
         {
-            if (movementCommandsBuffer.Length != 0)
-            {
-                movementComponent.target = movementCommandsBuffer[0].target;
-                movementCommandsBuffer.RemoveAt(0);
-            }
-            else
-            {
-                movementComponent.isMoving = false;
-                return;
-            } 
+            movementComponent.isMoving = false;
+            return;
         }
 
         float3 tempDir = movementComponent.target - transform.Position;

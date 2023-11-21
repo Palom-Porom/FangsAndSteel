@@ -10,8 +10,6 @@ using Unity.Collections;
 using UnityEngine.InputSystem;
 using RaycastHit = Unity.Physics.RaycastHit;
 using Unity.Transforms;
-using UnityEngine.EventSystems;
-using Unity.VisualScripting;
 using Unity.Rendering;
 
 public partial class SelectionSystem : SystemBase
@@ -23,7 +21,6 @@ public partial class SelectionSystem : SystemBase
 
     private float2 mouseStartPos;
     private bool isDragging;
-    private bool wasClickedOnUI;
 
     private ComponentLookup<SelectTag> selectLookup;
 
@@ -68,16 +65,12 @@ public partial class SelectionSystem : SystemBase
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            wasClickedOnUI = EventSystem.current.IsPointerOverGameObject();
-            if (!wasClickedOnUI)
-                mouseStartPos = Mouse.current.position.value;
+            mouseStartPos = Mouse.current.position.value;
         }
 
         else if (Mouse.current.leftButton.isPressed)
         {
-            if (!isDragging &&
-                math.distancesq(mouseStartPos, Mouse.current.position.value) > SQRD_DISTANCE_TO_DRAG &&
-                !wasClickedOnUI)
+            if (!isDragging && math.distancesq(mouseStartPos, Mouse.current.position.value) > SQRD_DISTANCE_TO_DRAG)
             {
                 isDragging = true;
                 GUI_Manager.Instance.isDragging = true;
@@ -87,12 +80,6 @@ public partial class SelectionSystem : SystemBase
 
         else if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
-            //If was clicked on UI, then nothing to do
-            if (wasClickedOnUI)
-            {
-                wasClickedOnUI = false;
-                return;
-            }
             //Update containers
             selectLookup.Update(this);
             ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
