@@ -14,18 +14,18 @@ public class EscButtonPush : MonoBehaviour
     
     private void Awake()
     {
-        escPush = new ControlsAsset();
-        escPush.Game.OpenCloseEscMenu.performed += context => OpenCloseMenu();
+        //escPush = new ControlsAsset();
+        //escPush.Game.OpenCloseEscMenu.performed += context => OpenCloseMenu();
     }
 
     private void OnEnable()
     {
-        escPush.Enable();    
+        //escPush.Enable();    
     }
 
     private void OnDisable()
     {
-        escPush.Disable();
+        //escPush.Disable();
     }
 
     public void OpenCloseMenu()
