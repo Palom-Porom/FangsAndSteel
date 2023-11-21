@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class StaticUIRefs : MonoBehaviour
 {
-    [HideInInspector] public static StaticUIRefs Instance { get; private set; }
+    [SerializeField] public static StaticUIRefs Instance { get; private set; }
+    [SerializeField] public Image TurnIndicator { get { return turnIndicator; } }
+    public Image turnIndicator;
     [HideInInspector] public TextMeshProUGUI HpText { get { return hpText; } }
     private TextMeshProUGUI hpText;
     [HideInInspector] public TextMeshProUGUI AttackText { get { return attackText; } }
@@ -19,6 +22,9 @@ public class StaticUIRefs : MonoBehaviour
     private TextMeshProUGUI movementText;
 
     public GameObject unitStats;
+
+    [SerializeField] public TextMeshProUGUI TurnTimer { get { return turnTimer; } }
+    public TextMeshProUGUI turnTimer;
 
     void Awake()
     {
@@ -34,7 +40,7 @@ public class StaticUIRefs : MonoBehaviour
         movementText = unitStats.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
     }
 
-    [SerializeField] public bool endTurnBut;
-    [SerializeField] public bool stopMoveBut;
-    [SerializeField] public bool changeSpeedBut;
+    [HideInInspector] public bool endTurnBut;
+    [HideInInspector] public bool stopMoveBut;
+    [HideInInspector] public bool changeSpeedBut;
 }

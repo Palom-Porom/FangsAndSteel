@@ -15,6 +15,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Shift_TargetSelectedUnits",
+                    "type": "Button",
+                    "id": "a49fcf94-c9cc-4cf3-ac08-418d098229ef",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "MoveCamera",
                     "type": "Value",
                     "id": "50284be7-1343-4b20-bb2a-a873263e8f9b",
@@ -40,6 +49,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "OpenCloseEscMenu",
+                    "type": "Button",
+                    "id": "b0ed22d0-1a5e-48f3-8306-6dfdacb9dcd0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -152,6 +170,50 @@
                     "action": "TargetSelectedUnits",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5caf310b-36f4-43ee-ac92-35616aea365b",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenCloseEscMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                 },
+                {
+                    "name": "Shift_RMB",
+                    "id": "a53bdbdb-f9a3-4e2b-831a-fed302bfe62c",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shift_TargetSelectedUnits",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "binding",
+                    "id": "45fb2a4e-3455-4f09-b873-b70abd13f620",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shift_TargetSelectedUnits",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "modifier",
+                    "id": "757c5e2f-86b2-4ea7-8c3d-7dea357339d4",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shift_TargetSelectedUnits",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }

@@ -37,6 +37,15 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Shift_TargetSelectedUnits"",
+                    ""type"": ""Button"",
+                    ""id"": ""a49fcf94-c9cc-4cf3-ac08-418d098229ef"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""MoveCamera"",
                     ""type"": ""Value"",
                     ""id"": ""50284be7-1343-4b20-bb2a-a873263e8f9b"",
@@ -62,6 +71,15 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""OpenCloseEscMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""b0ed22d0-1a5e-48f3-8306-6dfdacb9dcd0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -174,6 +192,50 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
                     ""action"": ""TargetSelectedUnits"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5caf310b-36f4-43ee-ac92-35616aea365b"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenCloseEscMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Shift_RMB"",
+                    ""id"": ""a53bdbdb-f9a3-4e2b-831a-fed302bfe62c"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shift_TargetSelectedUnits"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""45fb2a4e-3455-4f09-b873-b70abd13f620"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shift_TargetSelectedUnits"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""757c5e2f-86b2-4ea7-8c3d-7dea357339d4"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shift_TargetSelectedUnits"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -183,9 +245,11 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
         // Game
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
         m_Game_TargetSelectedUnits = m_Game.FindAction("TargetSelectedUnits", throwIfNotFound: true);
+        m_Game_Shift_TargetSelectedUnits = m_Game.FindAction("Shift_TargetSelectedUnits", throwIfNotFound: true);
         m_Game_MoveCamera = m_Game.FindAction("MoveCamera", throwIfNotFound: true);
         m_Game_RotateCamera = m_Game.FindAction("RotateCamera", throwIfNotFound: true);
         m_Game_ZoomCamera = m_Game.FindAction("ZoomCamera", throwIfNotFound: true);
+        m_Game_OpenCloseEscMenu = m_Game.FindAction("OpenCloseEscMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -248,17 +312,21 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Game;
     private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
     private readonly InputAction m_Game_TargetSelectedUnits;
+    private readonly InputAction m_Game_Shift_TargetSelectedUnits;
     private readonly InputAction m_Game_MoveCamera;
     private readonly InputAction m_Game_RotateCamera;
     private readonly InputAction m_Game_ZoomCamera;
+    private readonly InputAction m_Game_OpenCloseEscMenu;
     public struct GameActions
     {
         private @ControlsAsset m_Wrapper;
         public GameActions(@ControlsAsset wrapper) { m_Wrapper = wrapper; }
         public InputAction @TargetSelectedUnits => m_Wrapper.m_Game_TargetSelectedUnits;
+        public InputAction @Shift_TargetSelectedUnits => m_Wrapper.m_Game_Shift_TargetSelectedUnits;
         public InputAction @MoveCamera => m_Wrapper.m_Game_MoveCamera;
         public InputAction @RotateCamera => m_Wrapper.m_Game_RotateCamera;
         public InputAction @ZoomCamera => m_Wrapper.m_Game_ZoomCamera;
+        public InputAction @OpenCloseEscMenu => m_Wrapper.m_Game_OpenCloseEscMenu;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -271,6 +339,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
             @TargetSelectedUnits.started += instance.OnTargetSelectedUnits;
             @TargetSelectedUnits.performed += instance.OnTargetSelectedUnits;
             @TargetSelectedUnits.canceled += instance.OnTargetSelectedUnits;
+            @Shift_TargetSelectedUnits.started += instance.OnShift_TargetSelectedUnits;
+            @Shift_TargetSelectedUnits.performed += instance.OnShift_TargetSelectedUnits;
+            @Shift_TargetSelectedUnits.canceled += instance.OnShift_TargetSelectedUnits;
             @MoveCamera.started += instance.OnMoveCamera;
             @MoveCamera.performed += instance.OnMoveCamera;
             @MoveCamera.canceled += instance.OnMoveCamera;
@@ -280,6 +351,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
             @ZoomCamera.started += instance.OnZoomCamera;
             @ZoomCamera.performed += instance.OnZoomCamera;
             @ZoomCamera.canceled += instance.OnZoomCamera;
+            @OpenCloseEscMenu.started += instance.OnOpenCloseEscMenu;
+            @OpenCloseEscMenu.performed += instance.OnOpenCloseEscMenu;
+            @OpenCloseEscMenu.canceled += instance.OnOpenCloseEscMenu;
         }
 
         private void UnregisterCallbacks(IGameActions instance)
@@ -287,6 +361,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
             @TargetSelectedUnits.started -= instance.OnTargetSelectedUnits;
             @TargetSelectedUnits.performed -= instance.OnTargetSelectedUnits;
             @TargetSelectedUnits.canceled -= instance.OnTargetSelectedUnits;
+            @Shift_TargetSelectedUnits.started -= instance.OnShift_TargetSelectedUnits;
+            @Shift_TargetSelectedUnits.performed -= instance.OnShift_TargetSelectedUnits;
+            @Shift_TargetSelectedUnits.canceled -= instance.OnShift_TargetSelectedUnits;
             @MoveCamera.started -= instance.OnMoveCamera;
             @MoveCamera.performed -= instance.OnMoveCamera;
             @MoveCamera.canceled -= instance.OnMoveCamera;
@@ -296,6 +373,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
             @ZoomCamera.started -= instance.OnZoomCamera;
             @ZoomCamera.performed -= instance.OnZoomCamera;
             @ZoomCamera.canceled -= instance.OnZoomCamera;
+            @OpenCloseEscMenu.started -= instance.OnOpenCloseEscMenu;
+            @OpenCloseEscMenu.performed -= instance.OnOpenCloseEscMenu;
+            @OpenCloseEscMenu.canceled -= instance.OnOpenCloseEscMenu;
         }
 
         public void RemoveCallbacks(IGameActions instance)
@@ -316,8 +396,10 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
     public interface IGameActions
     {
         void OnTargetSelectedUnits(InputAction.CallbackContext context);
+        void OnShift_TargetSelectedUnits(InputAction.CallbackContext context);
         void OnMoveCamera(InputAction.CallbackContext context);
         void OnRotateCamera(InputAction.CallbackContext context);
         void OnZoomCamera(InputAction.CallbackContext context);
+        void OnOpenCloseEscMenu(InputAction.CallbackContext context);
     }
 }

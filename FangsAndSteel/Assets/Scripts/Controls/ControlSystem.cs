@@ -5,7 +5,6 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
 [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
 public partial class ControlSystem : SystemBase
 {
@@ -16,6 +15,7 @@ public partial class ControlSystem : SystemBase
     private float3 cameraPosition;
     private float3 mouseTargetingPoint;
     private bool neededTargeting = false;
+    private bool shiftTargeting = false;
 
 
     protected override void OnCreate()
@@ -24,6 +24,13 @@ public partial class ControlSystem : SystemBase
         EntityManager.AddComponent<InputData>(SystemHandle);
 
         controlsAssetClass.Game.TargetSelectedUnits.performed += CollectTargetingInfo;
+        controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += CollectTargetingInfo;
+        controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += SetFlagForShiftTargeting;
+    }
+
+    protected override void OnDestroy()
+    {
+        controlsAssetClass.Dispose();
     }
 
 
@@ -47,9 +54,10 @@ public partial class ControlSystem : SystemBase
             inputDataSingleton.ValueRW.mouseTargetingPoint = mouseTargetingPoint;
         }
         inputDataSingleton.ValueRW.neededTargeting = neededTargeting;
+        inputDataSingleton.ValueRW.shiftTargeting = shiftTargeting;
         neededTargeting = false;
+        shiftTargeting = false;
     }
-
     private void CollectTargetingInfo(InputAction.CallbackContext context)
     {
         var ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
@@ -57,6 +65,7 @@ public partial class ControlSystem : SystemBase
         cameraPosition = Camera.main.transform.position;
         neededTargeting = true;
     }
+    private void SetFlagForShiftTargeting(InputAction.CallbackContext context) { shiftTargeting = true; }
 }
 
 /// <summary>
@@ -73,6 +82,7 @@ public struct InputData : IComponentData
     public float3 cameraPosition;
     public float3 mouseTargetingPoint;
     public bool neededTargeting;
+    public bool shiftTargeting;
     
 
 }
