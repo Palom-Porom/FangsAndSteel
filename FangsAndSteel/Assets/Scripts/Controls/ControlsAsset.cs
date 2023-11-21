@@ -203,6 +203,8 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
                     ""action"": ""OpenCloseEscMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
                     ""name"": ""Shift_RMB"",
                     ""id"": ""a53bdbdb-f9a3-4e2b-831a-fed302bfe62c"",
                     ""path"": ""OneModifier"",

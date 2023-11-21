@@ -24,7 +24,6 @@ public partial class SelectionSystem : SystemBase
     private float2 mouseStartPos;
     private bool isDragging;
     private bool wasClickedOnUI;
-    private const float SQRD_DISTANCE_TO_DRAG = 0.25f;
 
     private ComponentLookup<SelectTag> selectLookup;
 
