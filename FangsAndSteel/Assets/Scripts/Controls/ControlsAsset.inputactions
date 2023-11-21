@@ -49,15 +49,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
-                },
-                {
-                    "name": "OpenCloseEscMenu",
-                    "type": "Button",
-                    "id": "b0ed22d0-1a5e-48f3-8306-6dfdacb9dcd0",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -172,15 +163,6 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "5caf310b-36f4-43ee-ac92-35616aea365b",
-                    "path": "<Keyboard>/escape",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "OpenCloseEscMenu",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                     "name": "Shift_RMB",
                     "id": "a53bdbdb-f9a3-4e2b-831a-fed302bfe62c",
                     "path": "OneModifier",

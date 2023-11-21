@@ -3,34 +3,39 @@ using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Entities.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 [UpdateInGroup(typeof(SimulationSystemGroup), OrderLast = true)]
-public partial class TurnSystem : SystemBase
+public partial struct TurnSystem : ISystem, ISystemStartStop
 {
-
     const float TURN_LEN = 10; 
+
     StaticUIData uIData;
     float timeToRun;
     bool orderPhase;
 
-    protected override void OnCreate()
+    public void OnCreate(ref SystemState state)
     {
-        RequireForUpdate<StaticUIData>();
+        state.RequireForUpdate<StaticUIData>();
+
+        //state.RequireForUpdate<MovementSystem>();
+        //state.RequireForUpdate<AttackTargetingSystem>();
+        //state.RequireForUpdate<AttackSystem>();
+
         timeToRun = 0;
         orderPhase = true;
     }
 
-    protected override void OnStartRunning()
+    public void OnStartRunning(ref SystemState state)
     {
-        EnableEngageSystems(!orderPhase);
+        EnableEngageSystems(ref state, !orderPhase);
+        //Debug.Log(state.WorldUnmanaged.GetExistingSystemState<MovementSystem>().Enabled);
     }
 
     public void OnStopRunning(ref SystemState state) { }
 
-    
-    protected override void OnUpdate()
+    public void OnUpdate(ref SystemState state)
     {
+        //Debug.Log(state.WorldUnmanaged.GetExistingSystemState<MovementSystem>().Enabled);
         //If Order phase
         if (orderPhase)
         {
@@ -38,11 +43,9 @@ public partial class TurnSystem : SystemBase
             if (uIData.endTurnBut)
             {
                 //Start all Engage systems
-                EnableEngageSystems(true);
+                EnableEngageSystems(ref state, true);
                 //Set Timer
                 timeToRun = TURN_LEN;
-
-                StaticUIRefs.Instance.TurnIndicator.color = Color.green;
 
                 orderPhase = false;
             }
@@ -50,25 +53,21 @@ public partial class TurnSystem : SystemBase
         //If Engage phase
         else
         {
-            timeToRun -= SystemAPI.Time.DeltaTime;
-            StaticUIRefs.Instance.TurnTimer.text = $"0:{(int)timeToRun:D2}";
+            timeToRun -= Time.deltaTime;
             if (timeToRun <= 0)
             {
-                StaticUIRefs.Instance.TurnTimer.text = "0:00";
                 //Stop all Engage systems
-                EnableEngageSystems(false);
-
-                StaticUIRefs.Instance.TurnIndicator.color = Color.red;
+                EnableEngageSystems(ref state, false);
 
                 orderPhase = true;
             }
         }
     }
 
-    private void EnableEngageSystems (bool enable)
+    private void EnableEngageSystems (ref SystemState systemState, bool enable)
     {
-        World.Unmanaged.GetExistingSystemState<MovementSystem>().Enabled = enable;
-        World.Unmanaged.GetExistingSystemState<TargetingAttackSystem>().Enabled = enable;
-        World.Unmanaged.GetExistingSystemState<AttackSystem>().Enabled = enable;
+        systemState.WorldUnmanaged.GetExistingSystemState<MovementSystem>().Enabled = enable;
+        systemState.WorldUnmanaged.GetExistingSystemState<TargetingAttackSystem>().Enabled = enable;
+        systemState.WorldUnmanaged.GetExistingSystemState<AttackSystem>().Enabled = enable;
     }
 }

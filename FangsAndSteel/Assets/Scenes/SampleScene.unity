@@ -700,7 +700,7 @@ Transform:
   m_GameObject: {fileID: 832575517}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.02, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -884,25 +884,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: Static UI
       objectReference: {fileID: 0}
-    - target: {fileID: 1287744671232382233, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0.020019531
-      objectReference: {fileID: 0}
-    - target: {fileID: 1925652844582194640, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -0.3000183
-      objectReference: {fileID: 0}
-    - target: {fileID: 4699295294970833010, guid: ecf47eede3abb274ea1e783f29462692,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 1.3999634
-      objectReference: {fileID: 0}
-    - target: {fileID: 7100809732264203222, guid: ecf47eede3abb274ea1e783f29462692,
+    - target: {fileID: 940729174954748449, guid: ecf47eede3abb274ea1e783f29462692,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.14465332
+      value: -0.90560913
+      objectReference: {fileID: 0}
+    - target: {fileID: 7103201347881672531, guid: ecf47eede3abb274ea1e783f29462692,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 2.5705566
       objectReference: {fileID: 0}
     - target: {fileID: 8818601149653250340, guid: ecf47eede3abb274ea1e783f29462692,
         type: 3}
