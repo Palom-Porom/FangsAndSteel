@@ -3,28 +3,26 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
-using TMPro;
         
 public class StaticUIRefs : MonoBehaviour
 {
-    [HideInInspector] public static StaticUIRefs Instance { get; private set; }
-    [HideInInspector] public TextMeshProUGUI HpText { get { return hpText; } }
+    public static StaticUIRefs Instance { get; private set; }
+    public TextMeshProUGUI HpText { get { return hpText; } }
     private TextMeshProUGUI hpText;
-    [HideInInspector] public TextMeshProUGUI AttackText { get { return attackText; } }
+    public TextMeshProUGUI AttackText { get { return attackText; } }
     private TextMeshProUGUI attackText;
-    [HideInInspector] public TextMeshProUGUI ReloadText { get { return reloadText; } }
+    public TextMeshProUGUI ReloadText { get { return reloadText; } }
     private TextMeshProUGUI reloadText;
-    [HideInInspector] public TextMeshProUGUI AttackRadiusText { get { return attackRadiusText; } }
+    public TextMeshProUGUI AttackRadiusText { get { return attackRadiusText; } }
     private TextMeshProUGUI attackRadiusText;
-    [HideInInspector] public TextMeshProUGUI MovementText { get { return movementText; } }
+     public TextMeshProUGUI MovementText { get { return movementText; } }
     private TextMeshProUGUI movementText;
-    [SerializeField] public Image TurnIndicator { get { return turnIndicator; } }
-    public Image turnIndicator;
-    [SerializeField] public TextMeshProUGUI TurnTimer { get { return turnTimer; } }
-    public TextMeshProUGUI turnTimer;
+    public Image TurnIndicator { get { return turnIndicator; } }
+    [SerializeField] private Image turnIndicator;
+    public TextMeshProUGUI TurnTimer { get { return turnTimer; } }
+    [SerializeField] private TextMeshProUGUI turnTimer;
 
-    public GameObject unitStats;
+    [SerializeField] private GameObject unitStats;
 
     void Awake()
     {

@@ -22,6 +22,7 @@ public partial struct AttackSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<AttackRequestComponent>();
+
         hpLookup = state.GetComponentLookup<HpComponent>();
         fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
         unitsIconsLookup = state.GetComponentLookup<UnitsIconsComponent>(true);
@@ -88,5 +89,10 @@ public partial struct AttackJob : IJobEntity
 
         }
         ecb.DestroyEntity(chunkIndexInQuery, requestEntity);
+    }
+
+    public void OnDestroy(ref SystemState state)
+    {
+        Debug.Log("Destroyed Attack System");
     }
 }

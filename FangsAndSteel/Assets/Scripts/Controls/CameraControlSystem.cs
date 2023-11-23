@@ -21,6 +21,7 @@ public partial class CameraControlSystem : SystemBase
 
     protected override void OnCreate()
     {
+        RequireForUpdate<GameTag>();
         RequireForUpdate<InputData>();
     }
 

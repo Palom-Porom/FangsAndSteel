@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,8 +10,8 @@ public class ExitButtonScript : MonoBehaviour
     Button button;
     public void GoInMainMenu()
     {
-        SceneManager.LoadScene("MainMenu");
-        SceneManager.UnloadSceneAsync("SampleScene");
+        TurnSystem.timeToRun = 0;
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
     private void Awake()

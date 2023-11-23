@@ -11,11 +11,12 @@ public partial class TurnSystem : SystemBase
 
     const float TURN_LEN = 10; 
     StaticUIData uIData;
-    float timeToRun;
+    public static float timeToRun;
     bool orderPhase;
 
     protected override void OnCreate()
     {
+        RequireForUpdate<GameTag>();
         RequireForUpdate<StaticUIData>();
         timeToRun = 0;
         orderPhase = true;
@@ -26,7 +27,10 @@ public partial class TurnSystem : SystemBase
         EnableEngageSystems(!orderPhase);
     }
 
-    public void OnStopRunning(ref SystemState state) { }
+    public void OnStopRunning(ref SystemState state) 
+    {
+        
+    }
 
     
     protected override void OnUpdate()
