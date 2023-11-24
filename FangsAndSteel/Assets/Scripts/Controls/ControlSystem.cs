@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
 public partial class ControlSystem : SystemBase
 {
-    private ControlsAsset controlsAssetClass;
+    static public ControlsAsset controlsAssetClass;
     private RefRW<InputData> inputDataSingleton;
 
     //Targeting
@@ -20,12 +20,10 @@ public partial class ControlSystem : SystemBase
 
     protected override void OnCreate()
     {
+        RequireForUpdate<GameTag>();
+
         controlsAssetClass = new ControlsAsset();
         EntityManager.AddComponent<InputData>(SystemHandle);
-
-        controlsAssetClass.Game.TargetSelectedUnits.performed += CollectTargetingInfo;
-        controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += CollectTargetingInfo;
-        controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += SetFlagForShiftTargeting;
     }
 
     protected override void OnDestroy()
@@ -34,8 +32,24 @@ public partial class ControlSystem : SystemBase
     }
 
 
-    protected override void OnStartRunning() => controlsAssetClass.Enable();
-    protected override void OnStopRunning() => controlsAssetClass.Disable();
+    protected override void OnStartRunning()
+    {
+        controlsAssetClass.Enable();
+
+        controlsAssetClass.Game.TargetSelectedUnits.performed += CollectTargetingInfo;
+        controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += CollectTargetingInfo;
+        controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += SetFlagForShiftTargeting;
+        //controlsAssetClass.Game.OpenCloseEscMenu.performed += StaticUIRefs.Instance.GetComponent<EscButtonPush>().OpenCloseMenu;
+    }
+    protected override void OnStopRunning()
+    {
+        controlsAssetClass.Game.TargetSelectedUnits.performed -= CollectTargetingInfo;
+        controlsAssetClass.Game.Shift_TargetSelectedUnits.performed -= CollectTargetingInfo;
+        controlsAssetClass.Game.Shift_TargetSelectedUnits.performed -= SetFlagForShiftTargeting;
+        //controlsAssetClass.Game.OpenCloseEscMenu.performed -= StaticUIRefs.Instance.GetComponent<EscButtonPush>().OpenCloseMenu;
+
+        controlsAssetClass.Disable();
+    }
 
 
     protected override void OnUpdate()

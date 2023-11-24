@@ -1,14 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
 
+[BurstCompile]
 public partial struct BasicButtonSystem : ISystem
 {
     const float STNDRT_SPD = 3;
-    const float BSTD_SPD = 6; 
+    const float BSTD_SPD = 6;
+
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<StaticUIData>();
@@ -16,6 +20,8 @@ public partial struct BasicButtonSystem : ISystem
 
 
     StaticUIData uiData;
+
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         uiData = SystemAPI.GetSingleton<StaticUIData>();

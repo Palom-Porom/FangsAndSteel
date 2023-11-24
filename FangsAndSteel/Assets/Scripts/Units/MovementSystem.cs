@@ -22,7 +22,7 @@ public partial struct MovementSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state) 
     {
-        var moveJob = new MovementJob { time = SystemAPI.Time.DeltaTime, collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld };
+        var moveJob = new MovementJob { deltaTime = SystemAPI.Time.DeltaTime, collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld };
         moveJob.Schedule();
     }
 
@@ -35,8 +35,9 @@ public partial struct MovementSystem : ISystem
 [BurstCompile]
 public partial struct MovementJob : IJobEntity
 {
+    private const float ROT_TIME = 0.33f;
 
-    public float time;
+    public float deltaTime;
     [ReadOnly] public CollisionWorld collisionWorld;
 
 
@@ -45,8 +46,9 @@ public partial struct MovementJob : IJobEntity
         if (!movementComponent.isMoving)
             return;
 
-        if (math.distancesq(movementComponent.target, transform.Position) < (time * movementComponent.speed) / 2)
+        if (math.distancesq(movementComponent.target, transform.Position) < (deltaTime * movementComponent.speed) / 2)
         {
+            //Has next target to move?
             if (movementCommandsBuffer.Length != 0)
             {
                 movementComponent.target = movementCommandsBuffer[0].target;
@@ -62,7 +64,7 @@ public partial struct MovementJob : IJobEntity
         float3 tempDir = movementComponent.target - transform.Position;
         tempDir.y = 0;
         tempDir = math.normalize(tempDir);
-        float speed = time * movementComponent.speed;
+        float speed = deltaTime * movementComponent.speed;
 
         CollisionFilter filter = new CollisionFilter
         {
@@ -76,7 +78,21 @@ public partial struct MovementJob : IJobEntity
         {
             if (closestHit.SurfaceNormal.y < 0f)
                 closestHit.SurfaceNormal = -closestHit.SurfaceNormal;
-            transform.Rotation = quaternion.LookRotationSafe(closestHit.Position - transform.Position, closestHit.SurfaceNormal);
+            //Debug.Log(transform.Rotation.value - quaternion.LookRotationSafe(closestHit.Position - transform.Position, closestHit.SurfaceNormal).value);
+            quaternion targetRot = quaternion.LookRotationSafe(closestHit.Position - transform.Position, closestHit.SurfaceNormal);
+            if (movementComponent.lastRotTarget.Equals(targetRot))
+            {
+                if (movementComponent.rotTimePassed < ROT_TIME)
+                {
+                    movementComponent.rotTimePassed += deltaTime;
+                    transform.Rotation = math.nlerp(transform.Rotation, targetRot, movementComponent.rotTimePassed / ROT_TIME);
+                }
+            }
+            else
+            {
+                movementComponent.rotTimePassed = deltaTime;
+                transform.Rotation = math.nlerp(transform.Rotation, targetRot, deltaTime / ROT_TIME);
+            }
             transform.Position = closestHit.Position;
         }
         else
