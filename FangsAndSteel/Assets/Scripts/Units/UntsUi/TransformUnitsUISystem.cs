@@ -17,6 +17,7 @@ public partial class TransformUnitsUISystem : SystemBase
 {
     Transform cameraTransform;
     ComponentLookup<LocalTransform> localTransformLookup;
+    ComponentLookup<FillFloatOverride> fillBarLookup;
 
     protected override void OnCreate()
     {
@@ -26,12 +27,13 @@ public partial class TransformUnitsUISystem : SystemBase
 
 
         localTransformLookup = GetComponentLookup<LocalTransform>();
+        fillBarLookup = GetComponentLookup<FillFloatOverride>();
     }
 
     protected override void OnStartRunning()
     {
         cameraTransform = Camera.main.transform;
-        new UpdateBarsJob { fillBarLookup = GetComponentLookup<FillFloatOverride>() }.Schedule();
+        new InitializeBarsJob { fillBarLookup = GetComponentLookup<FillFloatOverride>() }.Schedule();
 
     }
     protected override void OnUpdate()
@@ -39,14 +41,15 @@ public partial class TransformUnitsUISystem : SystemBase
         float3 position = cameraTransform.position;
         float3 camRight = cameraTransform.right;
         localTransformLookup.Update(this);
+        fillBarLookup.Update(this);
         TransformUnitsUIJob transformUnitsUIJob = new TransformUnitsUIJob 
         {
             camPosition = position, camRight = camRight,
             localTransformLookup = localTransformLookup
         };
         transformUnitsUIJob.Schedule();
-        
-    
+
+        new UpdateBarsJob { fillBarLookup = GetComponentLookup<FillFloatOverride>() }.Schedule();
     }
 
 }
@@ -78,10 +81,23 @@ public partial struct UpdateBarsJob : IJobEntity
 
     public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackComponent attackComponent)
     {
+        //Update ReloadBar
+        fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = attackComponent.curReload / attackComponent.reloadLen;
+    }
+}
+
+
+[BurstCompile]
+public partial struct InitializeBarsJob : IJobEntity
+{
+    public ComponentLookup<FillFloatOverride> fillBarLookup;
+
+    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackComponent attackComponent)
+    {
         //RefRW<FillFloatOverride> fillComponent = fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity);
         //fillComponent.ValueRW.Value = hpComponent.curHp / hpComponent.maxHp;
         //Update HealthBar
-        fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity).ValueRW.Value = hpComponent.curHp / hpComponent.maxHp;
+        fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity).ValueRW.Value = hpComponent.curHp / (float)hpComponent.maxHp;
         //Update ReloadBar
         fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = attackComponent.curReload / attackComponent.reloadLen;
     }

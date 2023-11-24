@@ -52,11 +52,6 @@ public partial struct AttackSystem : ISystem
             
         //}
     }
-
-    public void OnDestroy(ref SystemState state)
-    {
-        Debug.Log("Destroyed Attack System");
-    }
 }
 
 [BurstCompile]
@@ -73,7 +68,7 @@ public partial struct AttackJob : IJobEntity
         //Decrease health
         hpComponent.ValueRW.curHp -= attackRequest.damage;
         //Update HealthBar
-        fillBarLookup.GetRefRW(unitsIconsLookup[attackRequest.target].healthBarEntity).ValueRW.Value = hpComponent.ValueRO.curHp / hpComponent.ValueRO.maxHp;
+        fillBarLookup.GetRefRW(unitsIconsLookup[attackRequest.target].healthBarEntity).ValueRW.Value = (float)hpComponent.ValueRO.curHp / hpComponent.ValueRO.maxHp;
         //Killing the functionality of Unit and setting request for delayed physcial death (DeadComponent)
         if (hpComponent.ValueRO.curHp <= 0)
         {
