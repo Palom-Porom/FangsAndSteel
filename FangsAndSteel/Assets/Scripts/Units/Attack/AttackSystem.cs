@@ -52,6 +52,11 @@ public partial struct AttackSystem : ISystem
             
         //}
     }
+
+    public void OnDestroy(ref SystemState state)
+    {
+        Debug.Log("Destroyed Attack System");
+    }
 }
 
 [BurstCompile]
@@ -89,10 +94,5 @@ public partial struct AttackJob : IJobEntity
 
         }
         ecb.DestroyEntity(chunkIndexInQuery, requestEntity);
-    }
-
-    public void OnDestroy(ref SystemState state)
-    {
-        Debug.Log("Destroyed Attack System");
     }
 }

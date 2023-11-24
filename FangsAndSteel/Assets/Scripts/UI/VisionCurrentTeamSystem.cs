@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
@@ -10,6 +11,7 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 //ISystem - более производительный, но нельзя использовать ссылочный тип данных (классы)
 //SystemBase - менее производительный, но можно использовать ссылочный тип данных (классы)
+[BurstCompile]
 public partial struct VisionCurrentTeamSystem : ISystem 
 {
     BufferLookup<Child> children;
@@ -17,6 +19,7 @@ public partial struct VisionCurrentTeamSystem : ISystem
 
     EntityCommandBuffer ecb;
 
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         // Если нет ни единого экземпляра компонента, который мы указали в <>, то система не будет обновляться вплоть до момента, пока не появится хотя бы один экземпляр
@@ -27,6 +30,8 @@ public partial struct VisionCurrentTeamSystem : ISystem
         children = SystemAPI.GetBufferLookup<Child>();
         disableRendLookup = SystemAPI.GetComponentLookup<DisableRendering>();
     }
+
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         children.Update(ref state);
@@ -46,6 +51,8 @@ public partial struct VisionCurrentTeamSystem : ISystem
     }
 }
 
+
+[BurstCompile]
 public partial struct VisionCurrentTeamJob : IJobEntity
 {
     // in - чтение компонента, ref - чтение и запись (Возможность редактирования) компонента

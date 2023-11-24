@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -50,6 +51,7 @@ public partial class TransformUnitsUISystem : SystemBase
 
 }
 
+[BurstCompile]
 public partial struct TransformUnitsUIJob : IJobEntity
 {
     public float3 camPosition;
@@ -69,6 +71,7 @@ public partial struct TransformUnitsUIJob : IJobEntity
 
 }
 
+[BurstCompile]
 public partial struct UpdateBarsJob : IJobEntity
 {
     public ComponentLookup<FillFloatOverride> fillBarLookup;

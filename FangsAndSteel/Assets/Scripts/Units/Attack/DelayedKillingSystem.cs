@@ -5,18 +5,23 @@ using Unity.Jobs;
 using Unity.Transforms;
 using Unity.Collections;
 using UnityEngine;
+using Unity.Burst;
 
+[BurstCompile]
 public partial struct DelayedKillingSystem : ISystem
 {
     BufferLookup<Child> childrenLookup;
     EntityCommandBuffer ecb;
 
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<DeadComponent>();
 
         childrenLookup = state.GetBufferLookup<Child>(true);
     }
+
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         childrenLookup.Update(ref state);
@@ -42,6 +47,7 @@ public partial struct DelayedKillingSystem : ISystem
     }
 }
 
+[BurstCompile]
 public partial struct DestroyingDeadJob : IJobEntity
 {
     [ReadOnly] public BufferLookup<Child> childrenLookup;
