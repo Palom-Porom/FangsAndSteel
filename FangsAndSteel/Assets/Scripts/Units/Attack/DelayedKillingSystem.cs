@@ -7,6 +7,7 @@ using Unity.Collections;
 using UnityEngine;
 using Unity.Burst;
 
+[UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
 public partial struct DelayedKillingSystem : ISystem
 {

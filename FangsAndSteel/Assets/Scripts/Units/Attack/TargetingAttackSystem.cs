@@ -9,7 +9,7 @@ using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 
-[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
+[UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
 public partial struct TargetingAttackSystem : ISystem
 {

@@ -13,6 +13,8 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
+
+[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [BurstCompile]
 public partial struct VisionMapSystem : ISystem
 {

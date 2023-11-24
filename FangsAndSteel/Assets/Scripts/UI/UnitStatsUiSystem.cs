@@ -7,7 +7,7 @@ using Unity.Mathematics;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-[UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
+[UpdateInGroup(typeof(NoJobsSystemGroup))]
 public partial class UnitStatsUiSystem : SystemBase
 {
     ComponentLookup<HpComponent> hpStats;

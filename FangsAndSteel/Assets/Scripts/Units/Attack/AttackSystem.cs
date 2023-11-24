@@ -9,6 +9,7 @@ using UnityEngine;
 
 //All attacks are processed with a latency in 1 frame. May be there is a better solution?..
 //Not sure about using InitializationGroup as there are a lot of .Complete()-s, as I suppose
+[UpdateInGroup(typeof(UnitsSystemGroup))]
 [UpdateAfter(typeof(TargetingAttackSystem))]
 [BurstCompile]
 public partial struct AttackSystem : ISystem

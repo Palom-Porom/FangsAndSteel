@@ -9,6 +9,7 @@ using UnityEngine;
 using Unity.Collections;
 using System.Net.Security;
 
+[UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
 public partial struct MovementSystem : ISystem
 {

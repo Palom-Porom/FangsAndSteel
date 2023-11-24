@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 
+[UpdateInGroup(typeof(ControlsSystemGroup))]
 public partial class CameraControlSystem : SystemBase
 {
     private InputData inputData;

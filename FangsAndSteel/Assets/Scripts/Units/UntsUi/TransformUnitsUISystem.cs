@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 
+[UpdateInGroup(typeof(UnitsSystemGroup), OrderLast = true)]
 public partial class TransformUnitsUISystem : SystemBase
 {
     Transform cameraTransform;

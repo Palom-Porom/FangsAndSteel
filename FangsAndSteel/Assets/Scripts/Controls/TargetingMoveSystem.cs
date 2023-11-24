@@ -7,7 +7,8 @@ using Unity.Jobs;
 using Unity.Physics;
 using UnityEngine;
 
-[UpdateBefore(typeof(MovementSystem))]
+[UpdateInGroup(typeof(ControlsSystemGroup), OrderFirst = true)]
+[UpdateAfter(typeof(ControlSystem))]
 [BurstCompile]
 public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 {

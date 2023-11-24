@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-[UpdateAfter(typeof(ControlSystem))]
+[UpdateInGroup(typeof(StaticUISystemGroup), OrderFirst = true)]
 public partial class StaticUISystem : SystemBase
 {
     RefRW<StaticUIData> uiData;
