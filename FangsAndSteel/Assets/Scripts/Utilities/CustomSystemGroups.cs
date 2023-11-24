@@ -19,3 +19,6 @@ public partial class ControlsSystemGroup : ComponentSystemGroup { }
 
 [UpdateAfter(typeof(ControlsSystemGroup))]
 public partial class UnitsSystemGroup : ComponentSystemGroup { }
+
+[UpdateAfter(typeof(UnitsSystemGroup))]
+public partial class AfterUnitsSystemGroup : ComponentSystemGroup { }

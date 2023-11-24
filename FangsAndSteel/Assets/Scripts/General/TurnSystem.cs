@@ -71,8 +71,6 @@ public partial class TurnSystem : SystemBase
 
     private void EnableEngageSystems (bool enable)
     {
-        World.Unmanaged.GetExistingSystemState<MovementSystem>().Enabled = enable;
-        World.Unmanaged.GetExistingSystemState<TargetingAttackSystem>().Enabled = enable;
-        World.Unmanaged.GetExistingSystemState<AttackSystem>().Enabled = enable;
+        World.Unmanaged.GetExistingSystemState<UnitsSystemGroup>().Enabled = enable;
     }
 }
