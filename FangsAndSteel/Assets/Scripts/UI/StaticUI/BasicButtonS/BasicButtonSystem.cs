@@ -10,18 +10,15 @@ using UnityEngine;
 [BurstCompile]
 public partial struct BasicButtonSystem : ISystem
 {
-    const float STNDRT_SPD = 3;
-    const float BSTD_SPD = 6;
-
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<StaticUIData>();
+        state.RequireForUpdate<AttackSettingsComponent>();
     }
 
 
     StaticUIData uiData;
-
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
@@ -36,16 +33,15 @@ public partial struct BasicButtonSystem : ISystem
 
         if (uiData.changeSpeedBut)
         {
-
-            foreach ((SelectTag selectTag, RefRW<MovementComponent> movementComponent) in SystemAPI.Query<SelectTag, RefRW<MovementComponent>>())
-            { 
-                if (movementComponent.ValueRW.speed == BSTD_SPD) 
-                {
-                    movementComponent.ValueRW.speed = STNDRT_SPD;
-                }
-                else { movementComponent.ValueRW.speed = BSTD_SPD; }
-            }
+            new ChangeShootModeJob().Schedule();
         }
+    }
+}
+public partial struct ChangeShootModeJob : IJobEntity
+{
+    public void Execute(ref AttackSettingsComponent attackSettingsComponent, in SelectTag selectTag)
+    {
+        attackSettingsComponent.shootingOnMoveMode = !(attackSettingsComponent.shootingOnMoveMode);
     }
 }
     
