@@ -75,7 +75,9 @@ public partial struct AttackJob : IJobEntity
         {
             ecb.RemoveComponent<HpComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<AttackComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<AttackSettingsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<MovementCommandsBuffer>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<VisibilityComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<VisionCharsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<TeamComponent>(chunkIndexInQuery, attackRequest.target);
