@@ -7,20 +7,18 @@ using Unity.Transforms;
 using UnityEngine;
 
 [UpdateInGroup(typeof(StaticUISystemGroup))]
-[BurstCompile]
-public partial struct BasicButtonSystem : ISystem
+public partial class BasicButtonSystem : SystemBase
 {
-    [BurstCompile]
-    public void OnCreate(ref SystemState state)
+    
+    protected override void OnCreate()
     {
-        state.RequireForUpdate<StaticUIData>();
-        state.RequireForUpdate<AttackSettingsComponent>();
+        RequireForUpdate<StaticUIData>();
+        RequireForUpdate<AttackSettingsComponent>();
     }
 
 
     StaticUIData uiData;
-    [BurstCompile]
-    public void OnUpdate(ref SystemState state)
+    protected override void OnUpdate()
     {
         uiData = SystemAPI.GetSingleton<StaticUIData>();
         if (uiData.stopMoveBut)
@@ -34,6 +32,9 @@ public partial struct BasicButtonSystem : ISystem
         if (uiData.changeSpeedBut)
         {
             new ChangeShootModeJob().Schedule();
+            Color c = StaticUIRefs.Instance.ShootModeButton.color;
+            StaticUIRefs.Instance.ShootModeButton.color = new Color((c.r + 1) % 2, (c.g + 1) % 2, 0);
+
         }
     }
 }

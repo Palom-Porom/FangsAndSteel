@@ -17,12 +17,18 @@ public class StaticUIRefs : MonoBehaviour
     private TextMeshProUGUI attackRadiusText;
      public TextMeshProUGUI MovementText { get { return movementText; } }
     private TextMeshProUGUI movementText;
+    public TextMeshProUGUI VisionRadiusText { get { return visionRadiusText; } }
+    private TextMeshProUGUI visionRadiusText;
+
+    [SerializeField] private GameObject unitStats;
+
     public Image TurnIndicator { get { return turnIndicator; } }
     [SerializeField] private Image turnIndicator;
     public TextMeshProUGUI TurnTimer { get { return turnTimer; } }
     [SerializeField] private TextMeshProUGUI turnTimer;
 
-    [SerializeField] private GameObject unitStats;
+    public Image ShootModeButton { get { return shootModeButton; } }
+    [SerializeField] private Image shootModeButton;
 
     void Awake()
     {
@@ -36,6 +42,7 @@ public class StaticUIRefs : MonoBehaviour
         reloadText = unitStats.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
         attackRadiusText = unitStats.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
         movementText = unitStats.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
+        visionRadiusText = unitStats.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
     }
 
     [HideInInspector] public bool endTurnBut;

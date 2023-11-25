@@ -55,7 +55,7 @@ public partial class SelectionSystem : SystemBase
         allSelected = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
         allSelectable = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
 
-        if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestComponent>(out unitStatsRqstEntity))
+        if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
             unitStatsRqstEntity = Entity.Null;
         new DeselectAllUnitsJob 
         { 
@@ -98,7 +98,7 @@ public partial class SelectionSystem : SystemBase
             selectLookup.Update(this);
             ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
-            if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestComponent>(out unitStatsRqstEntity))
+            if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
                 unitStatsRqstEntity = Entity.Null;
 
             if (isDragging)
@@ -113,7 +113,7 @@ public partial class SelectionSystem : SystemBase
 
                 //removing stats for single unit selection
                 if (unitStatsRqstEntity != Entity.Null)
-                    ecb.RemoveComponent<UnitStatsRequestComponent>(unitStatsRqstEntity);
+                    ecb.RemoveComponent<UnitStatsRequestTag>(unitStatsRqstEntity);
 
                 new MultipleSelectJob
                 {
@@ -180,7 +180,7 @@ public partial struct DeselectAllUnitsJob : IJobEntity
 
         //hiding stats for single unit selection
         if (unitStatsRqstEntity != Entity.Null)
-            ecb.RemoveComponent<UnitStatsRequestComponent>(chunkIndexInQuery, unitStatsRqstEntity);
+            ecb.RemoveComponent<UnitStatsRequestTag>(chunkIndexInQuery, unitStatsRqstEntity);
     }
 }
 
@@ -208,7 +208,7 @@ public partial struct SingleSelectJob : IJob
 
                 //showing stats for single unit selection
                 //Entity unitStatsRqstEntity = ecb.CreateEntity();
-                ecb.AddComponent(raycastHit.Entity, new UnitStatsRequestComponent());
+                ecb.AddComponent(raycastHit.Entity, new UnitStatsRequestTag());
             }
         }
     }
