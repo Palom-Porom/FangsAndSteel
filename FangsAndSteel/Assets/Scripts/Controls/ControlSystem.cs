@@ -39,14 +39,12 @@ public partial class ControlSystem : SystemBase
         controlsAssetClass.Game.TargetSelectedUnits.performed += CollectTargetingInfo;
         controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += CollectTargetingInfo;
         controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += SetFlagForShiftTargeting;
-        //controlsAssetClass.Game.OpenCloseEscMenu.performed += StaticUIRefs.Instance.GetComponent<EscButtonPush>().OpenCloseMenu;
     }
     protected override void OnStopRunning()
     {
         controlsAssetClass.Game.TargetSelectedUnits.performed -= CollectTargetingInfo;
         controlsAssetClass.Game.Shift_TargetSelectedUnits.performed -= CollectTargetingInfo;
         controlsAssetClass.Game.Shift_TargetSelectedUnits.performed -= SetFlagForShiftTargeting;
-        //controlsAssetClass.Game.OpenCloseEscMenu.performed -= StaticUIRefs.Instance.GetComponent<EscButtonPush>().OpenCloseMenu;
 
         controlsAssetClass.Disable();
     }

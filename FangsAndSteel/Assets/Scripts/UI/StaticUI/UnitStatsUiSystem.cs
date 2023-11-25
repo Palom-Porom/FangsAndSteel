@@ -16,9 +16,6 @@ public partial class UnitStatsUiSystem : SystemBase
     protected override void OnCreate()
     {
         RequireForUpdate<UnitStatsRequestComponent>();
-        //RequireForUpdate<HpComponent>();
-        //RequireForUpdate<AttackComponent>();
-        //RequireForUpdate<MovementComponent>();
         hpStats = SystemAPI.GetComponentLookup<HpComponent>();
         attackStats = SystemAPI.GetComponentLookup<AttackComponent>();
         movementStats = SystemAPI.GetComponentLookup<MovementComponent>();

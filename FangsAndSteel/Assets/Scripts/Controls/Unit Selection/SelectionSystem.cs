@@ -207,7 +207,7 @@ public partial struct SingleSelectJob : IJob
                 ecb.RemoveComponent<DisableRendering>(selectTagLookup[raycastHit.Entity].selectionRing);
 
                 //showing stats for single unit selection
-                //Entity unitStatsRqstEntity = ecb.CreateEntity();
+               // Entity unitStatsRqstEntity = ecb.CreateEntity();
                 //ecb.AddComponent(unitStatsRqstEntity, new UnitStatsRequestComponent { entity = raycastHit.Entity });
             }
         }

@@ -11,12 +11,9 @@ public class EscButtonPush : MonoBehaviour
     public GameObject gameActiveUI;
     public GameObject escUI;
     public GameObject settingsWindow;
-    private ControlsAsset escPush;
     
     private void Awake()
     {
-        //escPush = new ControlsAsset();
-        //escPush.Game.OpenCloseEscMenu.performed += context => OpenCloseMenu();
         ControlSystem.controlsAssetClass.Game.OpenCloseEscMenu.performed += OpenCloseMenu;
     }
 
@@ -28,11 +25,6 @@ public class EscButtonPush : MonoBehaviour
     public void OpenCloseMenu(InputAction.CallbackContext context) => OpenCloseMenu();
     public void OpenCloseMenu()
     {
-        if (settingsWindow == null)
-        {
-            Debug.Log("Settings window is null");
-            return;
-        }
         if (settingsWindow.activeSelf) { settingsWindow.SetActive(!settingsWindow.activeSelf); }
         else
         {
