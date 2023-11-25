@@ -113,7 +113,7 @@ public partial class SelectionSystem : SystemBase
 
                 //removing stats for single unit selection
                 if (unitStatsRqstEntity != Entity.Null)
-                    ecb.DestroyEntity(unitStatsRqstEntity);
+                    ecb.RemoveComponent<UnitStatsRequestComponent>(unitStatsRqstEntity);
 
                 new MultipleSelectJob
                 {
@@ -180,7 +180,7 @@ public partial struct DeselectAllUnitsJob : IJobEntity
 
         //hiding stats for single unit selection
         if (unitStatsRqstEntity != Entity.Null)
-            ecb.DestroyEntity(chunkIndexInQuery, unitStatsRqstEntity);
+            ecb.RemoveComponent<UnitStatsRequestComponent>(chunkIndexInQuery, unitStatsRqstEntity);
     }
 }
 
@@ -207,8 +207,8 @@ public partial struct SingleSelectJob : IJob
                 ecb.RemoveComponent<DisableRendering>(selectTagLookup[raycastHit.Entity].selectionRing);
 
                 //showing stats for single unit selection
-               // Entity unitStatsRqstEntity = ecb.CreateEntity();
-                //ecb.AddComponent(unitStatsRqstEntity, new UnitStatsRequestComponent { entity = raycastHit.Entity });
+                //Entity unitStatsRqstEntity = ecb.CreateEntity();
+                ecb.AddComponent(raycastHit.Entity, new UnitStatsRequestComponent());
             }
         }
     }

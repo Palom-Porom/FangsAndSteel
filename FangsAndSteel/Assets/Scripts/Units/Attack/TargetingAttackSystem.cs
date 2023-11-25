@@ -67,7 +67,7 @@ public partial struct TargetingAttackSystem : ISystem
 /// <summary>
 /// Checks all current attack targets and searches for new ones
 /// </summary>
-[BurstCompile]
+//[BurstCompile]
 public partial struct AttackTargetingJob : IJobEntity
 {
     [ReadOnly] public ComponentLookup<HpComponent> hpLookup;
@@ -99,7 +99,7 @@ public partial struct AttackTargetingJob : IJobEntity
         //If has valid target -> create an attackRequest and return
         if (attack.target != Entity.Null
             && math.distancesq(localToWorld.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq
-            && hpLookup[attack.target].curHp > 0)
+            && hpLookup.HasComponent(attack.target))
         {
             Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
             ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = attack.target, damage = attack.damage });
