@@ -16,3 +16,12 @@ enum layers
     Terrain = 1024,
     Everything = 1215
 }
+
+enum basicAnims
+{
+    Rest,
+    Movement,
+    Attack,
+    Recharge,
+    Death
+}

@@ -31,7 +31,7 @@ public partial class UnitStatsUiSystem : SystemBase
         hpStats.Update(this);
         attackStats.Update(this);
         movementStats.Update(this);
-        Entity entity = SystemAPI.GetSingleton<UnitStatsRequestComponent>().entity;
+        Entity entity = SystemAPI.GetSingletonEntity<UnitStatsRequestComponent>();
         StaticUIRefs.Instance.HpText.text = $"HP: {hpStats[entity].curHp} / {hpStats[entity].maxHp}";
         StaticUIRefs.Instance.AttackText.text = $"DMG: {attackStats[entity].damage}";
         StaticUIRefs.Instance.ReloadText.text = $"ReloadTime: {attackStats[entity].curReload} / {attackStats[entity].reloadLen}";
@@ -47,5 +47,4 @@ public partial class UnitStatsUiSystem : SystemBase
 
 public struct UnitStatsRequestComponent : IComponentData
 {
-    public Entity entity;
 }

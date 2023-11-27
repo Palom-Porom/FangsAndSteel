@@ -6,29 +6,50 @@ using Unity.Entities;
 using Unity.Transforms;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using AnimCooker;
+using Unity.Mathematics;
 
 //All attacks are processed with a latency in 1 frame. May be there is a better solution?..
 //Not sure about using InitializationGroup as there are a lot of .Complete()-s, as I suppose
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [UpdateAfter(typeof(TargetingAttackSystem))]
 [BurstCompile]
-public partial struct AttackSystem : ISystem
+public partial struct AttackSystem : ISystem, ISystemStartStop
 {
     ComponentLookup<HpComponent> hpLookup;
     ComponentLookup<FillFloatOverride> fillBarLookup;
     ComponentLookup<UnitsIconsComponent> unitsIconsLookup;
     BufferLookup<Child> childrenLookup;
 
+    ComponentLookup<AnimationCmdData> animCmdLookup;
+    ComponentLookup<AnimationStateData> animStateLookup;
+    BufferLookup<ModelsBuffer> modelBufLookup;
+    NativeArray<AnimDbEntry> deathClips;
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<AttackRequestComponent>();
+        state.RequireForUpdate<AnimDbRefData>();
 
         hpLookup = state.GetComponentLookup<HpComponent>();
         fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
         unitsIconsLookup = state.GetComponentLookup<UnitsIconsComponent>(true);
         childrenLookup = state.GetBufferLookup<Child>(true);
 
+        animCmdLookup = state.GetComponentLookup<AnimationCmdData>();
+        animStateLookup = state.GetComponentLookup<AnimationStateData>();
+        modelBufLookup = state.GetBufferLookup<ModelsBuffer>();
+    }
+
+    public void OnStartRunning(ref SystemState state)
+    {
+        deathClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Death_2");        
+    }
+
+    public void OnStopRunning(ref SystemState state)
+    {
+        
     }
 
     [BurstCompile]
@@ -38,6 +59,9 @@ public partial struct AttackSystem : ISystem
         fillBarLookup.Update(ref state);
         unitsIconsLookup.Update(ref state);
         childrenLookup.Update(ref state);
+        animCmdLookup.Update(ref state);
+        animStateLookup.Update(ref state);
+        modelBufLookup.Update(ref state);
         var ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
         new AttackJob 
         { 
@@ -45,7 +69,12 @@ public partial struct AttackSystem : ISystem
             fillBarLookup = fillBarLookup, 
             unitsIconsLookup = unitsIconsLookup, 
             childrenLookup = childrenLookup,
-            ecb = ecb 
+            ecb = ecb,
+            
+            animCmdLookup = animCmdLookup,
+            animStateLookup = animStateLookup,
+            modelBufLookup = modelBufLookup,
+            deathClips = deathClips
         }.Schedule();
 
         //foreach((MovementComponent move, Entity entity) in SystemAPI.Query<MovementComponent>().WithEntityAccess() )
@@ -55,7 +84,7 @@ public partial struct AttackSystem : ISystem
     }
 }
 
-[BurstCompile]
+//[BurstCompile]
 public partial struct AttackJob : IJobEntity
 {
     public ComponentLookup<HpComponent> hpLookup;
@@ -63,6 +92,12 @@ public partial struct AttackJob : IJobEntity
     [ReadOnly] public ComponentLookup<UnitsIconsComponent> unitsIconsLookup;
     [ReadOnly] public BufferLookup<Child> childrenLookup;
     public EntityCommandBuffer.ParallelWriter ecb;
+
+    public ComponentLookup<AnimationCmdData> animCmdLookup;
+    [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
+    [ReadOnly] public BufferLookup<ModelsBuffer> modelBufLookup;
+    public NativeArray<AnimDbEntry> deathClips;
+
     public void Execute(in AttackRequestComponent attackRequest, Entity requestEntity, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
         RefRW<HpComponent> hpComponent = hpLookup.GetRefRW(attackRequest.target);
@@ -70,12 +105,17 @@ public partial struct AttackJob : IJobEntity
         hpComponent.ValueRW.curHp -= attackRequest.damage;
         //Update HealthBar
         fillBarLookup.GetRefRW(unitsIconsLookup[attackRequest.target].healthBarEntity).ValueRW.Value = (float)hpComponent.ValueRO.curHp / hpComponent.ValueRO.maxHp;
+
         //Killing the functionality of Unit and setting request for delayed physcial death (DeadComponent)
         if (hpComponent.ValueRO.curHp <= 0)
         {
+            ecb.AddComponent(chunkIndexInQuery, attackRequest.target, new DeadComponent { timeToDie = hpComponent.ValueRO.timeToDie});
+
             ecb.RemoveComponent<HpComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<AttackComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<AttackSettingsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<MovementCommandsBuffer>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<VisibilityComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<VisionCharsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<TeamComponent>(chunkIndexInQuery, attackRequest.target);
@@ -86,9 +126,23 @@ public partial struct AttackJob : IJobEntity
             UtilityFuncs.DestroyParentAndAllChildren(ecb, childrenLookup, unitsIconsLookup[attackRequest.target].infoQuadsEntity, chunkIndexInQuery);
             ecb.RemoveComponent<UnitsIconsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<UnitStatsRequestComponent>(chunkIndexInQuery, attackRequest.target);
-            ecb.AddComponent(chunkIndexInQuery, attackRequest.target, new DeadComponent { timeToDie = hpComponent.ValueRO.timeToDie });
 
+            //Play Death anim
+            float maxTimeToDie = float.MinValue;
+            if (modelBufLookup.HasBuffer(attackRequest.target))
+            {
+                foreach (var modelBufElem in modelBufLookup[attackRequest.target])
+                {
+                    AnimDbEntry deathClip = deathClips[animStateLookup[modelBufElem.model].ModelIndex];
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = deathClip.ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnceAndStop;
+                    maxTimeToDie = math.max(maxTimeToDie, deathClip.GetLength());
+                }
+            }
+            
         }
+
         ecb.DestroyEntity(chunkIndexInQuery, requestEntity);
     }
 }
