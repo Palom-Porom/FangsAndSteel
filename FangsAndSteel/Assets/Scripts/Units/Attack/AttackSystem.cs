@@ -84,7 +84,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     }
 }
 
-[BurstCompile]
+//[BurstCompile]
 public partial struct AttackJob : IJobEntity
 {
     public ComponentLookup<HpComponent> hpLookup;
@@ -109,6 +109,8 @@ public partial struct AttackJob : IJobEntity
         //Killing the functionality of Unit and setting request for delayed physcial death (DeadComponent)
         if (hpComponent.ValueRO.curHp <= 0)
         {
+            ecb.AddComponent(chunkIndexInQuery, attackRequest.target, new DeadComponent { timeToDie = hpComponent.ValueRO.timeToDie});
+
             ecb.RemoveComponent<HpComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<AttackComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<AttackSettingsComponent>(chunkIndexInQuery, attackRequest.target);
@@ -127,15 +129,17 @@ public partial struct AttackJob : IJobEntity
 
             //Play Death anim
             float maxTimeToDie = float.MinValue;
-            foreach (var modelBufElem in modelBufLookup[attackRequest.target])
+            if (modelBufLookup.HasBuffer(attackRequest.target))
             {
-                AnimDbEntry deathClip = deathClips[animStateLookup[modelBufElem.model].ModelIndex];
-                RefRW <AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                animCmd.ValueRW.ClipIndex = deathClip.ClipIndex;
-                animCmd.ValueRW.Cmd = AnimationCmd.PlayOnceAndStop;
-                maxTimeToDie = math.max(maxTimeToDie, deathClip.GetLength());
+                foreach (var modelBufElem in modelBufLookup[attackRequest.target])
+                {
+                    AnimDbEntry deathClip = deathClips[animStateLookup[modelBufElem.model].ModelIndex];
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = deathClip.ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnceAndStop;
+                    maxTimeToDie = math.max(maxTimeToDie, deathClip.GetLength());
+                }
             }
-            ecb.AddComponent(chunkIndexInQuery, attackRequest.target, new DeadComponent { timeToDie = hpComponent.ValueRO.timeToDie});
             
         }
 
