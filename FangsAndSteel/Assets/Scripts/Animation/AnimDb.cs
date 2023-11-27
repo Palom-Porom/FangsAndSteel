@@ -11,7 +11,7 @@
 				dict["FirstRobot", "Attack"] = new AnimDbEntry { BeginFrame = 42, EndFrame = 59, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Attack", ModelIndex = 5, ClipIndex = 2 };
 				dict["FirstRobot", "Recharge"] = new AnimDbEntry { BeginFrame = 60, EndFrame = 80, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Recharge", ModelIndex = 5, ClipIndex = 3 };
 				dict["FirstRobot", "Death_1"] = new AnimDbEntry { BeginFrame = 81, EndFrame = 101, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Death_1", ModelIndex = 5, ClipIndex = 4 };
-				dict["FirstRobot", "Death_2"] = new AnimDbEntry { BeginFrame = 102, EndFrame = 116, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Death_2", ModelIndex = 5, ClipIndex = 5 };
+				dict["FirstRobot", "Death_2"] = new AnimDbEntry { BeginFrame = 102, EndFrame = 115, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Death_2", ModelIndex = 5, ClipIndex = 5 };
 				}
 			public enum Model { FirstRobot }
 			public enum FirstRobot { Rest, Movement, Attack, Recharge, Death_1, Death_2}

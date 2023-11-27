@@ -15,6 +15,8 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 {
     private InputData inputData;
 
+    ComponentLookup<AnimationCmdData> animCmdLookup;
+    ComponentLookup<AnimationStateData> animStateLookup;
     NativeArray<AnimDbEntry> moveClips;
 
     [BurstCompile]
@@ -24,14 +26,17 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
         state.RequireForUpdate<PhysicsWorldSingleton>();
         state.RequireForUpdate<InputData>();
         state.RequireForUpdate<MovementComponent>();
+        state.RequireForUpdate<AnimDbRefData>();
 
-        moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Move");
+        animCmdLookup = state.GetComponentLookup<AnimationCmdData>();
+        animStateLookup = state.GetComponentLookup<AnimationStateData>();
     }
 
     [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
         new PutAllOnTerrainJob { collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld }.Schedule();
+        moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Movement");
     }
 
     [BurstCompile]
@@ -46,6 +51,10 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 
         if (!inputData.neededTargeting)
             return;
+
+        animCmdLookup.Update(ref state);
+        animStateLookup.Update(ref state);
+
 
         RaycastInput raycastInput = new RaycastInput
         {
@@ -68,7 +77,14 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
             raycastResult = raycastResult
         }.Schedule(state.Dependency);
 
-        new ChangeTargetJob { raycastResult = raycastResult, shiftTargeting = inputData.shiftTargeting, moveClips = moveClips }.Schedule();
+        new ChangeTargetJob 
+        { 
+            raycastResult = raycastResult,
+            shiftTargeting = inputData.shiftTargeting,
+            animCmdLookup = animCmdLookup,
+            animStateLookup = animStateLookup,
+            moveClips = moveClips 
+        }.Schedule();
 
         raycastResult.Dispose(state.Dependency);
     }
@@ -85,8 +101,11 @@ public partial struct ChangeTargetJob : IJobEntity
     [ReadOnly]
     public NativeReference<RaycastResult> raycastResult;
     public bool shiftTargeting;
+
+    public ComponentLookup<AnimationCmdData> animCmdLookup;
+    [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
-    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in SelectTag selectTag, ref AnimationCmdData animCmd, in AnimationStateData animState)
+    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in SelectTag selectTag, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         var result = raycastResult.Value;
         if (!result.hasHit)
@@ -100,8 +119,13 @@ public partial struct ChangeTargetJob : IJobEntity
             moveComBuf.Clear();
             movementComponent.target = result.raycastHitInfo.Position;
             movementComponent.isMoving = true;
-            animCmd.ClipIndex = moveClips[animState.ModelIndex].ClipIndex;
-            animCmd.Cmd = AnimationCmd.SetPlayForever;
+            //Play move anim
+            foreach (var modelBufElem in modelsBuf)
+            {
+                RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+using AnimCooker;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
@@ -72,5 +73,7 @@ public partial class TurnSystem : SystemBase
     private void EnableEngageSystems (bool enable)
     {
         World.Unmanaged.GetExistingSystemState<UnitsSystemGroup>().Enabled = enable;
+        World.Unmanaged.GetExistingSystemState<VisionMapSystem>().Enabled = enable;
+        World.Unmanaged.GetExistingSystemState<AnimationSystem>().Enabled = enable;
     }
 }

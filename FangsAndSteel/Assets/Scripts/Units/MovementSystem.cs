@@ -12,8 +12,10 @@ using System.Net.Security;
 
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
-public partial struct MovementSystem : ISystem
+public partial struct MovementSystem : ISystem, ISystemStartStop
 {
+    ComponentLookup<AnimationCmdData> animCmdLookup;
+    ComponentLookup<AnimationStateData> animStateLookup;
     NativeArray<AnimDbEntry> restClips;
 
 
@@ -22,18 +24,35 @@ public partial struct MovementSystem : ISystem
     {
         state.RequireForUpdate<PhysicsWorldSingleton>();
         state.RequireForUpdate<MovementComponent>();
+        state.RequireForUpdate<AnimDbRefData>();
 
-        restClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Rest");
+        animCmdLookup = state.GetComponentLookup<AnimationCmdData>();
+        animStateLookup = state.GetComponentLookup<AnimationStateData>();
+    }
+
+    public void OnStartRunning(ref SystemState state)
+    {
+        restClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Rest");        
+    }
+
+    public void OnStopRunning(ref SystemState state)
+    {
+        
     }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state) 
     {
+        animCmdLookup.Update(ref state);
+        animStateLookup.Update(ref state);
+
         var moveJob = new MovementJob
         {
             deltaTime = SystemAPI.Time.DeltaTime,
             collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld,
 
+            animCmdLookup = animCmdLookup,
+            animStateLookup = animStateLookup,
             restClips = restClips
         };
         moveJob.Schedule();
@@ -53,9 +72,11 @@ public partial struct MovementJob : IJobEntity
     public float deltaTime;
     [ReadOnly] public CollisionWorld collisionWorld;
 
+    public ComponentLookup<AnimationCmdData> animCmdLookup;
+    [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> restClips;
 
-    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer, ref AnimationCmdData animCmd, in AnimationStateData animState)
+    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         if (!movementComponent.isMoving)
             return;
@@ -71,8 +92,12 @@ public partial struct MovementJob : IJobEntity
             else
             {
                 movementComponent.isMoving = false;
-                animCmd.ClipIndex = restClips[animState.ModelIndex].ClipIndex;
-                animCmd.Cmd = AnimationCmd.SetPlayForever;
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = restClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                }
                 return;
             } 
         }
