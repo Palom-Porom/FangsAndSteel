@@ -7,23 +7,20 @@ using Unity.Transforms;
 using UnityEngine;
 
 [UpdateInGroup(typeof(StaticUISystemGroup))]
-[BurstCompile]
-public partial struct BasicButtonSystem : ISystem
+public partial class BasicButtonSystem : SystemBase
 {
-    const float STNDRT_SPD = 3;
-    const float BSTD_SPD = 6;
 
-    [BurstCompile]
-    public void OnCreate(ref SystemState state)
+    ShootModeButChangeColorRqst shootButColorChangeRqst;
+    EntityCommandBuffer ecb;
+
+    protected override void OnCreate()
     {
-        state.RequireForUpdate<StaticUIData>();
+        RequireForUpdate<StaticUIData>();
+        RequireForUpdate<AttackSettingsComponent>();
     }
 
-
     StaticUIData uiData;
-
-    [BurstCompile]
-    public void OnUpdate(ref SystemState state)
+    protected override void OnUpdate()
     {
         uiData = SystemAPI.GetSingleton<StaticUIData>();
         if (uiData.stopMoveBut)
@@ -34,19 +31,32 @@ public partial struct BasicButtonSystem : ISystem
             }
         }
 
+        if (SystemAPI.TryGetSingleton<ShootModeButChangeColorRqst>(out shootButColorChangeRqst))
+        {
+            StaticUIRefs.Instance.ShootModeButton.color = shootButColorChangeRqst.color;
+            ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+            ecb.DestroyEntity(SystemAPI.GetSingletonEntity<ShootModeButChangeColorRqst>());
+        }
         if (uiData.changeSpeedBut)
         {
+            new ChangeShootModeJob().Schedule();
+            Color c = StaticUIRefs.Instance.ShootModeButton.color;
+            StaticUIRefs.Instance.ShootModeButton.color = new Color((c.r + 1) % 2, (c.g + 1) % 2, 0);
 
-            foreach ((SelectTag selectTag, RefRW<MovementComponent> movementComponent) in SystemAPI.Query<SelectTag, RefRW<MovementComponent>>())
-            { 
-                if (movementComponent.ValueRW.speed == BSTD_SPD) 
-                {
-                    movementComponent.ValueRW.speed = STNDRT_SPD;
-                }
-                else { movementComponent.ValueRW.speed = BSTD_SPD; }
-            }
         }
     }
+}
+public partial struct ChangeShootModeJob : IJobEntity
+{
+    public void Execute(ref AttackSettingsComponent attackSettingsComponent, in SelectTag selectTag)
+    {
+        attackSettingsComponent.shootingOnMoveMode = !(attackSettingsComponent.shootingOnMoveMode);
+    }
+}
+
+public struct ShootModeButChangeColorRqst : IComponentData
+{
+    public Color color;
 }
     
 

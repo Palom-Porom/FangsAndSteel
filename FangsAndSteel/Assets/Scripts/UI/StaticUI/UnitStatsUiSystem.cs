@@ -13,12 +13,14 @@ public partial class UnitStatsUiSystem : SystemBase
     ComponentLookup<HpComponent> hpStats;
     ComponentLookup<AttackComponent> attackStats;
     ComponentLookup<MovementComponent> movementStats;
+    ComponentLookup<VisionCharsComponent> visionStats;
     protected override void OnCreate()
     {
-        RequireForUpdate<UnitStatsRequestComponent>();
+        RequireForUpdate<UnitStatsRequestTag>();
         hpStats = SystemAPI.GetComponentLookup<HpComponent>();
         attackStats = SystemAPI.GetComponentLookup<AttackComponent>();
         movementStats = SystemAPI.GetComponentLookup<MovementComponent>();
+        visionStats = SystemAPI.GetComponentLookup<VisionCharsComponent>();
     }
 
     protected override void OnStartRunning()
@@ -31,12 +33,14 @@ public partial class UnitStatsUiSystem : SystemBase
         hpStats.Update(this);
         attackStats.Update(this);
         movementStats.Update(this);
-        Entity entity = SystemAPI.GetSingletonEntity<UnitStatsRequestComponent>();
-        StaticUIRefs.Instance.HpText.text = $"HP: {hpStats[entity].curHp} / {hpStats[entity].maxHp}";
-        StaticUIRefs.Instance.AttackText.text = $"DMG: {attackStats[entity].damage}";
-        StaticUIRefs.Instance.ReloadText.text = $"ReloadTime: {attackStats[entity].curReload} / {attackStats[entity].reloadLen}";
-        StaticUIRefs.Instance.AttackRadiusText.text = $"AttackRadius: {math.sqrt(attackStats[entity].radiusSq)}";
-        StaticUIRefs.Instance.MovementText.text = $"Speed: {movementStats[entity].speed}";
+        visionStats.Update(this);
+        Entity entity = SystemAPI.GetSingletonEntity<UnitStatsRequestTag>();
+        StaticUIRefs.Instance.HpText.text = $"��������: {hpStats[entity].curHp} / {hpStats[entity].maxHp}";
+        StaticUIRefs.Instance.AttackText.text = $"����: {attackStats[entity].damage}";
+        StaticUIRefs.Instance.ReloadText.text = $"�����������: {attackStats[entity].curReload:f2} / {attackStats[entity].reloadLen}";
+        StaticUIRefs.Instance.AttackRadiusText.text = $"������ �����: {math.sqrt(attackStats[entity].radiusSq)}";
+        StaticUIRefs.Instance.MovementText.text = $"��������: {movementStats[entity].speed}";
+        StaticUIRefs.Instance.VisionRadiusText.text = $"������ ������: {visionStats[entity].radius}";
     }
 
     protected override void OnStopRunning()
@@ -45,6 +49,6 @@ public partial class UnitStatsUiSystem : SystemBase
     }
 }
 
-public struct UnitStatsRequestComponent : IComponentData
+public struct UnitStatsRequestTag : IComponentData
 {
 }

@@ -125,7 +125,7 @@ public partial struct AttackJob : IJobEntity
             //Destroying all Unit Icons
             UtilityFuncs.DestroyParentAndAllChildren(ecb, childrenLookup, unitsIconsLookup[attackRequest.target].infoQuadsEntity, chunkIndexInQuery);
             ecb.RemoveComponent<UnitsIconsComponent>(chunkIndexInQuery, attackRequest.target);
-            ecb.RemoveComponent<UnitStatsRequestComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<UnitStatsRequestTag>(chunkIndexInQuery, attackRequest.target);
 
             //Play Death anim
             float maxTimeToDie = float.MinValue;
