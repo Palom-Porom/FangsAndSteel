@@ -1,0 +1,31 @@
+﻿// This compute buffer kernal is used to copy an array of positional vertexes into a texture.
+// This code originated from https://github.com/sugi-cho/Animation-Texture-Baker .
+// Each #kernel tells which function to compile; you can have many kernels
+//
+// This is intended to compile and run in the unity editor to speed up texture building.
+// It is not intended to run on cell phones and stuff
+//
+// TODO: all pixel encoding is done outside of this function.
+// This could change later to improve Bake times, but for now it's easiest
+// to just perform the encoding outside of the function.
+
+#pragma kernel CSMain
+
+struct PixelInfo
+{
+	float4 position;
+	float4 normal;
+	float4 tangent;
+};
+
+// Create a RenderTexture with enableRandomWrite flag and set it with cs.SetTexture
+RWTexture2D<float4> OutPosition;
+StructuredBuffer<PixelInfo> Info;
+int TexWidth;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	PixelInfo info = Info[(id.y * TexWidth) + id.x];
+	OutPosition[id.xy] = info.position;
+}

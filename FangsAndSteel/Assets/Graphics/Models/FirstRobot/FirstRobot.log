@@ -1,0 +1,25 @@
+Model: FirstRobot
+Enum Declaration: enabled
+Reset Rotation Before Bake: enabled
+Reset Position Before Bake: enabled
+Reset Scale Before Bake: enabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone
+   13fps, 512x512, 4194KB
+     0 Rest : 1,6154s 21f [0..20]
+     1 Movement : 1,6154s 21f [21..41]
+     2 Attack : 1,3846s 18f [42..59]
+     3 Recharge : 1,6154s 21f [60..80]
+     4 Death_1 : 1,6154s 21f [81..101]
+     5 Death_2 : 1,1538s 15f [102..116]
+   Frame Count> Expected: 117, Actual: 117
+   Point Count> Expected: 251477, Actual: 251477
+   Fill ratio: 96,09375%.
+   6 clips, 13fps, 9s, 117f
+Started: 11/27/2023 1:57:24 PM
+Output files were saved to: Assets/ExampleScene/Baked\FirstRobot
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 17,0009 seconds.

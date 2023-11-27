@@ -1,3 +1,4 @@
+using AnimCooker;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst;
@@ -11,7 +12,7 @@ using UnityEngine;
 
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
-public partial struct TargetingAttackSystem : ISystem
+public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 {
     ComponentLookup<HpComponent> hpLookup;
     ComponentLookup<LocalToWorld> localToWorldLookup;
@@ -19,6 +20,10 @@ public partial struct TargetingAttackSystem : ISystem
     ComponentLookup<FillFloatOverride> fillBarLookup;
 
     EntityQuery potentialTargetsQuery;
+
+    ComponentLookup<AnimationCmdData> animCmdLookup;
+    ComponentLookup<AnimationStateData> animStateLookup;
+    NativeArray<AnimDbEntry> attackClips;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -32,6 +37,19 @@ public partial struct TargetingAttackSystem : ISystem
         fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
 
         potentialTargetsQuery = new EntityQueryBuilder(Allocator.TempJob).WithAll<HpComponent, LocalToWorld, TeamComponent>().Build(ref state);
+
+        animCmdLookup = state.GetComponentLookup<AnimationCmdData>();
+        animStateLookup = state.GetComponentLookup<AnimationStateData>();
+    }
+
+    public void OnStartRunning(ref SystemState state)
+    {
+        attackClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Attack");
+    }
+
+    public void OnStopRunning(ref SystemState state)
+    {
+        
     }
 
     [BurstCompile]
@@ -41,6 +59,8 @@ public partial struct TargetingAttackSystem : ISystem
         localToWorldLookup.Update(ref state);
         teamLookup.Update(ref state);
         fillBarLookup.Update(ref state);
+        animCmdLookup.Update(ref state);
+        animStateLookup.Update(ref state);
         NativeArray<Entity> potentialTargetsArr = potentialTargetsQuery.ToEntityArray(Allocator.TempJob);
 
         var ecb =  SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
@@ -55,7 +75,11 @@ public partial struct TargetingAttackSystem : ISystem
             potentialTargetsArr = potentialTargetsArr,
 
             ecb = ecb,
-            deltaTime = Time.deltaTime  
+            deltaTime = Time.deltaTime,
+
+            animCmdLookup = animCmdLookup,
+            animStateLookup = animStateLookup,
+            attackClips = attackClips
         };
         state.Dependency = attackTargetingJob.Schedule(state.Dependency);
 
@@ -84,7 +108,11 @@ public partial struct AttackTargetingJob : IJobEntity
     private float modHp;
     private float modDist;
 
-    public void Execute(ref AttackComponent attack, in AttackSettingsComponent attackSettings, in LocalToWorld localToWorld, in TeamComponent team, in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery)
+    public ComponentLookup<AnimationCmdData> animCmdLookup;
+    [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
+    [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
+
+    public void Execute(ref AttackComponent attack, in AttackSettingsComponent attackSettings, in LocalToWorld localToWorld, in TeamComponent team, in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         //For now put the reloading here, but maybe then it is a good idea to put it in another Job with updating all units characteristics (MAYBE for example hp from healing)
         attack.curReload += deltaTime;
@@ -101,8 +129,9 @@ public partial struct AttackTargetingJob : IJobEntity
             && math.distancesq(localToWorld.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq
             && hpLookup.HasComponent(attack.target))
         {
-            Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
-            ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = attack.target, damage = attack.damage });
+            CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
+            //Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
+            //ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = attack.target, damage = attack.damage });
             attack.curReload = 0;
             return;
         }
@@ -147,9 +176,33 @@ public partial struct AttackTargetingJob : IJobEntity
 
         if (bestScoreEntity != Entity.Null)
         {
-            Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
-            ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = bestScoreEntity, damage = attack.damage });
+            CreateAttackRequest(chunkIndexInQuery, bestScoreEntity, attack.damage, modelsBuf);
             attack.curReload = 0;
+            //Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
+            //ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = bestScoreEntity, damage = attack.damage });
+            //attack.curReload = 0;
+
+            ////Play Attack Anim
+            //foreach (var modelBufElem in modelsBuf)
+            //{
+            //    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+            //    animCmd.ValueRW.ClipIndex = attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+            //    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
+            //}
+        }
+    }
+
+    private void CreateAttackRequest(int chunkIndexInQuery, Entity target, int damage, in DynamicBuffer<ModelsBuffer> modelsBuf)
+    {
+        Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
+        ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = target, damage = damage });
+
+        //Play Attack Anim
+        foreach (var modelBufElem in modelsBuf)
+        {
+            RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+            animCmd.ValueRW.ClipIndex = attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+            animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
         }
     }
 }
