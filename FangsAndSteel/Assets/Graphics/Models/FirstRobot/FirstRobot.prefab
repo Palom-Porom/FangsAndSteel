@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_animationModelName: FirstRobot
-  m_defaultAnimationName: 
+  m_defaultAnimationName: Rest
   m_addMaterialAnimationSpeedProperty: 1
   m_addMaterialCurrentTimeProperty: 1
   m_addMaterialClipIndexProperty: 1

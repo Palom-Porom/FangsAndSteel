@@ -7,23 +7,35 @@ using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 using Unity.Collections;
+using AnimCooker;
 using System.Net.Security;
 
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
 public partial struct MovementSystem : ISystem
 {
+    NativeArray<AnimDbEntry> restClips;
+
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PhysicsWorldSingleton>();
         state.RequireForUpdate<MovementComponent>();
+
+        restClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Rest");
     }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state) 
     {
-        var moveJob = new MovementJob { deltaTime = SystemAPI.Time.DeltaTime, collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld };
+        var moveJob = new MovementJob
+        {
+            deltaTime = SystemAPI.Time.DeltaTime,
+            collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld,
+
+            restClips = restClips
+        };
         moveJob.Schedule();
     }
 
@@ -41,8 +53,9 @@ public partial struct MovementJob : IJobEntity
     public float deltaTime;
     [ReadOnly] public CollisionWorld collisionWorld;
 
+    [ReadOnly] public NativeArray<AnimDbEntry> restClips;
 
-    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer)
+    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer, ref AnimationCmdData animCmd, in AnimationStateData animState)
     {
         if (!movementComponent.isMoving)
             return;
@@ -58,6 +71,8 @@ public partial struct MovementJob : IJobEntity
             else
             {
                 movementComponent.isMoving = false;
+                animCmd.ClipIndex = restClips[animState.ModelIndex].ClipIndex;
+                animCmd.Cmd = AnimationCmd.SetPlayForever;
                 return;
             } 
         }

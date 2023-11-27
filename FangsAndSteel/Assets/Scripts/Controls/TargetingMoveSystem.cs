@@ -6,6 +6,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Physics;
 using UnityEngine;
+using AnimCooker;
 
 [UpdateInGroup(typeof(ControlsSystemGroup), OrderFirst = true)]
 [UpdateAfter(typeof(ControlSystem))]
@@ -14,6 +15,8 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 {
     private InputData inputData;
 
+    NativeArray<AnimDbEntry> moveClips;
+
     [BurstCompile]
     public void OnCreate (ref SystemState state)
     {
@@ -21,6 +24,8 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
         state.RequireForUpdate<PhysicsWorldSingleton>();
         state.RequireForUpdate<InputData>();
         state.RequireForUpdate<MovementComponent>();
+
+        moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Move");
     }
 
     [BurstCompile]
@@ -63,7 +68,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
             raycastResult = raycastResult
         }.Schedule(state.Dependency);
 
-        new ChangeTargetJob { raycastResult = raycastResult, shiftTargeting = inputData.shiftTargeting }.Schedule();
+        new ChangeTargetJob { raycastResult = raycastResult, shiftTargeting = inputData.shiftTargeting, moveClips = moveClips }.Schedule();
 
         raycastResult.Dispose(state.Dependency);
     }
@@ -80,7 +85,8 @@ public partial struct ChangeTargetJob : IJobEntity
     [ReadOnly]
     public NativeReference<RaycastResult> raycastResult;
     public bool shiftTargeting;
-    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in SelectTag selectTag)
+    [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
+    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in SelectTag selectTag, ref AnimationCmdData animCmd, in AnimationStateData animState)
     {
         var result = raycastResult.Value;
         if (!result.hasHit)
@@ -94,6 +100,8 @@ public partial struct ChangeTargetJob : IJobEntity
             moveComBuf.Clear();
             movementComponent.target = result.raycastHitInfo.Position;
             movementComponent.isMoving = true;
+            animCmd.ClipIndex = moveClips[animState.ModelIndex].ClipIndex;
+            animCmd.Cmd = AnimationCmd.SetPlayForever;
         }
     }
 }
