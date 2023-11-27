@@ -27,6 +27,7 @@ public partial class SelectionSystem : SystemBase
     private bool wasClickedOnUI;
 
     private ComponentLookup<SelectTag> selectLookup;
+    private ComponentLookup<AttackSettingsComponent> attackSetsLookup;
 
     private EntityCommandBuffer ecb;
 
@@ -44,11 +45,14 @@ public partial class SelectionSystem : SystemBase
     protected override void OnCreate()
     {
         RequireForUpdate<SelectTag>();
+
+        selectLookup = GetComponentLookup<SelectTag>();
+        attackSetsLookup = GetComponentLookup<AttackSettingsComponent>();
     }
 
     protected override void OnStartRunning()
     {
-        selectLookup = GetComponentLookup<SelectTag>();
+        selectLookup.Update(this);
 
         ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
@@ -96,6 +100,7 @@ public partial class SelectionSystem : SystemBase
             }
             //Update containers
             selectLookup.Update(this);
+            attackSetsLookup.Update(this);
             ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
             if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
@@ -114,6 +119,10 @@ public partial class SelectionSystem : SystemBase
                 //removing stats for single unit selection
                 if (unitStatsRqstEntity != Entity.Null)
                     ecb.RemoveComponent<UnitStatsRequestTag>(unitStatsRqstEntity);
+
+                //Change ShootMode color to the neutral
+                Entity colorRqstEntity = ecb.CreateEntity();
+                ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
 
                 new MultipleSelectJob
                 {
@@ -153,6 +162,7 @@ public partial class SelectionSystem : SystemBase
                     raycastInput = raycastInput,
 
                     selectTagLookup = selectLookup,
+                    attackSetsLookup = attackSetsLookup,
                     ecb = ecb
                 }.Schedule(Dependency);
             }
@@ -194,6 +204,7 @@ public partial struct SingleSelectJob : IJob
     [ReadOnly] public CollisionWorld collisionWorld;
     public RaycastInput raycastInput;
     public ComponentLookup<SelectTag> selectTagLookup;
+    public ComponentLookup<AttackSettingsComponent> attackSetsLookup;
 
     public EntityCommandBuffer ecb;
 
@@ -209,6 +220,20 @@ public partial struct SingleSelectJob : IJob
                 //showing stats for single unit selection
                 //Entity unitStatsRqstEntity = ecb.CreateEntity();
                 ecb.AddComponent(raycastHit.Entity, new UnitStatsRequestTag());
+
+                //Change ShootMode color depending on the state of that variable
+                Entity entity = ecb.CreateEntity();
+                if (attackSetsLookup[raycastHit.Entity].shootingOnMoveMode)
+                    ecb.AddComponent(entity, new ShootModeButChangeColorRqst { color = Color.green});
+                else
+                    ecb.AddComponent(entity, new ShootModeButChangeColorRqst { color = Color.red});
+
+            }
+            else
+            {
+                //Change ShootMode color to the neutral
+                Entity colorRqstEntity = ecb.CreateEntity();
+                ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
             }
         }
     }

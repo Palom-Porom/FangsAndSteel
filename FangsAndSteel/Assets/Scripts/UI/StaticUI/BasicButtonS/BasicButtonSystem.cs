@@ -9,13 +9,15 @@ using UnityEngine;
 [UpdateInGroup(typeof(StaticUISystemGroup))]
 public partial class BasicButtonSystem : SystemBase
 {
-    
+
+    ShootModeButChangeColorRqst shootButColorChangeRqst;
+    EntityCommandBuffer ecb;
+
     protected override void OnCreate()
     {
         RequireForUpdate<StaticUIData>();
         RequireForUpdate<AttackSettingsComponent>();
     }
-
 
     StaticUIData uiData;
     protected override void OnUpdate()
@@ -29,6 +31,12 @@ public partial class BasicButtonSystem : SystemBase
             }
         }
 
+        if (SystemAPI.TryGetSingleton<ShootModeButChangeColorRqst>(out shootButColorChangeRqst))
+        {
+            StaticUIRefs.Instance.ShootModeButton.color = shootButColorChangeRqst.color;
+            ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+            ecb.DestroyEntity(SystemAPI.GetSingletonEntity<ShootModeButChangeColorRqst>());
+        }
         if (uiData.changeSpeedBut)
         {
             new ChangeShootModeJob().Schedule();
@@ -44,6 +52,11 @@ public partial struct ChangeShootModeJob : IJobEntity
     {
         attackSettingsComponent.shootingOnMoveMode = !(attackSettingsComponent.shootingOnMoveMode);
     }
+}
+
+public struct ShootModeButChangeColorRqst : IComponentData
+{
+    public Color color;
 }
     
 
