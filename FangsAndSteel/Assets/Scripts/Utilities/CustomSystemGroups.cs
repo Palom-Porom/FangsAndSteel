@@ -10,7 +10,7 @@ using UnityEngine;
 public partial class NoJobsSystemGroup : ComponentSystemGroup { }
 
 
-[UpdateAfter(typeof(VisionMapSystem))]
+[UpdateAfter(typeof(FillVisionMapTextureSystem))]
 public partial class StaticUISystemGroup : ComponentSystemGroup{ }
 
 

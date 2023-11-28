@@ -16,7 +16,7 @@ using UnityEngine;
 
 [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [BurstCompile]
-public partial struct VisionMapSystem : ISystem
+public partial struct VisionMapSystem : ISystem, ISystemStartStop
 {
     #region Debug Vars
     Entity noTeamPrefub;
@@ -39,6 +39,28 @@ public partial struct VisionMapSystem : ISystem
         //Set true if need to visualize the views in the first frame
         needToDebug = false;
     }
+
+    public void OnStartRunning(ref SystemState state)
+    {
+        
+    }
+
+    public void OnStopRunning(ref SystemState state)
+    {
+        DynamicBuffer<VisionMapBuffer> visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>();
+
+        unsafe
+        {
+            UnsafeUtility.MemClear(visionMap.GetUnsafePtr(), (long)visionMap.Length * sizeof(int));
+        }
+        FillVisionMapJob fillVisionMapJob = new FillVisionMapJob
+        {
+            visionMap = visionMap,
+        };
+
+        fillVisionMapJob.Schedule();
+    }
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
