@@ -51,6 +51,7 @@ Shader"Unlit/FogOfWarShader"
             CBUFFER_START(UnityPerMaterial)
             sampler2D _MainTex;
             float4 _MainTex_ST;
+int _curTeam;
             CBUFFER_END
 
             //extern StructuredBuffer<int> _VisionMap;
@@ -81,16 +82,16 @@ Shader"Unlit/FogOfWarShader"
 
                 //int idx = (int) (floor(x / 2) + floor(y / 2) * 500);
                 //return float4(1, 1, 1, 
-                //(_VisionMap[idx] % 1) * 0.3 + 
-                //(_VisionMap[(idx + 1) % 250000] % 1) * 0.05 + 
-                //(_VisionMap[(idx - 1) % 250000] % 1) * 0.05 + 
-                //(_VisionMap[(idx + 500) % 250000] % 1) * 0.05 + 
-                //(_VisionMap[(idx - 500) % 250000] % 1) * 0.05);
+                //(_VisionMap[idx] & _curTeam == 0) * 0.3 + 
+                //(_VisionMap[(idx + 1) % 250000] & _curTeam == 0) * 0.05 +
+                //(_VisionMap[(idx - 1) % 250000] & _curTeam == 0) * 0.05 +
+                //(_VisionMap[(idx + 500) % 250000] & _curTeam == 0) * 0.05 + 
+                //(_VisionMap[(idx - 500) % 250000] & _curTeam == 0) * 0.05);
     
-                if (visInfo == 0)
+                if (visInfo & _curTeam != 0)
                     return float4(0, 1, 0, 0.3);
                 else
-                    return float4(1, 0, 0, 0);
+                    return float4(1, 0, 0, 0.6);
                 }
             ENDHLSL
         }

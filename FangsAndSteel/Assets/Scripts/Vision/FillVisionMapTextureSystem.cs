@@ -40,6 +40,7 @@ public partial class FillVisionMapTextureSystem : SystemBase
         computeBuffer.BeginWrite<int>(0, 250000).CopyFrom(visionMapCopied);
         computeBuffer.EndWrite<int>(250000);
         material.SetBuffer("_VisionMap", computeBuffer);
+        material.SetInteger("_curTeam", SystemAPI.GetSingleton<CurrentTeamComponent>().currentTeam);    
     }
 
     protected override void OnUpdate()
