@@ -42,11 +42,6 @@ public partial struct VisionMapSystem : ISystem, ISystemStartStop
 
     public void OnStartRunning(ref SystemState state)
     {
-        
-    }
-
-    public void OnStopRunning(ref SystemState state)
-    {
         DynamicBuffer<VisionMapBuffer> visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>();
 
         unsafe
@@ -59,6 +54,11 @@ public partial struct VisionMapSystem : ISystem, ISystemStartStop
         };
 
         fillVisionMapJob.Schedule();
+    }
+
+    public void OnStopRunning(ref SystemState state)
+    {
+        
     }
 
     [BurstCompile]
