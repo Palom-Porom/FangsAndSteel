@@ -16,7 +16,7 @@ using UnityEngine;
 
 [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [BurstCompile]
-public partial struct VisionMapSystem : ISystem
+public partial struct VisionMapSystem : ISystem, ISystemStartStop
 {
     #region Debug Vars
     Entity noTeamPrefub;
@@ -39,6 +39,28 @@ public partial struct VisionMapSystem : ISystem
         //Set true if need to visualize the views in the first frame
         needToDebug = false;
     }
+
+    public void OnStartRunning(ref SystemState state)
+    {
+        
+    }
+
+    public void OnStopRunning(ref SystemState state)
+    {
+        DynamicBuffer<VisionMapBuffer> visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>();
+
+        unsafe
+        {
+            UnsafeUtility.MemClear(visionMap.GetUnsafePtr(), (long)visionMap.Length * sizeof(int));
+        }
+        FillVisionMapJob fillVisionMapJob = new FillVisionMapJob
+        {
+            visionMap = visionMap,
+        };
+
+        fillVisionMapJob.Schedule();
+    }
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
@@ -103,6 +125,9 @@ public partial struct FillVisionMapJob : IJobEntity
     const int VIS_MAP_SIZE = 500;
     const int ORIG_TO_VIS_MAP_RATIO = 2;
 
+    bool isOnLeftSideOfField;
+    bool isOnRightSideOfField;
+
     // Execute - обязательный метод IJobEntity, являющийся аналогом foreach
     public void Execute(in LocalToWorld localtoworld, in VisionCharsComponent visionChars, in TeamComponent team)
     {
@@ -110,6 +135,17 @@ public partial struct FillVisionMapJob : IJobEntity
         float2 point;
         //for (var x := ..... to visionChars.radius step ORIG_TO_....)
         //for (int i = 0; i < size; i++) - for (int x...) но более понятным языком
+        int idx = (int)((localtoworld.Position.x + VIS_MAP_SIZE) / ORIG_TO_VIS_MAP_RATIO + math.floor((localtoworld.Position.y + VIS_MAP_SIZE) / ORIG_TO_VIS_MAP_RATIO) * VIS_MAP_SIZE);
+        if (idx % 500 < visionChars.radius / 2 || idx % 500 > 500 - visionChars.radius / 2)
+        {
+            isOnLeftSideOfField = idx % 500 < 250;
+            isOnRightSideOfField = !isOnLeftSideOfField;
+        }
+        else
+        {
+            isOnLeftSideOfField = false;
+            isOnRightSideOfField = false;
+        }
         for (int x = (-visionChars.radius) - visionChars.radius % ORIG_TO_VIS_MAP_RATIO; x <= visionChars.radius; x += ORIG_TO_VIS_MAP_RATIO)
         {
             for (int y = (-visionChars.radius) - visionChars.radius % ORIG_TO_VIS_MAP_RATIO; y <= visionChars.radius; y += ORIG_TO_VIS_MAP_RATIO)
@@ -118,7 +154,9 @@ public partial struct FillVisionMapJob : IJobEntity
                 if (math.length(curpointline) > visionChars.radius)
                     continue;
                 point = math.floor(localtoworld.Position.xz + curpointline + VIS_MAP_SIZE);
-                int idx = (int)(point.x / ORIG_TO_VIS_MAP_RATIO + math.floor(point.y / ORIG_TO_VIS_MAP_RATIO) * VIS_MAP_SIZE);
+                idx = (int)(point.x / ORIG_TO_VIS_MAP_RATIO + math.floor(point.y / ORIG_TO_VIS_MAP_RATIO) * VIS_MAP_SIZE);
+                if ((isOnLeftSideOfField && idx % 500 >= 250) || (isOnRightSideOfField && idx % 500 < 250))
+                    continue;
                 if (idx >= 0 && idx < visionMap.Length)
                     //    |  -  побитовое "или"
                     visionMap[idx] |= team.teamInd;

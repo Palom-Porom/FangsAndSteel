@@ -84,7 +84,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     }
 }
 
-//[BurstCompile]
+[BurstCompile]
 public partial struct AttackJob : IJobEntity
 {
     public ComponentLookup<HpComponent> hpLookup;

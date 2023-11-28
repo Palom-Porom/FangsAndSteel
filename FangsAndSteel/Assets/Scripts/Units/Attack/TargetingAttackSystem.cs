@@ -91,7 +91,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 /// <summary>
 /// Checks all current attack targets and searches for new ones
 /// </summary>
-//[BurstCompile]
+[BurstCompile]
 public partial struct AttackTargetingJob : IJobEntity
 {
     [ReadOnly] public ComponentLookup<HpComponent> hpLookup;
