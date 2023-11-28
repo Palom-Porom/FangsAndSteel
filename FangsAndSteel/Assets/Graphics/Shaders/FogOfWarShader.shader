@@ -76,22 +76,62 @@ int _curTeam;
             {
                 float x = (i.vertexWS.x) + 500;
                 float y = (i.vertexWS.z) + 500;
-                int visInfo = _VisionMap[(int) (floor(x / 2) + floor(y / 2) * 500)];
+                //int visInfo = _VisionMap[(int) (floor(x / 2) + floor(y / 2) * 500)];
                 //point = math.floor(localtoworld.Position.xz + curpointline + VIS_MAP_SIZE);
                 //int idx = (int) (point.x / ORIG_TO_VIS_MAP_RATIO + math.floor(point.y / ORIG_TO_VIS_MAP_RATIO) * VIS_MAP_SIZE);
-
+            
                 //int idx = (int) (floor(x / 2) + floor(y / 2) * 500);
-                //return float4(1, 1, 1, 
-                //(_VisionMap[idx] & _curTeam == 0) * 0.3 + 
-                //(_VisionMap[(idx + 1) % 250000] & _curTeam == 0) * 0.05 +
-                //(_VisionMap[(idx - 1) % 250000] & _curTeam == 0) * 0.05 +
-                //(_VisionMap[(idx + 500) % 250000] & _curTeam == 0) * 0.05 + 
-                //(_VisionMap[(idx - 500) % 250000] & _curTeam == 0) * 0.05);
     
-                if (visInfo & _curTeam != 0)
-                    return float4(0, 1, 0, 0.3);
-                else
-                    return float4(1, 0, 0, 0.6);
+    //float centerX = (idx * 2) % 1000;
+    //float centerY = (idx * 2 - centerX) /500;
+    //float2 centerPoint = float2(centerX, centerY);
+    //int x = (index * ORIG_TO_VIS_MAP_RATIO) % ORIG_MAP_SIZE;
+    //int y = (index * ORIG_TO_VIS_MAP_RATIO - x) / VIS_MAP_SIZE;
+    
+                float step_w = 1.5f;
+                float step_h = 1.5f;
+                float2 offset[25] =
+                {
+                    float2(-step_w * 2.0, -step_h * 2.0), float2(-step_w, -step_h * 2.0), float2(0.0, -step_h * 2.0), float2(step_w, -step_h * 2.0), float2(step_w * 2.0, -step_h * 2.0),
+                                float2(-step_w * 2.0, -step_h), float2(-step_w, -step_h), float2(0.0, -step_h), float2(step_w, -step_h), float2(step_w * 2.0, -step_h),
+                                float2(-step_w * 2.0, 0.0), float2(-step_w, 0.0), float2(0.0, 0.0), float2(step_w, 0.0), float2(step_w * 2.0, 0.0),
+                                float2(-step_w * 2.0, step_h), float2(-step_w, step_h), float2(0.0, step_h), float2(step_w, step_h), float2(step_w * 2.0, step_h),
+                                float2(-step_w * 2.0, step_h * 2.0), float2(-step_w, step_h * 2.0), float2(0.0, step_h * 2.0), float2(step_w, step_h * 20), float2(step_w * 2.0, step_h * 2.0)
+                };
+
+                float kernel[25] =
+                {
+
+                    0.003765, 0.015019, 0.023792, 0.015019, 0.003765,
+                                0.015019, 0.059912, 0.094907, 0.059912, 0.015019,
+                                0.023792, 0.094907, 0.150342, 0.094907, 0.023792,
+                                0.015019, 0.059912, 0.094907, 0.059912, 0.015019,
+                                0.003765, 0.015019, 0.023792, 0.015019, 0.003765
+                };
+
+                float4 sum = float4(0.0, 0.0, 0.0, 0.0);
+                
+                
+                for (int j = 0; j < 25; j++)
+                {
+                    int idx = (int) (floor((x + offset[j].x) / 2) + floor((y + offset[j].y) / 2) * 500);
+                    float4 visInfoCol = float4(0, 0, 0, (abs((_VisionMap[idx] & _curTeam) - _curTeam)) * 0.6);
+                    sum += visInfoCol * kernel[j];
+                }
+
+                return sum;
+    
+                //return float4(0, 0, 0, 
+                //(abs((_VisionMap[idx] & _curTeam) - _curTeam)) * 0.6 * distance(centerPoint, float2(x, y)) / 2 +
+                //(abs((_VisionMap[(idx + 1) % 250000] & _curTeam) - _curTeam)) * 0.05 +
+                //(abs((_VisionMap[(idx - 1) % 250000] & _curTeam) - _curTeam)) * 0.05 +
+                //(abs((_VisionMap[(idx + 500) % 250000] & _curTeam) - _curTeam)) * 0.05 + 
+                //(abs((_VisionMap[(idx - 500) % 250000] & _curTeam) - _curTeam)) * 0.05);
+                //
+                //if (visInfo & _curTeam != 0)
+                //    return float4(0, 1, 0, 0.3);
+                //else
+                //    return float4(1, 0, 0, 0.6);
                 }
             ENDHLSL
         }
