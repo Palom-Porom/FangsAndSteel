@@ -68,7 +68,7 @@ public partial struct VisionCurrentTeamJob : IJobEntity
     const int VIS_MAP_SIZE = 500;
     const int ORIG_TO_VIS_MAP_RATIO = 2;
 
-    public void Execute(in LocalToWorld localtoworld, in TeamComponent team, ref VisibilityComponent visibility, Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery)
+    public void Execute(in LocalToWorld localtoworld, in TeamComponent team, ref VisibilityComponent visibility, Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery, in UnitsIconsComponent unitsIconsComponent)
     {
         float2 position;
         position = localtoworld.Position.xz + VIS_MAP_SIZE; 
@@ -79,13 +79,13 @@ public partial struct VisionCurrentTeamJob : IJobEntity
         // if not visible to current team
         if ((visibility.visibleToTeams & currentTeamComponent.currentTeam) == 0)
         {
-            if (!disableRendLookup.HasComponent(childrenLookup[entity][0].Value))
-                DisableParentAndAllChildrenRender(childrenLookup[entity][0].Value, chunkIndexInQuery);
+            if (!disableRendLookup.HasComponent(unitsIconsComponent.VisualizationEntity))
+                DisableParentAndAllChildrenRender(unitsIconsComponent.VisualizationEntity, chunkIndexInQuery);
         }
         // if visible to current team
         else
-            if (disableRendLookup.HasComponent(childrenLookup[entity][0].Value))
-                EnableParentAndAllChildrenRender(childrenLookup[entity][0].Value, chunkIndexInQuery);
+            if (disableRendLookup.HasComponent(unitsIconsComponent.VisualizationEntity))
+                EnableParentAndAllChildrenRender(unitsIconsComponent.VisualizationEntity, chunkIndexInQuery);
     }
 
 

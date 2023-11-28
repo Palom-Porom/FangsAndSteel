@@ -431,9 +431,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d484059398d440647adaec41b215d251, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  infoQuadsEntity: {fileID: 6593118440820444270}
-  healthBarEntity: {fileID: 4948704777112598906}
-  reloadBarEntity: {fileID: 8462255765766358663}
+  infoQuadsGO: {fileID: 6593118440820444270}
+  healthBarGO: {fileID: 4948704777112598906}
+  reloadBarGO: {fileID: 8462255765766358663}
+  VisualizationGO: {fileID: 2241612671097993943}
+  ModelsGO: {fileID: 4450080618980272199}
 --- !u!1 &8036942257129873740
 GameObject:
   m_ObjectHideFlags: 0

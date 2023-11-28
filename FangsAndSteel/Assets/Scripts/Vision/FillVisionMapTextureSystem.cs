@@ -6,7 +6,7 @@ using Unity.Jobs;
 using UnityEngine;
 using Unity.Burst;
 
-[UpdateAfter(typeof(VisionMapSystem))]
+[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 public partial class FillVisionMapTextureSystem : SystemBase
 {
     Material material;
@@ -28,9 +28,9 @@ public partial class FillVisionMapTextureSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        if (UnityEngine.Time.frameCount % 5 == 0)
+        if ((UnityEngine.Time.frameCount + 2) % 5 == 0)
         {
-            var visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>();
+            var visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>(true);
             computeBuffer.BeginWrite<int>(0, 250000).CopyFrom(visionMap.Reinterpret<int>().AsNativeArray());
             computeBuffer.EndWrite<int>(250000);
         }
