@@ -33,7 +33,6 @@ public partial class BasicButtonSystem : SystemBase
 
         if (SystemAPI.TryGetSingleton<ShootModeButChangeColorRqst>(out shootButColorChangeRqst))
         {
-            Debug.Log("Changing Color from Outside");
             StaticUIRefs.Instance.ShootModeButton.color = shootButColorChangeRqst.color;
             ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
             ecb.DestroyEntity(SystemAPI.GetSingletonEntity<ShootModeButChangeColorRqst>());
