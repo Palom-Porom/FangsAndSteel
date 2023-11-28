@@ -413,7 +413,7 @@ PrefabInstance:
     - target: {fileID: 5824819134941424039, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 22.1
+      value: -8.91
       objectReference: {fileID: 0}
     - target: {fileID: 5824819134941424039, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
@@ -423,7 +423,7 @@ PrefabInstance:
     - target: {fileID: 5824819134941424039, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -238.7
+      value: -1.77
       objectReference: {fileID: 0}
     - target: {fileID: 5824819134941424039, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
@@ -478,7 +478,7 @@ PrefabInstance:
     - target: {fileID: 8818506933466611722, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: VisionRadius
-      value: 200
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 510706356430527832, guid: c743507d0fc900b45898c8e09289fb9b, type: 3}

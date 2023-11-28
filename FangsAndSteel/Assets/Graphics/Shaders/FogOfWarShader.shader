@@ -48,10 +48,10 @@ Shader"Unlit/FogOfWarShader"
             #endif
 
             extern StructuredBuffer<int> _VisionMap;
+            int _curTeam;
             CBUFFER_START(UnityPerMaterial)
             sampler2D _MainTex;
             float4 _MainTex_ST;
-int _curTeam;
             CBUFFER_END
 
             //extern StructuredBuffer<int> _VisionMap;
