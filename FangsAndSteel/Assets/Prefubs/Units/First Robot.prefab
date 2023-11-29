@@ -132,7 +132,7 @@ PrefabInstance:
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: realodLen
-      value: 1.1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}

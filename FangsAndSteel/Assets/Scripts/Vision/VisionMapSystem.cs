@@ -93,7 +93,7 @@ public partial struct VisionMapSystem : ISystem, ISystemStartStop
                 secondTeamPrefub = SystemAPI.GetSingleton<DebugCube>().secondTeamPrefub;
                 bothTeamsPrefub = SystemAPI.GetSingleton<DebugCube>().bothTeamsPrefub;
 
-                ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
+                ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
                 state.Dependency = new DebugVissionMapJob
                 {

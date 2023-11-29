@@ -61,7 +61,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         animCmdLookup.Update(ref state);
         animStateLookup.Update(ref state);
         modelBufLookup.Update(ref state);
-        var ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
+        var ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
         new AttackJob 
         { 
             hpLookup = hpLookup, 

@@ -48,8 +48,8 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         //    typeof(TeamComponent),
         //    typeof(UnitsIconsComponent)
         //    );
-        usualUnitsQuery = new EntityQueryBuilder (Allocator.TempJob).WithAll< AttackComponent, AttackSettingsComponent, LocalToWorld, TeamComponent, UnitsIconsComponent, ModelsBuffer, MovementComponent > ().WithNone<Deployable>().Build(state.EntityManager);
-        deployableUnitsQuery = new EntityQueryBuilder (Allocator.TempJob).WithAll< AttackComponent, AttackSettingsComponent, LocalToWorld, TeamComponent, UnitsIconsComponent, ModelsBuffer, Deployable > ().WithAll<MovementComponent>().Build(state.EntityManager);
+        usualUnitsQuery = new EntityQueryBuilder (Allocator.TempJob).WithAll< AttackComponent, AttackSettingsComponent, LocalTransform, TeamComponent, UnitsIconsComponent, ModelsBuffer, MovementComponent > ().WithNone<Deployable>().Build(state.EntityManager);
+        deployableUnitsQuery = new EntityQueryBuilder (Allocator.TempJob).WithAll< AttackComponent, AttackSettingsComponent, LocalTransform, TeamComponent, UnitsIconsComponent, ModelsBuffer, Deployable > ().WithAll<MovementComponent>().Build(state.EntityManager);
         //deployableUnitsQuery = state.GetEntityQuery
         //    (
         //    typeof(AttackComponent),
@@ -86,7 +86,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         animStateLookup.Update(ref state);
         NativeArray<Entity> potentialTargetsArr = potentialTargetsQuery.ToEntityArray(Allocator.TempJob);
 
-        var ecb =  SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
+        var ecb =  SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
         if (!usualUnitsQuery.IsEmpty)
         {
@@ -156,7 +156,9 @@ public partial struct AttackTargetingJob : IJobEntity
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
 
-    public void Execute(ref AttackComponent attack, ref AttackSettingsComponent attackSettings, in LocalToWorld localToWorld, in TeamComponent team, MovementComponent movement,
+    private const float ROT_TIME = 5;
+
+    public void Execute(ref AttackComponent attack, ref AttackSettingsComponent attackSettings, ref LocalTransform localTransform, in TeamComponent team, ref MovementComponent movement,
         in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery, in DynamicBuffer<ModelsBuffer> modelsBuf, Entity entity)
     {
         //For now put the reloading here, but maybe then it is a good idea to put it in another Job with updating all units characteristics (MAYBE for example hp from healing)
@@ -165,19 +167,45 @@ public partial struct AttackTargetingJob : IJobEntity
             attack.curReload = attack.reloadLen;
         fillBarLookup.GetRefRW(unitsIcons.reloadBarEntity).ValueRW.Value = attack.curReload / attack.reloadLen;
 
+        //Rotate to enemy
+        if (!attackSettings.isAbleToMove && hpLookup.HasComponent(attack.target))
+        {
+            quaternion targetRot = quaternion.LookRotationSafe(localToWorldLookup[attack.target].Position - localTransform.Position, localTransform.Up());
+            if (movement.lastRotTarget.Equals(targetRot))
+            {
+                if (movement.rotTimePassed < ROT_TIME)
+                {
+                    movement.rotTimePassed += deltaTime;
+                    localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, movement.rotTimePassed / ROT_TIME);
+                }
+            }
+            else
+            {
+                movement.rotTimePassed = deltaTime;
+                movement.lastRotTarget = targetRot;
+                localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, deltaTime / ROT_TIME);
+            }
+        }
+
         //If not reloaded yet then no need for search for target
         if (math.abs(attack.curReload - attack.reloadLen) > float.Epsilon)
             return;
 
         //If has valid target -> create an attackRequest and return
         if (attack.target != Entity.Null
-            && math.distancesq(localToWorld.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq
+            && math.distancesq(localTransform.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq
             && hpLookup.HasComponent(attack.target))
         {
             attackSettings.isAbleToMove = attackSettings.shootingOnMoveMode;
+            //when shootingOnMoveMode was already enabled
+            if (attackSettings.isAbleToMove)
+            {
+                ecb.AddComponent(chunkIndexInQuery, entity, new NotAbleToMoveForTimeRqstComponent { passedTime = 0, targetTime = attack.timeToShoot });
+                attackSettings.isAbleToMove = false;
+            }
+
+
             CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
-            //Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
-            //ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = attack.target, damage = attack.damage });
             attack.curReload = 0;
             return;
         }
@@ -189,11 +217,13 @@ public partial struct AttackTargetingJob : IJobEntity
             modDist = 0.1f;
         }
 
-        attack.target = UtilityFuncs.FindBestTarget(in potentialTargetsArr, teamLookup, hpLookup, localToWorldLookup, localToWorld.Position, attack.radiusSq, team.teamInd, modDist, modHp);
+        attack.target = FindBestTarget(localTransform.Position, attack.radiusSq, team.teamInd, modDist, modHp);
 
         if (attack.target != Entity.Null)
         {
-            attackSettings.isAbleToMove = attackSettings.shootingOnMoveMode;
+            if (attackSettings.shootingOnMoveMode)
+                ecb.AddComponent(chunkIndexInQuery, entity, new NotAbleToMoveForTimeRqstComponent { passedTime = 0, targetTime = attack.timeToShoot });
+            attackSettings.isAbleToMove = false;
             CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
             attack.curReload = 0;
         }
@@ -201,8 +231,40 @@ public partial struct AttackTargetingJob : IJobEntity
         {
             attackSettings.isAbleToMove = true;
         }
+        
     }
 
+    private Entity FindBestTarget(float3 position, int radiusSq, int teamInd, float modDist, float modHp)
+    {
+        float bestScore = float.MinValue;
+        Entity bestScoreEntity = Entity.Null;
+
+        foreach (Entity potentialTarget in potentialTargetsArr)
+        {
+            //Check if they are in different teams
+            if (teamLookup[potentialTarget].teamInd - teamInd == 0)
+                continue;
+
+            float curScore = 0;
+
+            float distanceScore = radiusSq - math.distancesq(position, localToWorldLookup[potentialTarget].Position)/* * distScoreMultiplier*/;
+            //Check if target is not in the attack radius
+            if (distanceScore < 0)
+                continue;
+            curScore += distanceScore * modDist;
+
+            float hpScore = -(hpLookup[potentialTarget].curHp);
+            curScore += hpScore * modHp;
+            ///TODO Other score affectors
+
+            if (curScore > bestScore)
+            {
+                bestScore = curScore;
+                bestScoreEntity = potentialTarget;
+            }
+        }
+        return bestScoreEntity;
+    }
     private void CreateAttackRequest(int chunkIndexInQuery, Entity target, int damage, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
@@ -238,7 +300,9 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
 
-    public void Execute(ref AttackComponent attack, ref AttackSettingsComponent attackSettings, in LocalToWorld localToWorld, in TeamComponent team, in MovementComponent movement,
+    private const float ROT_TIME = 5;
+
+    public void Execute(ref AttackComponent attack, ref AttackSettingsComponent attackSettings, ref LocalTransform localTransform, in TeamComponent team, ref MovementComponent movement,
         in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery, in DynamicBuffer<ModelsBuffer> modelsBuf, ref Deployable deployable)
     {
         //Deploy Handle
@@ -259,6 +323,26 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
 
         bool fullyDeployed = deployable.deployTimeCur >= deployable.deployTimeMax;
 
+        //Rotate to enemy
+        if (!attackSettings.isAbleToMove && fullyDeployed && hpLookup.HasComponent(attack.target))
+        {
+            quaternion targetRot = quaternion.LookRotationSafe(localToWorldLookup[attack.target].Position - localTransform.Position, localTransform.Up());
+            if (movement.lastRotTarget.Equals(targetRot))
+            {
+                if (movement.rotTimePassed < ROT_TIME)
+                {
+                    movement.rotTimePassed += deltaTime;
+                    localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, movement.rotTimePassed / ROT_TIME);
+                }
+            }
+            else
+            {
+                movement.rotTimePassed = deltaTime;
+                movement.lastRotTarget = targetRot;
+                localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, deltaTime / ROT_TIME);
+            }
+        }
+
         if (fullyDeployed)
         {
             //For now put the reloading here, but maybe then it is a good idea to put it in another Job with updating all units characteristics (MAYBE for example hp from healing)
@@ -270,7 +354,7 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
             //If has valid target -> create an attackRequest and return
             if (attack.target != Entity.Null
                 && math.abs(attack.curReload - attack.reloadLen) <= float.Epsilon
-                && math.distancesq(localToWorld.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq
+                && math.distancesq(localTransform.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq
                 && hpLookup.HasComponent(attack.target))
             {
                 CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
@@ -288,7 +372,7 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
         }
 
 
-        attack.target = UtilityFuncs.FindBestTarget(potentialTargetsArr, teamLookup, hpLookup, localToWorldLookup, localToWorld.Position, attack.radiusSq, team.teamInd, modDist, modHp);
+        attack.target = FindBestTarget(localTransform.Position, attack.radiusSq, team.teamInd, modDist, modHp);
 
 
         if (attack.target != Entity.Null)
@@ -313,6 +397,37 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
         }
     }
 
+    private Entity FindBestTarget(float3 position, int radiusSq, int teamInd, float modDist, float modHp)
+    {
+        float bestScore = float.MinValue;
+        Entity bestScoreEntity = Entity.Null;
+
+        foreach (Entity potentialTarget in potentialTargetsArr)
+        {
+            //Check if they are in different teams
+            if (teamLookup[potentialTarget].teamInd - teamInd == 0)
+                continue;
+
+            float curScore = 0;
+
+            float distanceScore = radiusSq - math.distancesq(position, localToWorldLookup[potentialTarget].Position)/* * distScoreMultiplier*/;
+            //Check if target is not in the attack radius
+            if (distanceScore < 0)
+                continue;
+            curScore += distanceScore * modDist;
+
+            float hpScore = -(hpLookup[potentialTarget].curHp);
+            curScore += hpScore * modHp;
+            ///TODO Other score affectors
+
+            if (curScore > bestScore)
+            {
+                bestScore = curScore;
+                bestScoreEntity = potentialTarget;
+            }
+        }
+        return bestScoreEntity;
+    }
     private void CreateAttackRequest(int chunkIndexInQuery, Entity target, int damage, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
