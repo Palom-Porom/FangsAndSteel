@@ -58,6 +58,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "DisableCameraBorders",
+                    "type": "Button",
+                    "id": "3c19ec32-155e-4899-883f-d5c2a95c301d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -181,7 +190,7 @@
                     "action": "OpenCloseEscMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
-                 },
+                },
                 {
                     "name": "Shift_RMB",
                     "id": "a53bdbdb-f9a3-4e2b-831a-fed302bfe62c",
@@ -214,6 +223,17 @@
                     "action": "Shift_TargetSelectedUnits",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "38675ab8-d8c5-4904-8925-59dcb9e68ac8",
+                    "path": "<Keyboard>/b",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DisableCameraBorders",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

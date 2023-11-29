@@ -39,7 +39,7 @@ public partial class CameraControlSystem : SystemBase
 
         cameraPivotTransform.position += cameraPivotTransform.forward * inputData.cameraMoveInputs.y * MOVE_SPEED * SystemAPI.Time.DeltaTime;
         cameraPivotTransform.position += cameraPivotTransform.right * inputData.cameraMoveInputs.x * MOVE_SPEED * SystemAPI.Time.DeltaTime;
-        if (cameraPivotTransform.position.y < MIN_HEIGHT)
+        if (!inputData.cameraBordersDisabled && cameraPivotTransform.position.y < MIN_HEIGHT)
             cameraPivotTransform.position = new float3(cameraPivotTransform.position.x, MIN_HEIGHT, cameraPivotTransform.position.z);
 
         float2 rotateInputs = inputData.cameraRotateInputs;

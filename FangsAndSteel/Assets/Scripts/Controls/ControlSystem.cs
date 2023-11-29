@@ -17,6 +17,8 @@ public partial class ControlSystem : SystemBase
     private bool neededTargeting = false;
     private bool shiftTargeting = false;
 
+    private bool cameraBordersDisabled = false;
+
 
     protected override void OnCreate()
     {
@@ -39,12 +41,14 @@ public partial class ControlSystem : SystemBase
         controlsAssetClass.Game.TargetSelectedUnits.performed += CollectTargetingInfo;
         controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += CollectTargetingInfo;
         controlsAssetClass.Game.Shift_TargetSelectedUnits.performed += SetFlagForShiftTargeting;
+        controlsAssetClass.Game.DisableCameraBorders.performed += DisableCameraBorders;
     }
     protected override void OnStopRunning()
     {
         controlsAssetClass.Game.TargetSelectedUnits.performed -= CollectTargetingInfo;
         controlsAssetClass.Game.Shift_TargetSelectedUnits.performed -= CollectTargetingInfo;
         controlsAssetClass.Game.Shift_TargetSelectedUnits.performed -= SetFlagForShiftTargeting;
+        controlsAssetClass.Game.DisableCameraBorders.performed -= DisableCameraBorders;
 
         controlsAssetClass.Disable();
     }
@@ -67,6 +71,7 @@ public partial class ControlSystem : SystemBase
         }
         inputDataSingleton.ValueRW.neededTargeting = neededTargeting;
         inputDataSingleton.ValueRW.shiftTargeting = shiftTargeting;
+        inputDataSingleton.ValueRW.cameraBordersDisabled = cameraBordersDisabled;
         neededTargeting = false;
         shiftTargeting = false;
     }
@@ -78,6 +83,8 @@ public partial class ControlSystem : SystemBase
         neededTargeting = true;
     }
     private void SetFlagForShiftTargeting(InputAction.CallbackContext context) { shiftTargeting = true; }
+
+    private void DisableCameraBorders(InputAction.CallbackContext context) { cameraBordersDisabled = !cameraBordersDisabled; }
 }
 
 /// <summary>
@@ -95,6 +102,6 @@ public struct InputData : IComponentData
     public float3 mouseTargetingPoint;
     public bool neededTargeting;
     public bool shiftTargeting;
-    
 
+    public bool cameraBordersDisabled;
 }

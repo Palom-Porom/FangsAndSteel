@@ -80,6 +80,15 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DisableCameraBorders"",
+                    ""type"": ""Button"",
+                    ""id"": ""3c19ec32-155e-4899-883f-d5c2a95c301d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -236,6 +245,17 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
                     ""action"": ""Shift_TargetSelectedUnits"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""38675ab8-d8c5-4904-8925-59dcb9e68ac8"",
+                    ""path"": ""<Keyboard>/b"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DisableCameraBorders"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -250,6 +270,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
         m_Game_RotateCamera = m_Game.FindAction("RotateCamera", throwIfNotFound: true);
         m_Game_ZoomCamera = m_Game.FindAction("ZoomCamera", throwIfNotFound: true);
         m_Game_OpenCloseEscMenu = m_Game.FindAction("OpenCloseEscMenu", throwIfNotFound: true);
+        m_Game_DisableCameraBorders = m_Game.FindAction("DisableCameraBorders", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -317,6 +338,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
     private readonly InputAction m_Game_RotateCamera;
     private readonly InputAction m_Game_ZoomCamera;
     private readonly InputAction m_Game_OpenCloseEscMenu;
+    private readonly InputAction m_Game_DisableCameraBorders;
     public struct GameActions
     {
         private @ControlsAsset m_Wrapper;
@@ -327,6 +349,7 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
         public InputAction @RotateCamera => m_Wrapper.m_Game_RotateCamera;
         public InputAction @ZoomCamera => m_Wrapper.m_Game_ZoomCamera;
         public InputAction @OpenCloseEscMenu => m_Wrapper.m_Game_OpenCloseEscMenu;
+        public InputAction @DisableCameraBorders => m_Wrapper.m_Game_DisableCameraBorders;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -354,6 +377,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
             @OpenCloseEscMenu.started += instance.OnOpenCloseEscMenu;
             @OpenCloseEscMenu.performed += instance.OnOpenCloseEscMenu;
             @OpenCloseEscMenu.canceled += instance.OnOpenCloseEscMenu;
+            @DisableCameraBorders.started += instance.OnDisableCameraBorders;
+            @DisableCameraBorders.performed += instance.OnDisableCameraBorders;
+            @DisableCameraBorders.canceled += instance.OnDisableCameraBorders;
         }
 
         private void UnregisterCallbacks(IGameActions instance)
@@ -376,6 +402,9 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
             @OpenCloseEscMenu.started -= instance.OnOpenCloseEscMenu;
             @OpenCloseEscMenu.performed -= instance.OnOpenCloseEscMenu;
             @OpenCloseEscMenu.canceled -= instance.OnOpenCloseEscMenu;
+            @DisableCameraBorders.started -= instance.OnDisableCameraBorders;
+            @DisableCameraBorders.performed -= instance.OnDisableCameraBorders;
+            @DisableCameraBorders.canceled -= instance.OnDisableCameraBorders;
         }
 
         public void RemoveCallbacks(IGameActions instance)
@@ -401,5 +430,6 @@ public partial class @ControlsAsset: IInputActionCollection2, IDisposable
         void OnRotateCamera(InputAction.CallbackContext context);
         void OnZoomCamera(InputAction.CallbackContext context);
         void OnOpenCloseEscMenu(InputAction.CallbackContext context);
+        void OnDisableCameraBorders(InputAction.CallbackContext context);
     }
 }
