@@ -6,7 +6,7 @@ using Unity.Entities.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-[UpdateInGroup(typeof(ControlsSystemGroup), OrderLast = true)]
+[UpdateInGroup(typeof(SimulationSystemGroup), OrderLast = true)]
 public partial class TurnSystem : SystemBase
 {
 
