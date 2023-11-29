@@ -9,7 +9,7 @@ public class AttackAuthoring : MonoBehaviour
     public int damage = 0;
     public float realodLen = 1;
     public int attackRadius = 0;
-    public int timeToShoot = 1;
+    public float timeToShoot = 1;
     public class Baker : Baker<AttackAuthoring>
     {
         public override void Bake(AttackAuthoring authoring)
