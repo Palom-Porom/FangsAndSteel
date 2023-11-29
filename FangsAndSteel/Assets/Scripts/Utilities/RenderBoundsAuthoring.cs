@@ -19,7 +19,7 @@ public class RenderBoundsAuthoring : MonoBehaviour
             AddComponent(entity, new RenderBoundsAdjustRqstComponent
             {
                 center = authoring.transform.parent.parent.parent.GetComponent<PhysicsShapeAuthoring>().GetBakedBoxProperties().Center,
-                extents = authoring.transform.parent.parent.parent.GetComponent<PhysicsShapeAuthoring>().GetBoxProperties().Size / 2
+                extents = authoring.transform.parent.parent.parent.GetComponent<PhysicsShapeAuthoring>().GetBoxProperties().Size
                 //extents = new float3(authoring.xExtent, authoring.yExtent, authoring.zExtent)
             });
         }
