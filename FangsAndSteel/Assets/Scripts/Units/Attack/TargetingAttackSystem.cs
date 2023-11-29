@@ -128,8 +128,6 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             };
             state.Dependency = attackTargetingDeployableJob.Schedule(deployableUnitsQuery, state.Dependency);
         }
-
-        //World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>().AddJobHandleForProducer(state.Dependency);
     }
 }
 
@@ -176,6 +174,7 @@ public partial struct AttackTargetingJob : IJobEntity
             && math.distancesq(localToWorld.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq
             && hpLookup.HasComponent(attack.target))
         {
+            attackSettings.isAbleToMove = attackSettings.shootingOnMoveMode;
             CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
             //Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
             //ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = attack.target, damage = attack.damage });
@@ -197,6 +196,10 @@ public partial struct AttackTargetingJob : IJobEntity
             attackSettings.isAbleToMove = attackSettings.shootingOnMoveMode;
             CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
             attack.curReload = 0;
+        }
+        else
+        {
+            attackSettings.isAbleToMove = true;
         }
     }
 
@@ -244,7 +247,7 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
             if (deployable.deployTimeCur > 0)
             {
                 deployable.deployTimeCur -= deltaTime;
-                if (deployable.deployTimeCur == deployable.deployTimeMax)
+                if (deployable.deployTimeCur <= 0)
                     attackSettings.isAbleToMove = true;
             }
         }
