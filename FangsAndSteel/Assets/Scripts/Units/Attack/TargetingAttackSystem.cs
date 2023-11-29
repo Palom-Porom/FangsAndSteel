@@ -245,13 +245,16 @@ public partial struct AttackTargetingJob : IJobEntity
         }
         else
         {
-            attackSettings.isAbleToMove = true;
-            foreach (var modelBufElem in modelsBuf)
-            {
-                RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+            if (!attackSettings.isAbleToMove)
+            { 
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                }
             }
+            attackSettings.isAbleToMove = true;
         }
         
     }
