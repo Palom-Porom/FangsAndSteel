@@ -30,7 +30,7 @@ public partial class TurnSystem : SystemBase
 
     public void OnStopRunning(ref SystemState state) 
     {
-        
+        orderPhase = !orderPhase;
     }
 
     
@@ -73,7 +73,7 @@ public partial class TurnSystem : SystemBase
     private void EnableEngageSystems (bool enable)
     {
         World.Unmanaged.GetExistingSystemState<UnitsSystemGroup>().Enabled = enable;
-        World.Unmanaged.GetExistingSystemState<VisionMapSystem>().Enabled = enable;
+        //World.Unmanaged.GetExistingSystemState<VisionMapSystem>().Enabled = enable;
         World.Unmanaged.GetExistingSystemState<AnimationSystem>().Enabled = enable;
 
         World.Unmanaged.GetExistingSystemState<TargetingMoveSystem>().Enabled = !enable;

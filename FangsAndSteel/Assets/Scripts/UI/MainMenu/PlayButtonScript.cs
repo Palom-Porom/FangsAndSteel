@@ -9,8 +9,9 @@ public class PlayButtonScript : MonoBehaviour
     Button button;
     public void PlayGame()
     {
-        SceneManager.LoadScene("SampleScene");
-        SceneManager.UnloadSceneAsync("MainMenu");
+        //SceneManager.LoadScene("SampleScene");
+        //SceneManager.UnloadSceneAsync("MainMenu");
+        SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
     }
 
     private void Awake()
