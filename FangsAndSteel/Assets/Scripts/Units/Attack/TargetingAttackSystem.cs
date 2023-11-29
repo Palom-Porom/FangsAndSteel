@@ -30,6 +30,8 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
     NativeArray<AnimDbEntry> attackClips;
     NativeArray<AnimDbEntry> reloadClips;
     NativeArray<AnimDbEntry> moveClips;
+    NativeArray<AnimDbEntry> deployClips;
+    NativeArray<AnimDbEntry> undeployClips;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -72,6 +74,8 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         attackClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Attack");
         reloadClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Recharge");
         moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Movement");
+        deployClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Deploy");
+        undeployClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Undeploy");
     }
 
     public void OnStopRunning(ref SystemState state)
@@ -132,7 +136,9 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
                 animStateLookup = animStateLookup,
                 attackClips = attackClips,
                 reloadClips = reloadClips,
-                moveClips = moveClips
+                moveClips = moveClips,
+                deployClips = deployClips,
+                undeployClips = undeployClips
             };
             state.Dependency = attackTargetingDeployableJob.Schedule(deployableUnitsQuery, state.Dependency);
         }
@@ -319,6 +325,8 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
     [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
     [ReadOnly] public NativeArray<AnimDbEntry> reloadClips;
     [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> deployClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> undeployClips;
 
     private const float ROT_TIME = 5;
 
@@ -329,10 +337,16 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
         if (!deployable.deployedState)
         {
             if (deployable.deployTimeCur > 0)
-            {
                 deployable.deployTimeCur -= deltaTime;
-                if (deployable.deployTimeCur <= 0)
-                    attackSettings.isAbleToMove = true;
+            if (!attackSettings.isAbleToMove && deployable.deployTimeCur <= 0)
+            {
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                }
+                attackSettings.isAbleToMove = true;
             }
         }
         else if (deployable.deployTimeCur < deployable.deployTimeMax)
@@ -402,6 +416,13 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
             {
                 deployable.deployedState = true;
                 attackSettings.isAbleToMove = false;
+                //deploy anim
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = deployClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
+                }
             }
             else if (fullyDeployed && math.abs(attack.curReload - attack.reloadLen) <= float.Epsilon)
             {
@@ -413,7 +434,18 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
         {
             if (deployable.waitingTimeCur < deployable.waitingTimeMax)
                 deployable.waitingTimeCur += deltaTime;
-            deployable.deployedState = (deployable.waitingTimeCur < deployable.waitingTimeMax);
+            //if waiting to long for the new target -> undeply
+            if (deployable.deployedState && deployable.waitingTimeCur >= deployable.waitingTimeMax)
+            {
+                deployable.deployedState = false;
+                //undeploy anim
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = undeployClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
+                }
+            }
         }
     }
 
@@ -457,6 +489,7 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
         foreach (var modelBufElem in modelsBuf)
         {
             RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+            ///TODO: Reload when the anim on model appear
             animCmd.ValueRW.ClipIndex = attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
             animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
         }

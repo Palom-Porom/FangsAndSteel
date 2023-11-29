@@ -16,9 +16,9 @@ public static class AnimDb
 	dict["Second_robot", "Attack"] = new AnimDbEntry { BeginFrame = 38, EndFrame = 57, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Attack", ModelIndex = 6, ClipIndex = 2 };
 	dict["Second_robot", "Death"] = new AnimDbEntry { BeginFrame = 58, EndFrame = 73, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Death", ModelIndex = 6, ClipIndex = 3 };
 	dict["Second_robot", "Rest_Deployed"] = new AnimDbEntry { BeginFrame = 74, EndFrame = 93, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Rest_Deployed", ModelIndex = 6, ClipIndex = 4 };
-	dict["Second_robot", "Deploy"] = new AnimDbEntry { BeginFrame = 94, EndFrame = 109, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Deploy", ModelIndex = 6, ClipIndex = 5 };
+	dict["Second_robot", "Undeploy"] = new AnimDbEntry { BeginFrame = 94, EndFrame = 108, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Undeploy", ModelIndex = 6, ClipIndex = 5 };
 	dict["Second_robot", "Death_Deployed"] = new AnimDbEntry { BeginFrame = 110, EndFrame = 124, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Death_Deployed", ModelIndex = 6, ClipIndex = 6 };
-	dict["Second_robot", "Undeploy"] = new AnimDbEntry { BeginFrame = 125, EndFrame = 144, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Undeploy", ModelIndex = 6, ClipIndex = 7 };
+	dict["Second_robot", "Deploy"] = new AnimDbEntry { BeginFrame = 125, EndFrame = 144, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Deploy", ModelIndex = 6, ClipIndex = 7 };
 	}
 public enum Model { FirstRobot, Second_robot }
 public enum FirstRobot { Rest, Movement, Attack, Recharge, Death_1, Death_2}
