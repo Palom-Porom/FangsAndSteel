@@ -171,7 +171,7 @@ PrefabInstance:
     - target: {fileID: 1034131159984770949, guid: 0f8880dd7d47ec349b3fad58ce3395c4,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 11
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 1034131159984770949, guid: 0f8880dd7d47ec349b3fad58ce3395c4,
         type: 3}
@@ -790,7 +790,7 @@ PrefabInstance:
     - target: {fileID: 1034131159984770949, guid: 0f8880dd7d47ec349b3fad58ce3395c4,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1034131159984770949, guid: 0f8880dd7d47ec349b3fad58ce3395c4,
         type: 3}
@@ -836,6 +836,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: FogOfWarQuad (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465701237415902328, guid: 0f8880dd7d47ec349b3fad58ce3395c4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
