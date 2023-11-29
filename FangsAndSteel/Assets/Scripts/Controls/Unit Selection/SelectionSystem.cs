@@ -54,7 +54,7 @@ public partial class SelectionSystem : SystemBase
     {
         selectLookup.Update(this);
 
-        ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+        ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
         allSelected = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
         allSelectable = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
@@ -101,7 +101,7 @@ public partial class SelectionSystem : SystemBase
             //Update containers
             selectLookup.Update(this);
             attackSetsLookup.Update(this);
-            ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+            ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
             if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
                 unitStatsRqstEntity = Entity.Null;

@@ -37,7 +37,7 @@ public partial struct VisionCurrentTeamSystem : ISystem
     {
         children.Update(ref state);
         disableRendLookup.Update(ref state);
-        ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
+        ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
         DynamicBuffer<VisionMapBuffer> visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>();
         VisionCurrentTeamJob visionCurrentTeamJob = new VisionCurrentTeamJob
@@ -48,7 +48,7 @@ public partial struct VisionCurrentTeamSystem : ISystem
             disableRendLookup = disableRendLookup,
             ecb = ecb.AsParallelWriter()
         };
-        visionCurrentTeamJob.Schedule();
+        state.Dependency = visionCurrentTeamJob.Schedule(state.Dependency);
     }
 }
 

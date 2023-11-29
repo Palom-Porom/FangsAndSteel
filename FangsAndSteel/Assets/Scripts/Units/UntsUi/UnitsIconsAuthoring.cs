@@ -11,8 +11,6 @@ public class UnitsIconsAuthoring : MonoBehaviour
     public GameObject reloadBarGO;
 
     public GameObject VisualizationGO;
-
-    public GameObject ModelsGO;
     public class Baker : Baker<UnitsIconsAuthoring>
     {
         public override void Bake(UnitsIconsAuthoring authoring)
@@ -24,9 +22,7 @@ public class UnitsIconsAuthoring : MonoBehaviour
             healthBarEntity = GetEntity(authoring.healthBarGO, TransformUsageFlags.Dynamic), 
             reloadBarEntity = GetEntity(authoring.reloadBarGO, TransformUsageFlags.Dynamic),
 
-            VisualizationEntity = GetEntity(authoring.VisualizationGO, TransformUsageFlags.Dynamic), 
-
-            ModelsEntity= GetEntity(authoring.ModelsGO, TransformUsageFlags.Dynamic) 
+            VisualizationEntity = GetEntity(authoring.VisualizationGO, TransformUsageFlags.Dynamic)
             });
             
         }
@@ -42,6 +38,4 @@ public struct UnitsIconsComponent: IComponentData
     public Entity reloadBarEntity;
 
     public Entity VisualizationEntity;
-
-    public Entity ModelsEntity;
 }

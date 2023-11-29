@@ -25,8 +25,9 @@ public partial class BasicButtonSystem : SystemBase
         uiData = SystemAPI.GetSingleton<StaticUIData>();
         if (uiData.stopMoveBut)
         {
-            foreach ((SelectTag selectTag, RefRW<MovementComponent> movementComponent, LocalTransform localTransform) in SystemAPI.Query<SelectTag, RefRW<MovementComponent>, LocalTransform>())
+            foreach ((SelectTag selectTag, RefRW<MovementComponent> movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, LocalTransform localTransform) in SystemAPI.Query<SelectTag, RefRW<MovementComponent>, DynamicBuffer<MovementCommandsBuffer>, LocalTransform>())
             {
+                moveComBuf.Clear();
                 movementComponent.ValueRW.target = localTransform.Position;
             }
         }

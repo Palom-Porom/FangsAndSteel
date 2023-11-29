@@ -26,7 +26,7 @@ public partial struct DelayedKillingSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         childrenLookup.Update(ref state);
-        ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
+        ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
         //foreach ((RefRW<DeadComponent> dieComponent, Entity entity) in SystemAPI.Query<RefRW<DeadComponent>>().WithEntityAccess())
         //{
         //    if (dieComponent.ValueRO.timeToDie <= 0)

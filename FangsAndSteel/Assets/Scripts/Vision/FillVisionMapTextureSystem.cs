@@ -30,6 +30,8 @@ public partial class FillVisionMapTextureSystem : SystemBase
     {
         if ((UnityEngine.Time.frameCount + 2) % 5 == 0)
         {
+            EntityManager.CompleteDependencyBeforeRO<VisionMapBuffer>();
+            
             var visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>(true);
             computeBuffer.BeginWrite<int>(0, 250000).CopyFrom(visionMap.Reinterpret<int>().AsNativeArray());
             computeBuffer.EndWrite<int>(250000);

@@ -83,7 +83,7 @@ public partial struct VisionMapSystem : ISystem, ISystemStartStop
             };
 
             //Планировщик работы Job. Когда будет возможность начинает работу Job
-            fillVisionMapJob.Schedule();
+            state.Dependency = fillVisionMapJob.Schedule(state.Dependency);
 
             #region Debug
             if (needToDebug)
@@ -93,7 +93,7 @@ public partial struct VisionMapSystem : ISystem, ISystemStartStop
                 secondTeamPrefub = SystemAPI.GetSingleton<DebugCube>().secondTeamPrefub;
                 bothTeamsPrefub = SystemAPI.GetSingleton<DebugCube>().bothTeamsPrefub;
 
-                ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
+                ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
                 state.Dependency = new DebugVissionMapJob
                 {
@@ -171,7 +171,7 @@ public partial struct FillVisionMapJob : IJobEntity
 /// <summary>
 /// Visualize the current visionMap state (don't destroy the debugCubes)
 /// </summary>
-[BurstCompile]
+//[BurstCompile]
 public partial struct DebugVissionMapJob : IJobParallelFor
 {
     [ReadOnly] public DynamicBuffer<VisionMapBuffer> visionMap;
