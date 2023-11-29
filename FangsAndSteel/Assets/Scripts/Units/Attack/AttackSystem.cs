@@ -4,7 +4,6 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Transforms;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using AnimCooker;
 using Unity.Mathematics;

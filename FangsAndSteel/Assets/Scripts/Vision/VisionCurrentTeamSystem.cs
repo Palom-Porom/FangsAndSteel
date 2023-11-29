@@ -48,7 +48,7 @@ public partial struct VisionCurrentTeamSystem : ISystem
             disableRendLookup = disableRendLookup,
             ecb = ecb.AsParallelWriter()
         };
-        visionCurrentTeamJob.Schedule();
+        state.Dependency = visionCurrentTeamJob.Schedule(state.Dependency);
     }
 }
 

@@ -21,7 +21,13 @@ public class AttackAuthoring : MonoBehaviour
                 radiusSq = authoring.attackRadius * authoring.attackRadius,
                 target = Entity.Null });
 
-            AddComponent(entity, new AttackSettingsComponent {targettingMinHP = false, shootingOnMoveMode = false});
+            AddComponent(entity, new AttackSettingsComponent 
+            {
+                isAbleToMove = true,
+
+                targettingMinHP = false,
+                shootingOnMoveMode = false
+            });
         }
     }
 }
@@ -36,6 +42,8 @@ public struct AttackComponent : IComponentData
 
 public struct AttackSettingsComponent : IComponentData
 {
+    public bool isAbleToMove;
+
     public bool targettingMinHP;
     public bool shootingOnMoveMode;
 }

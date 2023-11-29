@@ -76,8 +76,11 @@ public partial struct MovementJob : IJobEntity
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> restClips;
 
-    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer, in DynamicBuffer<ModelsBuffer> modelsBuf)
+    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer, in DynamicBuffer<ModelsBuffer> modelsBuf, in AttackSettingsComponent attackSettings)
     {
+        if (!attackSettings.isAbleToMove)
+            return;
+
         if (!movementComponent.isMoving)
             return;
 

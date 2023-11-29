@@ -17,6 +17,7 @@ public class MovementAuthoring : MonoBehaviour
             AddComponent(this.GetEntity(TransformUsageFlags.Dynamic), new MovementComponent 
             { 
                 speed = authoring.speed, 
+                hasActualTarget = false,
                 target = authoring.target, 
                 isMoving = authoring.isMoving,
 
@@ -32,6 +33,7 @@ public class MovementAuthoring : MonoBehaviour
 public struct MovementComponent : IComponentData
 {
     public float speed;
+    public bool hasActualTarget;
     public float3 target;
     public bool isMoving;
 
