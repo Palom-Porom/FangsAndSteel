@@ -75,5 +75,8 @@ public partial class TurnSystem : SystemBase
         World.Unmanaged.GetExistingSystemState<UnitsSystemGroup>().Enabled = enable;
         World.Unmanaged.GetExistingSystemState<VisionMapSystem>().Enabled = enable;
         World.Unmanaged.GetExistingSystemState<AnimationSystem>().Enabled = enable;
+
+        World.Unmanaged.GetExistingSystemState<TargetingMoveSystem>().Enabled = !enable;
+        World.Unmanaged.GetExistingSystemState<BasicButtonSystem>().Enabled = !enable;
     }
 }

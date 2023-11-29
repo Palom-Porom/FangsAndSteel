@@ -40,10 +40,14 @@ public partial class BasicButtonSystem : SystemBase
         }
         if (uiData.changeSpeedBut)
         {
+            Debug.Log("1");
             new ChangeShootModeJob().Schedule();
             Color c = StaticUIRefs.Instance.ShootModeButton.color;
             if (c.r != c.g)
+            {
+                Debug.Log("2");
                 StaticUIRefs.Instance.ShootModeButton.color = new Color((c.r + 1) % 2, (c.g + 1) % 2, 0);
+            }
 
         }
     }
