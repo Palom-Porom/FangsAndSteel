@@ -28,6 +28,8 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
     ComponentLookup<AnimationCmdData> animCmdLookup;
     ComponentLookup<AnimationStateData> animStateLookup;
     NativeArray<AnimDbEntry> attackClips;
+    NativeArray<AnimDbEntry> reloadClips;
+    NativeArray<AnimDbEntry> moveClips;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -68,6 +70,8 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
     public void OnStartRunning(ref SystemState state)
     {
         attackClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Attack");
+        reloadClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Recharge");
+        moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Movement");
     }
 
     public void OnStopRunning(ref SystemState state)
@@ -104,7 +108,9 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 
                 animCmdLookup = animCmdLookup,
                 animStateLookup = animStateLookup,
-                attackClips = attackClips
+                attackClips = attackClips,
+                reloadClips = reloadClips,
+                moveClips = moveClips
             };
             state.Dependency = attackTargetingJob.Schedule(usualUnitsQuery, state.Dependency);
         }
@@ -124,7 +130,9 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 
                 animCmdLookup = animCmdLookup,
                 animStateLookup = animStateLookup,
-                attackClips = attackClips
+                attackClips = attackClips,
+                reloadClips = reloadClips,
+                moveClips = moveClips
             };
             state.Dependency = attackTargetingDeployableJob.Schedule(deployableUnitsQuery, state.Dependency);
         }
@@ -153,8 +161,10 @@ public partial struct AttackTargetingJob : IJobEntity
     private float modDist;
 
     public ComponentLookup<AnimationCmdData> animCmdLookup;
-    [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
+    public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> reloadClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
 
     private const float ROT_TIME = 5;
 
@@ -209,7 +219,7 @@ public partial struct AttackTargetingJob : IJobEntity
             attack.curReload = 0;
             return;
         }
-        //else -> find new target
+        //----find new target----
 
         if (attackSettings.targettingMinHP)
         {
@@ -230,6 +240,12 @@ public partial struct AttackTargetingJob : IJobEntity
         else
         {
             attackSettings.isAbleToMove = true;
+            foreach (var modelBufElem in modelsBuf)
+            {
+                RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+            }
         }
         
     }
@@ -274,6 +290,8 @@ public partial struct AttackTargetingJob : IJobEntity
         foreach (var modelBufElem in modelsBuf)
         {
             RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+            byte reloadIdx = reloadClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+            animStateLookup.GetRefRW(modelBufElem.model).ValueRW.ForeverClipIndex = reloadIdx;
             animCmd.ValueRW.ClipIndex = attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
             animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
         }
@@ -299,6 +317,8 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
     public ComponentLookup<AnimationCmdData> animCmdLookup;
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> reloadClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
 
     private const float ROT_TIME = 5;
 
@@ -363,7 +383,7 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
             }
         }
 
-        //find new target
+        //----find new target----
 
         if (attackSettings.targettingMinHP)
         {

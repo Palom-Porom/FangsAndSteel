@@ -105,7 +105,7 @@ public partial struct ChangeTargetJob : IJobEntity
     public ComponentLookup<AnimationCmdData> animCmdLookup;
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
-    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in SelectTag selectTag, in DynamicBuffer<ModelsBuffer> modelsBuf)
+    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in SelectTag selectTag, in DynamicBuffer<ModelsBuffer> modelsBuf, in AttackSettingsComponent attackSets)
     {
         var result = raycastResult.Value;
         if (!result.hasHit)
@@ -119,12 +119,15 @@ public partial struct ChangeTargetJob : IJobEntity
             moveComBuf.Clear();
             movementComponent.target = result.raycastHitInfo.Position;
             movementComponent.isMoving = true;
-            //Play move anim
-            foreach (var modelBufElem in modelsBuf)
+            if (attackSets.isAbleToMove)
             {
-                RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                //Play move anim
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                }
             }
         }
     }

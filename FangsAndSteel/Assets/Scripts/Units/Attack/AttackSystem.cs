@@ -132,7 +132,7 @@ public partial struct AttackJob : IJobEntity
             ecb.RemoveComponent<UnitStatsRequestTag>(chunkIndexInQuery, attackRequest.target);
 
             //Play Death anim
-            localTransformLookup.GetRefRW(attackRequest.target).ValueRW.Rotation = quaternion.LookRotationSafe(attackRequest.attackerPos, localTransformLookup[attackRequest.target].Up());
+            //localTransformLookup.GetRefRW(attackRequest.target).ValueRW.Rotation = quaternion.LookRotationSafe(attackRequest.attackerPos, localTransformLookup[attackRequest.target].Up());
             float maxTimeToDie = float.MinValue;
             if (modelBufLookup.HasBuffer(attackRequest.target))
             {
