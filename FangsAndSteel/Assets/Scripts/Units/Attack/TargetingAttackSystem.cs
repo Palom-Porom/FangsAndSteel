@@ -205,7 +205,7 @@ public partial struct AttackTargetingJob : IJobEntity
             }
 
 
-            CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
+            CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, localTransform.Position, modelsBuf);
             attack.curReload = 0;
             return;
         }
@@ -224,7 +224,7 @@ public partial struct AttackTargetingJob : IJobEntity
             if (attackSettings.shootingOnMoveMode)
                 ecb.AddComponent(chunkIndexInQuery, entity, new NotAbleToMoveForTimeRqstComponent { passedTime = 0, targetTime = attack.timeToShoot });
             attackSettings.isAbleToMove = false;
-            CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
+            CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, localTransform.Position, modelsBuf);
             attack.curReload = 0;
         }
         else
@@ -265,10 +265,10 @@ public partial struct AttackTargetingJob : IJobEntity
         }
         return bestScoreEntity;
     }
-    private void CreateAttackRequest(int chunkIndexInQuery, Entity target, int damage, in DynamicBuffer<ModelsBuffer> modelsBuf)
+    private void CreateAttackRequest(int chunkIndexInQuery, Entity target, int damage, float3 attackerPos, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
-        ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = target, damage = damage });
+        ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = target, damage = damage, attackerPos = attackerPos });
 
         //Play Attack Anim
         foreach (var modelBufElem in modelsBuf)
@@ -357,7 +357,7 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
                 && math.distancesq(localTransform.Position, localToWorldLookup[attack.target].Position) <= attack.radiusSq
                 && hpLookup.HasComponent(attack.target))
             {
-                CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
+                CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, localTransform.Position, modelsBuf);
                 attack.curReload = 0;
                 return;
             }
@@ -385,7 +385,7 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
             }
             else if (fullyDeployed && math.abs(attack.curReload - attack.reloadLen) <= float.Epsilon)
             {
-                CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, modelsBuf);
+                CreateAttackRequest(chunkIndexInQuery, attack.target, attack.damage, localTransform.Position, modelsBuf);
                 attack.curReload = 0;
             }
         }
@@ -428,10 +428,10 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
         }
         return bestScoreEntity;
     }
-    private void CreateAttackRequest(int chunkIndexInQuery, Entity target, int damage, in DynamicBuffer<ModelsBuffer> modelsBuf)
+    private void CreateAttackRequest(int chunkIndexInQuery, Entity target, int damage, float3 attackerPos, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
-        ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = target, damage = damage });
+        ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = target, damage = damage, attackerPos = attackerPos });
 
         //Play Attack Anim
         foreach (var modelBufElem in modelsBuf)
@@ -448,4 +448,5 @@ public struct AttackRequestComponent : IComponentData
 {
     public Entity target;
     public int damage;
+    public float3 attackerPos;
 }

@@ -20,6 +20,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     ComponentLookup<UnitsIconsComponent> unitsIconsLookup;
     BufferLookup<Child> childrenLookup;
 
+    ComponentLookup<LocalTransform> localTransformLookup;
     ComponentLookup<AnimationCmdData> animCmdLookup;
     ComponentLookup<AnimationStateData> animStateLookup;
     BufferLookup<ModelsBuffer> modelBufLookup;
@@ -36,6 +37,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         unitsIconsLookup = state.GetComponentLookup<UnitsIconsComponent>(true);
         childrenLookup = state.GetBufferLookup<Child>(true);
 
+        localTransformLookup = state.GetComponentLookup<LocalTransform>();
         animCmdLookup = state.GetComponentLookup<AnimationCmdData>();
         animStateLookup = state.GetComponentLookup<AnimationStateData>();
         modelBufLookup = state.GetBufferLookup<ModelsBuffer>();
@@ -58,6 +60,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         fillBarLookup.Update(ref state);
         unitsIconsLookup.Update(ref state);
         childrenLookup.Update(ref state);
+        localTransformLookup.Update(ref state);
         animCmdLookup.Update(ref state);
         animStateLookup.Update(ref state);
         modelBufLookup.Update(ref state);
@@ -69,7 +72,8 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
             unitsIconsLookup = unitsIconsLookup, 
             childrenLookup = childrenLookup,
             ecb = ecb,
-            
+
+            localTransformLookup = localTransformLookup,
             animCmdLookup = animCmdLookup,
             animStateLookup = animStateLookup,
             modelBufLookup = modelBufLookup,
@@ -92,6 +96,7 @@ public partial struct AttackJob : IJobEntity
     [ReadOnly] public BufferLookup<Child> childrenLookup;
     public EntityCommandBuffer.ParallelWriter ecb;
 
+    public ComponentLookup<LocalTransform> localTransformLookup;
     public ComponentLookup<AnimationCmdData> animCmdLookup;
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public BufferLookup<ModelsBuffer> modelBufLookup;
@@ -127,6 +132,7 @@ public partial struct AttackJob : IJobEntity
             ecb.RemoveComponent<UnitStatsRequestTag>(chunkIndexInQuery, attackRequest.target);
 
             //Play Death anim
+            localTransformLookup.GetRefRW(attackRequest.target).ValueRW.Rotation = quaternion.LookRotationSafe(attackRequest.attackerPos, localTransformLookup[attackRequest.target].Up());
             float maxTimeToDie = float.MinValue;
             if (modelBufLookup.HasBuffer(attackRequest.target))
             {
