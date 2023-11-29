@@ -28,6 +28,7 @@ public partial class SelectionSystem : SystemBase
 
     private ComponentLookup<SelectTag> selectLookup;
     private ComponentLookup<AttackSettingsComponent> attackSetsLookup;
+    private ComponentLookup<TeamComponent> teamLookup;
 
     private EntityCommandBuffer ecb;
 
@@ -48,6 +49,7 @@ public partial class SelectionSystem : SystemBase
 
         selectLookup = GetComponentLookup<SelectTag>();
         attackSetsLookup = GetComponentLookup<AttackSettingsComponent>();
+        teamLookup = GetComponentLookup<TeamComponent>();
     }
 
     protected override void OnStartRunning()
@@ -57,7 +59,7 @@ public partial class SelectionSystem : SystemBase
         ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
         allSelected = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
-        allSelectable = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
+        allSelectable = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform, TeamComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
 
         if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
             unitStatsRqstEntity = Entity.Null;
@@ -101,6 +103,7 @@ public partial class SelectionSystem : SystemBase
             //Update containers
             selectLookup.Update(this);
             attackSetsLookup.Update(this);
+            teamLookup.Update(this);
             ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
             if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
@@ -163,7 +166,8 @@ public partial class SelectionSystem : SystemBase
 
                     selectTagLookup = selectLookup,
                     attackSetsLookup = attackSetsLookup,
-                    ecb = ecb
+                    ecb = ecb,
+                    teamLookup = teamLookup
                 }.Schedule(Dependency);
             }
         }
@@ -207,12 +211,13 @@ public partial struct SingleSelectJob : IJob
     public ComponentLookup<AttackSettingsComponent> attackSetsLookup;
 
     public EntityCommandBuffer ecb;
+    public ComponentLookup<TeamComponent> teamLookup;
 
     public void Execute()
     {
         if (collisionWorld.CastRay(raycastInput, out RaycastHit raycastHit))
         {
-            if (selectTagLookup.HasComponent(raycastHit.Entity))
+            if (selectTagLookup.HasComponent(raycastHit.Entity) && teamLookup[raycastHit.Entity].teamInd == 1)
             {
                 selectTagLookup.SetComponentEnabled(raycastHit.Entity, true);
                 ecb.RemoveComponent<DisableRendering>(selectTagLookup[raycastHit.Entity].selectionRing);
@@ -254,9 +259,9 @@ public partial struct MultipleSelectJob : IJobEntity
     public ComponentLookup<SelectTag> selectTagLookup;
     public EntityCommandBuffer.ParallelWriter ecb;
 
-    public void Execute(Entity entity, in LocalTransform transform, [ChunkIndexInQuery] int chunkIndexInQuery)
+    public void Execute(Entity entity, in LocalTransform transform, [ChunkIndexInQuery] int chunkIndexInQuery, in TeamComponent team)
     {
-        if (rect.Contains(transform.Position.WorldToScreenCoordinatesNative(worldToScreen)))
+        if (rect.Contains(transform.Position.WorldToScreenCoordinatesNative(worldToScreen)) && team.teamInd == 1)
         {
             selectTagLookup.SetComponentEnabled(entity, true);
             ecb.RemoveComponent<DisableRendering>(chunkIndexInQuery, selectTagLookup[entity].selectionRing);
