@@ -32,6 +32,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
     NativeArray<AnimDbEntry> moveClips;
     NativeArray<AnimDbEntry> deployClips;
     NativeArray<AnimDbEntry> undeployClips;
+    NativeArray<AnimDbEntry> restClips;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -76,6 +77,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Movement");
         deployClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Deploy");
         undeployClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Undeploy");
+        restClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Rest");
     }
 
     public void OnStopRunning(ref SystemState state)
@@ -114,7 +116,8 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
                 animStateLookup = animStateLookup,
                 attackClips = attackClips,
                 reloadClips = reloadClips,
-                moveClips = moveClips
+                moveClips = moveClips,
+                restClips = restClips
             };
             state.Dependency = attackTargetingJob.Schedule(usualUnitsQuery, state.Dependency);
         }
@@ -171,8 +174,9 @@ public partial struct AttackTargetingJob : IJobEntity
     [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
     [ReadOnly] public NativeArray<AnimDbEntry> reloadClips;
     [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> restClips;
 
-    private const float ROT_TIME = 5;
+    private const float ROT_TIME = 0.33f;
 
     public void Execute(ref AttackComponent attack, ref AttackSettingsComponent attackSettings, ref LocalTransform localTransform, in TeamComponent team, ref MovementComponent movement,
         in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery, in DynamicBuffer<ModelsBuffer> modelsBuf, Entity entity)
@@ -247,12 +251,20 @@ public partial struct AttackTargetingJob : IJobEntity
         {
             if (!attackSettings.isAbleToMove)
             { 
-                foreach (var modelBufElem in modelsBuf)
-                {
-                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                    animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
-                }
+                if (movement.isMoving)
+                    foreach (var modelBufElem in modelsBuf)
+                    {
+                        RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                        animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                        animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                    }
+                else
+                    foreach (var modelBufElem in modelsBuf)
+                    {
+                        RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                        animCmd.ValueRW.ClipIndex = restClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                        animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                    }
             }
             attackSettings.isAbleToMove = true;
         }
@@ -331,7 +343,7 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
     [ReadOnly] public NativeArray<AnimDbEntry> deployClips;
     [ReadOnly] public NativeArray<AnimDbEntry> undeployClips;
 
-    private const float ROT_TIME = 5;
+    private const float ROT_TIME = 0.33f;
 
     public void Execute(ref AttackComponent attack, ref AttackSettingsComponent attackSettings, ref LocalTransform localTransform, in TeamComponent team, ref MovementComponent movement,
         in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery, in DynamicBuffer<ModelsBuffer> modelsBuf, ref Deployable deployable)

@@ -30,7 +30,7 @@ public class AttackAuthoring : MonoBehaviour
             {
                 isAbleToMove = true,
 
-                targettingMinHP = false,
+                targettingMinHP = true,
                 shootingOnMoveMode = false
             });
         }

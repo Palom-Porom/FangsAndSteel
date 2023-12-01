@@ -284,6 +284,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2732234473486736558, guid: 916e12f1481daef48b465e4998f3cee9,
+        type: 3}
+      propertyPath: m_defaultAnimationName
+      value: Movement
+      objectReference: {fileID: 0}
     - target: {fileID: 5235555238945495427, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
       propertyPath: teamInd
@@ -507,6 +512,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4007902539913488216, guid: ba6c6a0960feff34989875f9fbdcab95,
+        type: 3}
+      propertyPath: m_defaultAnimationName
+      value: Movement
       objectReference: {fileID: 0}
     - target: {fileID: 4066485212239326434, guid: ba6c6a0960feff34989875f9fbdcab95,
         type: 3}
@@ -772,6 +782,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2732234473486736558, guid: 916e12f1481daef48b465e4998f3cee9,
+        type: 3}
+      propertyPath: m_defaultAnimationName
+      value: Movement
+      objectReference: {fileID: 0}
     - target: {fileID: 5235555238945495427, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
       propertyPath: teamInd
@@ -937,6 +952,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2732234473486736558, guid: 916e12f1481daef48b465e4998f3cee9,
+        type: 3}
+      propertyPath: m_defaultAnimationName
+      value: Movement
       objectReference: {fileID: 0}
     - target: {fileID: 5235555238945495427, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
