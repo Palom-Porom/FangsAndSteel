@@ -26,8 +26,8 @@ public partial class StaticUISystem : SystemBase
         StaticUIRefs.Instance.stopMoveBut = false;
 
         
-        uiData.ValueRW.changeSpeedBut = StaticUIRefs.Instance.changeSpeedBut;
-        StaticUIRefs.Instance.changeSpeedBut = false;
+        uiData.ValueRW.shootModeBut = StaticUIRefs.Instance.shootModeBut;
+        StaticUIRefs.Instance.shootModeBut = false;
 
         
 
@@ -38,5 +38,5 @@ public struct StaticUIData : IComponentData
 {
     public bool endTurnBut;
     public bool stopMoveBut;
-    public bool changeSpeedBut;
+    public bool shootModeBut;
 }

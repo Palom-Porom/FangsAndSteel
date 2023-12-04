@@ -11,7 +11,7 @@ public class EndTurnButton : MonoBehaviour
     private void OnClick()
     {
         StaticUIRefs.Instance.endTurnBut = true;
-        //Debug.Log("EndTurn Button was clicked");
+        
     }
 
     void Awake()

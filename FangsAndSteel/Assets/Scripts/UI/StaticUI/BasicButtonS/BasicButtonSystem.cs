@@ -38,7 +38,7 @@ public partial class BasicButtonSystem : SystemBase
             ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
             ecb.DestroyEntity(SystemAPI.GetSingletonEntity<ShootModeButChangeColorRqst>());
         }
-        if (uiData.changeSpeedBut)
+        if (uiData.shootModeBut)
         {
             Debug.Log("1");
             new ChangeShootModeJob().Schedule();
