@@ -47,5 +47,5 @@ public class StaticUIRefs : MonoBehaviour
 
     [HideInInspector] public bool endTurnBut;
     [HideInInspector] public bool stopMoveBut;
-    [HideInInspector] public bool changeSpeedBut;
+    [HideInInspector] public bool shootModeBut;
 }

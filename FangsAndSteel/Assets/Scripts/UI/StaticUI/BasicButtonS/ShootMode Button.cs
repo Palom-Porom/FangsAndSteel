@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ChangeSpeedButton : MonoBehaviour
+public class ShootModeButton : MonoBehaviour
 {
     Button button;
-    public void ChangeSpeed()
+    public void ShootMode()
     {
-        StaticUIRefs.Instance.changeSpeedBut = true;
+        StaticUIRefs.Instance.shootModeBut = true;
     }
 
     private void Awake()
     {
         button = GetComponent<Button>();
-        button.onClick.AddListener(ChangeSpeed);
+        button.onClick.AddListener(ShootMode);
     }
 
     private void OnDestroy()
     {
-        button.onClick.RemoveListener(ChangeSpeed);
+        button.onClick.RemoveListener(ShootMode);
     }
 
 
