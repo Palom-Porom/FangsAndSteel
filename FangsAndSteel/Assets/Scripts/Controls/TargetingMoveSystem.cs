@@ -7,6 +7,7 @@ using Unity.Jobs;
 using Unity.Physics;
 using UnityEngine;
 using AnimCooker;
+using System.Linq;
 
 [UpdateInGroup(typeof(ControlsSystemGroup), OrderFirst = true)]
 [UpdateAfter(typeof(ControlSystem))]
@@ -110,15 +111,30 @@ public partial struct ChangeTargetJob : IJobEntity
         var result = raycastResult.Value;
         if (!result.hasHit)
             return;
-        if (shiftTargeting && movementComponent.isMoving)
+        if (shiftTargeting && movementComponent.hasMoveTarget)
         {
-            moveComBuf.Add(new MovementCommandsBuffer { target = result.raycastHitInfo.Position });
+            if (!moveComBuf.IsEmpty)
+                moveComBuf.Add(new MovementCommandsBuffer 
+                { 
+                    target = result.raycastHitInfo.Position, 
+                    //Copying the previous settings by default
+                    targettingMinHP = moveComBuf[moveComBuf.Length - 1].targettingMinHP, 
+                    shootingOnMoveMode = moveComBuf[moveComBuf.Length - 1].shootingOnMoveMode 
+                });
+            else
+                moveComBuf.Add(new MovementCommandsBuffer
+                {
+                    target = result.raycastHitInfo.Position,
+                    //Copying the current settings by default
+                    targettingMinHP = attackSets.shootingOnMoveMode,
+                    shootingOnMoveMode = attackSets.shootingOnMoveMode
+                });
         }
         else
         {
             moveComBuf.Clear();
             movementComponent.target = result.raycastHitInfo.Position;
-            movementComponent.isMoving = true;
+            movementComponent.hasMoveTarget = true;
             if (attackSets.isAbleToMove)
             {
                 //Play move anim

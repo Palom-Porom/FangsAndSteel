@@ -17,9 +17,8 @@ public class MovementAuthoring : MonoBehaviour
             AddComponent(this.GetEntity(TransformUsageFlags.Dynamic), new MovementComponent 
             { 
                 speed = authoring.speed, 
-                hasActualTarget = false,
                 target = authoring.target, 
-                isMoving = authoring.isMoving,
+                hasMoveTarget = authoring.isMoving,
 
                 rotTimePassed = 0,
                 lastRotTarget = quaternion.identity
@@ -33,9 +32,8 @@ public class MovementAuthoring : MonoBehaviour
 public struct MovementComponent : IComponentData
 {
     public float speed;
-    public bool hasActualTarget;
     public float3 target;
-    public bool isMoving;
+    public bool hasMoveTarget;
 
     public float rotTimePassed;
     public quaternion lastRotTarget;
@@ -45,4 +43,8 @@ public struct MovementComponent : IComponentData
 public struct MovementCommandsBuffer : IBufferElementData
 {
     public float3 target;
+
+    //AttackSettingsComponent
+    public bool targettingMinHP;
+    public bool shootingOnMoveMode;
 }

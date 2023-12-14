@@ -29,6 +29,7 @@ public partial class BasicButtonSystem : SystemBase
             {
                 moveComBuf.Clear();
                 movementComponent.ValueRW.target = localTransform.Position;
+                movementComponent.ValueRW.hasMoveTarget = false;
             }
         }
 

@@ -81,7 +81,7 @@ public partial struct MovementJob : IJobEntity
         if (!attackSettings.isAbleToMove)
             return;
 
-        if (!movementComponent.isMoving)
+        if (!movementComponent.hasMoveTarget)
             return;
 
         if (math.distancesq(movementComponent.target, transform.Position) < (deltaTime * movementComponent.speed) / 2)
@@ -94,7 +94,7 @@ public partial struct MovementJob : IJobEntity
             }
             else
             {
-                movementComponent.isMoving = false;
+                movementComponent.hasMoveTarget = false;
                 foreach (var modelBufElem in modelsBuf)
                 {
                     RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
