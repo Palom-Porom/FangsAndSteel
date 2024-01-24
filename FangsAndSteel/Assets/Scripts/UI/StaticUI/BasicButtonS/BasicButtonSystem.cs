@@ -53,11 +53,15 @@ public partial class BasicButtonSystem : SystemBase
         }
     }
 }
+
+[WithAll(typeof(SelectTag))]
 public partial struct ChangeShootModeJob : IJobEntity
 {
-    public void Execute(ref AttackSettingsComponent attackSettingsComponent, in SelectTag selectTag)
+    public void Execute(ref AttackSettingsComponent attackSettingsComponent, ref ReloadComponent reloadComponent, ref MovementComponent movement)
     {
         attackSettingsComponent.shootingOnMoveMode = !(attackSettingsComponent.shootingOnMoveMode);
+        reloadComponent.curDebaff += attackSettingsComponent.shootingOnMoveMode ? reloadComponent.reload_SoM_Debaff : -reloadComponent.reload_SoM_Debaff;
+        movement.curDebaff += attackSettingsComponent.shootingOnMoveMode ? movement.movement_SoM_Debaff : -movement.movement_SoM_Debaff;
     }
 }
 

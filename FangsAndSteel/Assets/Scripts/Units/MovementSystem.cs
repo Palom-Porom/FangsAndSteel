@@ -9,11 +9,16 @@ using UnityEngine;
 using Unity.Collections;
 using AnimCooker;
 using System.Net.Security;
+using System;
+using Unity.Jobs;
+using static AnimDb;
 
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
 public partial struct MovementSystem : ISystem, ISystemStartStop
 {
+    ComponentLookup<LocalTransform> transformLookup;
+    
     ComponentLookup<AnimationCmdData> animCmdLookup;
     ComponentLookup<AnimationStateData> animStateLookup;
     NativeArray<AnimDbEntry> restClips;
@@ -25,6 +30,8 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
         state.RequireForUpdate<PhysicsWorldSingleton>();
         state.RequireForUpdate<MovementComponent>();
         state.RequireForUpdate<AnimDbRefData>();
+
+        transformLookup = state.GetComponentLookup<LocalTransform>();
 
         animCmdLookup = state.GetComponentLookup<AnimationCmdData>();
         animStateLookup = state.GetComponentLookup<AnimationStateData>();
@@ -43,9 +50,13 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state) 
     {
+        transformLookup.Update(ref state);
+
         animCmdLookup.Update(ref state);
         animStateLookup.Update(ref state);
 
+
+        #region MovementJob
         var moveJob = new MovementJob
         {
             deltaTime = SystemAPI.Time.DeltaTime,
@@ -55,7 +66,23 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
             animStateLookup = animStateLookup,
             restClips = restClips
         };
-        moveJob.Schedule();
+        JobHandle movementJobHandle = moveJob.Schedule(state.Dependency);
+        #endregion
+
+        #region RotationJobs
+        JobHandle rotationJobHandle = new RotationToTargetJob
+        {
+            deltaTime = SystemAPI.Time.DeltaTime
+        }.Schedule(movementJobHandle);
+
+        JobHandle attackRotationJobHandle = new AttackRotationToTargetJob
+        {
+            deltaTime = SystemAPI.Time.DeltaTime,
+            transformLookup = transformLookup
+        }.Schedule(movementJobHandle);
+
+        state.Dependency = JobHandle.CombineDependencies(attackRotationJobHandle, rotationJobHandle);
+        #endregion
     }
 
 
@@ -67,8 +94,6 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 [BurstCompile]
 public partial struct MovementJob : IJobEntity
 {
-    private const float ROT_TIME = 0.33f;
-
     public float deltaTime;
     [ReadOnly] public CollisionWorld collisionWorld;
 
@@ -76,7 +101,8 @@ public partial struct MovementJob : IJobEntity
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> restClips;
 
-    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer, in DynamicBuffer<ModelsBuffer> modelsBuf, in AttackSettingsComponent attackSettings)
+    public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, ref RotationToTargetComponent rotation,
+        DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer, in DynamicBuffer<ModelsBuffer> modelsBuf, in AttackSettingsComponent attackSettings)
     {
         if (!attackSettings.isAbleToMove)
             return;
@@ -108,7 +134,9 @@ public partial struct MovementJob : IJobEntity
         float3 tempDir = movementComponent.target - transform.Position;
         tempDir.y = 0;
         tempDir = math.normalize(tempDir);
-        float speed = deltaTime * movementComponent.speed;
+        float speed = deltaTime * movementComponent.speed * (1 - movementComponent.curDebaff);
+        if (speed < 0)
+            Debug.Log("ERROR: Movement debuff is higher than 1!");
 
         CollisionFilter filter = new CollisionFilter
         {
@@ -122,26 +150,128 @@ public partial struct MovementJob : IJobEntity
         {
             if (closestHit.SurfaceNormal.y < 0f)
                 closestHit.SurfaceNormal = -closestHit.SurfaceNormal;
-            //Debug.Log(transform.Rotation.value - quaternion.LookRotationSafe(closestHit.Position - transform.Position, closestHit.SurfaceNormal).value);
-            quaternion targetRot = quaternion.LookRotationSafe(closestHit.Position - transform.Position, closestHit.SurfaceNormal);
-            if (movementComponent.lastRotTarget.Equals(targetRot))
-            {
-                if (movementComponent.rotTimePassed < ROT_TIME)
-                {
-                    movementComponent.rotTimePassed += deltaTime;
-                    transform.Rotation = math.nlerp(transform.Rotation, targetRot, movementComponent.rotTimePassed / ROT_TIME);
-                }
-            }
-            else
-            {
-                movementComponent.rotTimePassed = deltaTime;
-                transform.Rotation = math.nlerp(transform.Rotation, targetRot, deltaTime / ROT_TIME);
-            }
+
+            rotation.newRotTarget = quaternion.LookRotationSafe(closestHit.Position - transform.Position, closestHit.SurfaceNormal);
+            //if (UtilityFuncs.Nearly_Equals_quaternion(newTargetRot, movementComponent.curRotTarget))
+            //{
+            //    if (movementComponent.rotTimeElapsed < ROT_TIME)
+            //    {
+            //        movementComponent.rotTimeElapsed += deltaTime;
+            //        transform.Rotation = math.nlerp(movementComponent.initialRotation, newTargetRot, movementComponent.rotTimeElapsed / ROT_TIME);
+            //        //if (movementComponent.rotTimePassed / ROT_TIME > 0.5)
+            //        Debug.Log(movementComponent.rotTimeElapsed / ROT_TIME);
+            //    }
+            //}
+            //else
+            //{
+            //    movementComponent.rotTimeElapsed = deltaTime;
+            //    movementComponent.initialRotation = transform.Rotation;
+            //    movementComponent.curRotTarget = newTargetRot;
+            //    transform.Rotation = math.nlerp(transform.Rotation, newTargetRot, deltaTime / ROT_TIME);
+            //    //if (movementComponent.rotTimePassed / ROT_TIME > 0.5)
+            //    //Debug.Log(movementComponent.rotTimePassed / ROT_TIME);
+            //    //Debug.Log(movementComponent.lastRotTarget);
+            //    //Debug.Log(movementComponent.lastRotTarget.value - targetRot.value);
+            //    //Debug.Log(targetRot);
+            //    //movementComponent.lastRotTarget = targetRot;
+            //}
+
+            ////{
+            ////    transform.Rotation = math.nlerp(transform.Rotation, newTargetRot, deltaTime / ROT_TIME);
+            ////}
+
+
             transform.Position = closestHit.Position;
         }
         else
         {
-            Debug.Log("ERROR: Terrain was not found near unit");
+            Debug.Log($"ERROR: Terrain was not found near unit!");
         }
     }
 }
+
+
+
+public partial struct RotationToTargetJob : IJobEntity
+{
+    public float deltaTime;
+
+    public void Execute(ref RotationToTargetComponent rotation, ref LocalTransform localTransform)
+    {
+        if (UtilityFuncs.Nearly_Equals_quaternion(rotation.newRotTarget, rotation.curRotTarget))
+        {
+            if (rotation.rotTimeElapsed < rotation.rotTime)
+            {
+                rotation.rotTimeElapsed += deltaTime;
+                localTransform.Rotation = math.nlerp(rotation.initialRotation, rotation.newRotTarget, rotation.rotTimeElapsed / rotation.rotTime);
+            }
+        }
+        else
+        {
+            rotation.rotTimeElapsed = deltaTime;
+            rotation.initialRotation = localTransform.Rotation;
+            rotation.curRotTarget = rotation.newRotTarget;
+            localTransform.Rotation = math.nlerp(localTransform.Rotation, rotation.newRotTarget, deltaTime / rotation.rotTime);
+        }
+    }
+}
+
+
+
+public partial struct AttackRotationToTargetJob : IJobEntity
+{
+    public float deltaTime;
+    public ComponentLookup<LocalTransform> transformLookup;
+
+    public void Execute(ref AttackRotationToTargetComponent rotation, in DynamicBuffer<AttackModelsBuffer> attackModelsBuf, in AttackCharsComponent attackChars, in LocalTransform localTransform)
+    {
+        #region Update target and handle automatic return to default rotation
+        if (attackChars.target != Entity.Null)
+        {
+            rotation.newRotTarget = quaternion.LookRotationSafe(transformLookup[attackChars.target].Position - localTransform.Position, localTransform.Up());
+            rotation.isInDefaultState = false;
+            rotation.isRotatingToDefault = false;
+            rotation.noRotTimeElapsed = 0;
+        }
+        else
+        {
+            if (rotation.isInDefaultState)
+                return;
+            if (!rotation.isRotatingToDefault)
+            {
+                rotation.noRotTimeElapsed += deltaTime;
+                if (rotation.noRotTimeElapsed >= rotation.timeToReturnRot)
+                    rotation.isRotatingToDefault = true;
+            }
+        }
+        #endregion
+
+        #region Usual rotation logic, but for attackModels
+        if (UtilityFuncs.Nearly_Equals_quaternion(rotation.newRotTarget, rotation.curRotTarget))
+        {
+            if (rotation.rotTimeElapsed < rotation.rotTime)
+            {
+                rotation.rotTimeElapsed += deltaTime;
+                quaternion resultRotation = math.nlerp(rotation.initialRotation, rotation.newRotTarget, deltaTime / rotation.rotTime);
+                foreach (var model in attackModelsBuf)
+                    transformLookup.GetRefRW(model).ValueRW.Rotation = resultRotation;
+            }
+            else if (rotation.isRotatingToDefault)
+            {
+                rotation.isRotatingToDefault = false;
+                rotation.isInDefaultState = true;
+            }
+        }
+        else
+        {
+            rotation.rotTimeElapsed = deltaTime;
+            rotation.initialRotation = transformLookup[attackModelsBuf[0]].Rotation;
+            rotation.curRotTarget = rotation.newRotTarget;
+            quaternion resultRotation = math.nlerp(rotation.initialRotation, rotation.newRotTarget, deltaTime / rotation.rotTime);
+            foreach (var model in attackModelsBuf)
+                transformLookup.GetRefRW(model).ValueRW.Rotation = resultRotation;
+        }
+        #endregion
+    }
+}
+

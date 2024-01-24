@@ -9,7 +9,6 @@ using AnimCooker;
 using Unity.Mathematics;
 
 //All attacks are processed with a latency in 1 frame. May be there is a better solution?..
-//Not sure about using InitializationGroup as there are a lot of .Complete()-s, as I suppose
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [UpdateAfter(typeof(TargetingAttackSystem))]
 [BurstCompile]
@@ -65,7 +64,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         animStateLookup.Update(ref state);
         modelBufLookup.Update(ref state);
         var ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
-        new AttackJob 
+        new DealingDamageJob 
         { 
             hpLookup = hpLookup, 
             fillBarLookup = fillBarLookup, 
@@ -88,7 +87,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
 }
 
 [BurstCompile]
-public partial struct AttackJob : IJobEntity
+public partial struct DealingDamageJob : IJobEntity
 {
     public ComponentLookup<HpComponent> hpLookup;
     public ComponentLookup<FillFloatOverride> fillBarLookup;
@@ -116,7 +115,7 @@ public partial struct AttackJob : IJobEntity
             ecb.AddComponent(chunkIndexInQuery, attackRequest.target, new DeadComponent { timeToDie = hpComponent.ValueRO.timeToDie});
 
             ecb.RemoveComponent<HpComponent>(chunkIndexInQuery, attackRequest.target);
-            ecb.RemoveComponent<AttackComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<AttackCharsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<AttackSettingsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementCommandsBuffer>(chunkIndexInQuery, attackRequest.target);

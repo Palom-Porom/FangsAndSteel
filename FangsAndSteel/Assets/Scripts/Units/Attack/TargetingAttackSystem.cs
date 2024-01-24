@@ -39,7 +39,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<AttackComponent>();
+        state.RequireForUpdate<AttackCharsComponent>();
         state.RequireForUpdate<HpComponent>();
 
         hpLookup = state.GetComponentLookup<HpComponent>(true);
@@ -48,12 +48,12 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
 
         usualUnitsQuery = new EntityQueryBuilder (Allocator.TempJob).
-            WithAll< AttackComponent, AttackSettingsComponent, LocalTransform, TeamComponent, UnitsIconsComponent, ModelsBuffer, MovementComponent > ().
+            WithAll< AttackCharsComponent, AttackSettingsComponent, LocalTransform, TeamComponent, UnitsIconsComponent, ModelsBuffer, MovementComponent > ().
             WithNone<Deployable>().
             Build(state.EntityManager);
 
         deployableUnitsQuery = new EntityQueryBuilder (Allocator.TempJob).
-            WithAll< AttackComponent, AttackSettingsComponent, LocalTransform, TeamComponent, UnitsIconsComponent, ModelsBuffer, Deployable > ().
+            WithAll< AttackCharsComponent, AttackSettingsComponent, LocalTransform, TeamComponent, UnitsIconsComponent, ModelsBuffer, Deployable > ().
             WithAll<MovementComponent>().
             Build(state.EntityManager);
 
@@ -149,6 +149,8 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             state.Dependency = attackTargetingDeployableJob.Schedule(deployableUnitsQuery, state.Dependency);
         }
         #endregion
+
+        ///TODO: Dispose of the potentialTargetsArr!!!!!!!!!!!!!!!!!!!!!!!!
     }
 }
 
@@ -182,7 +184,7 @@ public partial struct AttackTargetingJob : IJobEntity
 
     private const float ROT_TIME = 0.33f;
 
-    public void Execute(ref AttackComponent attack, ref AttackSettingsComponent attackSettings, ref LocalTransform localTransform, in TeamComponent team, ref MovementComponent movement,
+    public void Execute(ref AttackCharsComponent attack, ref AttackSettingsComponent attackSettings, ref LocalTransform localTransform, in TeamComponent team, ref MovementComponent movement,
         in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery, in DynamicBuffer<ModelsBuffer> modelsBuf, Entity entity)
     {
         #region Reload
@@ -197,18 +199,18 @@ public partial struct AttackTargetingJob : IJobEntity
         if (!attackSettings.isAbleToMove && hpLookup.HasComponent(attack.target))
         {
             quaternion targetRot = quaternion.LookRotationSafe(localToWorldLookup[attack.target].Position - localTransform.Position, localTransform.Up());
-            if (movement.lastRotTarget.Equals(targetRot))
+            if (movement.initialRotation.Equals(targetRot))
             {
-                if (movement.rotTimePassed < ROT_TIME)
+                if (movement.rotTimeElapsed < ROT_TIME)
                 {
-                    movement.rotTimePassed += deltaTime;
-                    localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, movement.rotTimePassed / ROT_TIME);
+                    movement.rotTimeElapsed += deltaTime;
+                    localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, movement.rotTimeElapsed / ROT_TIME);
                 }
             }
             else
             {
-                movement.rotTimePassed = deltaTime;
-                movement.lastRotTarget = targetRot;
+                movement.rotTimeElapsed = deltaTime;
+                movement.initialRotation = targetRot;
                 localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, deltaTime / ROT_TIME);
             }
         }
@@ -340,7 +342,7 @@ public partial struct AttackTargetingJob : IJobEntity
     //    }
     //    return bestScoreEntity;
     //}
-    private void CreateAttackRequest(int chunkIndexInQuery, Entity target, int damage, float3 attackerPos, in DynamicBuffer<ModelsBuffer> modelsBuf)
+    private void CreateAttackRequest(int chunkIndexInQuery, Entity target, float damage, float3 attackerPos, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
         ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = target, damage = damage, attackerPos = attackerPos });
@@ -356,6 +358,352 @@ public partial struct AttackTargetingJob : IJobEntity
         }
     }
 }
+
+
+
+
+///<summary> Update all units' reloadTime values and reload bars </summary>
+public partial struct ReloadJob : IJobEntity
+{
+    public float deltaTime;
+
+    public ComponentLookup<FillFloatOverride> fillBarLookup;
+
+    public void Execute(ref ReloadComponent reloadComponent, in UnitsIconsComponent unitsIcons)
+    {
+
+        if (reloadComponent.curBullets == 0) // if drum is empty -> drum reload
+        {
+            reloadComponent.drumReloadElapsed += deltaTime;
+            if (reloadComponent.drumReloadElapsed >= reloadComponent.drumReloadLen * reloadComponent.curDebaff)
+            {
+                reloadComponent.curBullets = reloadComponent.maxBullets;
+                reloadComponent.bulletReloadElapsed = reloadComponent.bulletReloadLen;
+            }
+            fillBarLookup.GetRefRW(unitsIcons.reloadBarEntity).ValueRW.Value = reloadComponent.drumReloadElapsed / reloadComponent.drumReloadLen;
+        }
+
+        else if (reloadComponent.bulletReloadElapsed >= reloadComponent.bulletReloadLen) // reload of the bullet
+        {
+            if (reloadComponent.bulletReloadElapsed <= float.Epsilon) //If just shot -> update the ReloadBar
+                fillBarLookup.GetRefRW(unitsIcons.reloadBarEntity).ValueRW.Value = reloadComponent.curBullets / reloadComponent.maxBullets;
+            reloadComponent.bulletReloadElapsed += deltaTime;
+        }
+
+    }
+}
+
+
+///<summary> Update deploying/undeploying values of units </summary>
+public partial struct UpdateDeployJob : IJobEntity
+{
+    public float deltaTime;
+
+
+    public ComponentLookup<AnimationCmdData> animCmdLookup;
+    [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
+    [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
+
+    public void Execute(ref Deployable deployable, ref MovementComponent movementComponent, in DynamicBuffer<ModelsBuffer> modelsBuf)
+    {
+        //Undeploying
+        if (!deployable.deployedState)
+        {
+            if (!movementComponent.isAbleToMove)
+            {
+                if (deployable.deployTimeElapsed <= 0)
+                {
+                    //Set move animation PlayForever
+                    foreach (var modelBufElem in modelsBuf)
+                    {
+                        RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                        animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                        animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                    }
+                    movementComponent.isAbleToMove = true;
+                }
+                else
+                    deployable.deployTimeElapsed -= deltaTime;
+            }
+        }
+        //Deploying
+        else if (deployable.deployTimeElapsed < deployable.deployTime)
+        {
+            deployable.deployTimeElapsed += deltaTime;
+        }
+    }
+}
+
+
+///<summary> Searching for the most valuable target at the moment for ALL units </summary>
+public partial struct AttackTargetSearchJob : IJobEntity
+{
+    /// <summary> In other words all units that can be attacked </summary>
+    [ReadOnly] public NativeArray<Entity> potentialTargetsArr;
+
+    [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
+    [ReadOnly] public ComponentLookup<TeamComponent> teamLookup;
+    [ReadOnly] public ComponentLookup<HpComponent> hpLookup;
+
+    public void Execute(ref AttackCharsComponent attackChars, in BattleModeComponent modeSettings, in LocalTransform localTransform, in TeamComponent team, in MovementComponent movement, Entity entity)
+    {
+        float bestScore = float.MinValue;
+        Entity bestScoreEntity = Entity.Null;
+
+        foreach (Entity potentialTarget in potentialTargetsArr)
+        {
+            //Check if they are in different teams
+            if (teamLookup[potentialTarget].teamInd - team.teamInd == 0)
+                continue;
+
+            float curScore = 0;
+
+            float distanceToPotTargetSq = math.distancesq(localTransform.Position, localToWorldLookup[potentialTarget].Position);
+
+            //auto-trigger check
+            if ((modeSettings.autoTriggerMoving || (modeSettings.autoTriggerStatic && (!movement.hasMoveTarget || movement.isAbleToMove)))
+                &&
+                distanceToPotTargetSq < modeSettings.autoTriggerRadiusSq
+                &&
+                (hpLookup[potentialTarget].curHp / hpLookup[potentialTarget].maxHp) <= modeSettings.autoTriggerMaxHpPercent
+                /*&& *check the type of unit* */)
+            {
+                curScore += 10000; // such targets has higher priority than other (auto-trigger has more priority than usual attack)
+            }
+            else if (distanceToPotTargetSq > attackChars.radiusSq)
+                continue; // if pot target is not in any of the radiuses - going to next potential target
+
+            curScore -= distanceToPotTargetSq;
+            ///TODO Other score affectors
+
+            if (curScore > bestScore)
+            {
+                bestScore = curScore;
+                bestScoreEntity = potentialTarget;
+            }
+        }
+
+        attackChars.target = bestScoreEntity;
+    }
+}
+
+
+/// <summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
+/// <remarks> That Job is for NON Deployable units! </remarks>
+public partial struct CreateUsualAttackRequestsJob : IJobEntity
+{
+    [ReadOnly] ComponentLookup<LocalTransform> transformLookup;
+
+    public EntityCommandBuffer.ParallelWriter ecb;
+
+    public ComponentLookup<AnimationCmdData> animCmdLookup;
+    public ComponentLookup<AnimationStateData> animStateLookup;
+    [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> reloadClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> restClips;
+
+    public void Execute(in AttackCharsComponent attackChars, in BattleModeComponent modeSettings, ref MovementComponent movementComponent, Entity entity,
+        in DynamicBuffer<ModelsBuffer> modelsBuf, in LocalTransform localTransform, ref ReloadComponent reloadComponent, [ChunkIndexInQuery] int chunkIndexInQuery,
+        ref RotationToTargetComponent rotation)
+    {
+        //if has some target and reloaded -> shoot
+        if (attackChars.target != Entity.Null && reloadComponent.curBullets > 0 && reloadComponent.bulletReloadElapsed >= reloadComponent.bulletReloadLen) 
+        {
+            if (modeSettings.shootingOnMove)
+                ecb.AddComponent(chunkIndexInQuery, entity, new NotAbleToMoveForTimeRqstComponent { passedTime = 0, targetTime = attackChars.timeToShoot });
+            movementComponent.isAbleToMove = false;
+            //Rotate to target
+            rotation.newRotTarget = quaternion.LookRotationSafe(transformLookup[attackChars.target].Position - localTransform.Position, localTransform.Up());
+
+            //Create Attack Request
+            Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
+            ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent 
+            { 
+                target = attackChars.target, 
+                damage = attackChars.damage, 
+                attackerPos = localTransform.Position
+            });
+
+            //Play Attack Anim
+            foreach (var modelBufElem in modelsBuf)
+            {
+                RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                byte reloadIdx = reloadClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                animStateLookup.GetRefRW(modelBufElem.model).ValueRW.ForeverClipIndex = reloadIdx;
+                animCmd.ValueRW.ClipIndex = attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
+            }
+            
+            reloadComponent.curBullets--;
+            reloadComponent.bulletReloadElapsed = 0;
+        }
+        //if cannot shoot -> can move + anim change (move or just stand)
+        else
+        {
+            if (!movementComponent.isAbleToMove)
+            {
+                if (movementComponent.hasMoveTarget)
+                    foreach (var modelBufElem in modelsBuf)
+                    {
+                        RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                        animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                        animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                    }
+                else
+                    foreach (var modelBufElem in modelsBuf)
+                    {
+                        RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                        animCmd.ValueRW.ClipIndex = restClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                        animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                    }
+                movementComponent.isAbleToMove = true;
+            }
+        }
+    }
+}
+
+
+///<summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
+/// <remarks> That Job is for Deployable units! </remarks>
+public partial struct CreateDeployableAttackRequestsJob : IJobEntity
+{
+    [ReadOnly] ComponentLookup<LocalTransform> transformLookup;
+
+    public EntityCommandBuffer.ParallelWriter ecb;
+
+    public float deltaTime;
+
+    public ComponentLookup<AnimationCmdData> animCmdLookup;
+    [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
+    [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> reloadClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> deployClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> undeployClips;
+
+    public void Execute(ref Deployable deployable, in AttackCharsComponent attackChars, ref MovementComponent movementComponent, in DynamicBuffer<ModelsBuffer> modelsBuf,
+        ref ReloadComponent reloadComponent, [ChunkIndexInQuery] int chunkIndexInQuery, in LocalTransform localTransform, ref RotationToTargetComponent rotation)
+    {
+        if (attackChars.target != Entity.Null)
+        {
+            deployable.waitingTimeCur = 0; // remove to other place
+
+            //if Undeployed, than start Deploying
+            if (!deployable.deployedState)
+            {
+                deployable.deployedState = true;
+                movementComponent.isAbleToMove = false;
+
+                //Set Deploy anim PlayOnce
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = deployClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
+                }
+            }
+            //If fully Deployed and Reloaded -> create Attack Rqst
+            else if (deployable.deployTimeElapsed >= deployable.deployTime && reloadComponent.curBullets > 0 && reloadComponent.bulletReloadElapsed >= reloadComponent.bulletReloadLen)
+            {
+                //Rotate to target
+                rotation.newRotTarget = quaternion.LookRotationSafe(transformLookup[attackChars.target].Position - localTransform.Position, localTransform.Up());
+
+                //Create Attack Request
+                Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
+                ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent 
+                { 
+                    target = attackChars.target, 
+                    damage = attackChars.damage, 
+                    attackerPos =  localTransform.Position
+                });
+
+                //Play Attack Anim
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    ///TODO: Reload when the anim on model appear
+                    animCmd.ValueRW.ClipIndex = attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
+                }
+
+                reloadComponent.curBullets--;
+                reloadComponent.bulletReloadElapsed = 0;
+            }
+        }
+        //If has no target and another point to Move -> undeploy and move after waitingTime elapsed
+        else if (movementComponent.hasMoveTarget) 
+        {
+            //Update waiting time
+            if (deployable.waitingTimeCur < deployable.waitingTimeMax)
+                deployable.waitingTimeCur += deltaTime;
+            //if waiting time elapsed -> undeploy and move
+            if (deployable.deployedState && deployable.waitingTimeCur >= deployable.waitingTimeMax)
+            {
+                deployable.deployedState = false;
+
+                //Set Undeploy anim PlayOnce
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = undeployClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
+                }
+            }
+        }
+    }
+}
+
+
+
+//public partial struct RotationToTargetJob : IJobEntity
+//{
+
+//    public float deltaTime;
+
+//    //[ReadOnly] public ComponentLookup<HpComponent> hpLookup;
+//    [ReadOnly] public ComponentLookup<Deployable> deployLookup;
+//    [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
+
+//    Deployable deployable;
+
+//    private const float ROT_TIME = 0.33f;
+
+//    public void Execute(ref LocalTransform localTransform,in AttackCharsComponent attackChars, ref MovementComponent movementComponent, Entity entity)
+//    {
+//        if (attackChars.target != Entity.Null && !movementComponent.isAbleToMove /*&& hpLookup.HasComponent(attackChars.target)*/) // <- I suppose there will be no such occasions when target is without hp component anymore
+//        {
+//            if (deployLookup.TryGetComponent(entity, out deployable))
+//            {
+//                if (!deployable.deployedState || (deployable.deployTimeElapsed < deployable.deployTime))
+//                    return;
+//            }
+//            quaternion targetRot = quaternion.LookRotationSafe(localToWorldLookup[attackChars.target].Position - localTransform.Position, localTransform.Up());
+//            if (movementComponent.initialRotation.Equals(targetRot))
+//            {
+//                if (movementComponent.rotTimeElapsed < ROT_TIME)
+//                {
+//                    movementComponent.rotTimeElapsed += deltaTime;
+//                    localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, movementComponent.rotTimeElapsed / ROT_TIME);
+//                }
+//            }
+//            else
+//            {
+//                movementComponent.rotTimeElapsed = deltaTime;
+//                movementComponent.initialRotation = targetRot;
+//                localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, deltaTime / ROT_TIME);
+//            }
+//        }
+//    }
+//}
+
+
+
+//Turning Job
+
+//Pursuing Job
+
+
 
 /// <summary>
 /// Checks all current attack targets and searches for new ones [For Deployable Units]
@@ -387,16 +735,18 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
 
     private const float ROT_TIME = 0.33f;
 
-    public void Execute(ref AttackComponent attack, ref AttackSettingsComponent attackSettings, ref LocalTransform localTransform, in TeamComponent team, ref MovementComponent movement,
-        in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery, in DynamicBuffer<ModelsBuffer> modelsBuf, ref Deployable deployable)
+    public void Execute(ref AttackCharsComponent attack, ref AttackSettingsComponent attackSettings, ref LocalTransform localTransform, in TeamComponent team, ref MovementComponent movement,
+        in UnitsIconsComponent unitsIcons, [ChunkIndexInQuery] int chunkIndexInQuery, [ReadOnly] DynamicBuffer<ModelsBuffer> modelsBuf, ref Deployable deployable)
     {
+        
+
         #region Deploy Handle
         //Undeploying
         if (!deployable.deployedState)
         {
-            if (deployable.deployTimeCur > 0)
-                deployable.deployTimeCur -= deltaTime;
-            if (!attackSettings.isAbleToMove && deployable.deployTimeCur <= 0)
+            if (deployable.deployTimeElapsed > 0)
+                deployable.deployTimeElapsed -= deltaTime;
+            if (!attackSettings.isAbleToMove && deployable.deployTimeElapsed <= 0)
             {
                 //Set move animation PlayForever
                 foreach (var modelBufElem in modelsBuf)
@@ -409,31 +759,31 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
             }
         }
         //Deploying
-        else if (deployable.deployTimeCur < deployable.deployTimeMax)
+        else if (deployable.deployTimeElapsed < deployable.deployTime)
         {
-            deployable.deployTimeCur += deltaTime;
+            deployable.deployTimeElapsed += deltaTime;
             return;
         }
         #endregion
 
-        bool fullyDeployed = deployable.deployTimeCur >= deployable.deployTimeMax;
+        bool fullyDeployed = deployable.deployTimeElapsed >= deployable.deployTime;
 
         #region Rotate to enemy
         if (!attackSettings.isAbleToMove && fullyDeployed && hpLookup.HasComponent(attack.target))
         {
             quaternion targetRot = quaternion.LookRotationSafe(localToWorldLookup[attack.target].Position - localTransform.Position, localTransform.Up());
-            if (movement.lastRotTarget.Equals(targetRot))
+            if (movement.initialRotation.Equals(targetRot))
             {
-                if (movement.rotTimePassed < ROT_TIME)
+                if (movement.rotTimeElapsed < ROT_TIME)
                 {
-                    movement.rotTimePassed += deltaTime;
-                    localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, movement.rotTimePassed / ROT_TIME);
+                    movement.rotTimeElapsed += deltaTime;
+                    localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, movement.rotTimeElapsed / ROT_TIME);
                 }
             }
             else
             {
-                movement.rotTimePassed = deltaTime;
-                movement.lastRotTarget = targetRot;
+                movement.rotTimeElapsed = deltaTime;
+                movement.initialRotation = targetRot;
                 localTransform.Rotation = math.nlerp(localTransform.Rotation, targetRot, deltaTime / ROT_TIME);
             }
         }
@@ -577,7 +927,7 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
     //    }
     //    return bestScoreEntity;
     //}
-    private void CreateAttackRequest(int chunkIndexInQuery, Entity target, int damage, float3 attackerPos, in DynamicBuffer<ModelsBuffer> modelsBuf)
+    private void CreateAttackRequest(int chunkIndexInQuery, Entity target, float damage, float3 attackerPos, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
         ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent { target = target, damage = damage, attackerPos = attackerPos });
@@ -597,6 +947,6 @@ public partial struct AttackTargetingDeployableJob : IJobEntity
 public struct AttackRequestComponent : IComponentData
 {
     public Entity target;
-    public int damage;
+    public float damage;
     public float3 attackerPos;
 }

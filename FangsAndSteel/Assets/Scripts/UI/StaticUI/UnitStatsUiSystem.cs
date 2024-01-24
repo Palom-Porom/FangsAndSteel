@@ -9,14 +9,14 @@ using UnityEngine;
 public partial class UnitStatsUiSystem : SystemBase
 {
     ComponentLookup<HpComponent> hpStats;
-    ComponentLookup<AttackComponent> attackStats;
+    ComponentLookup<AttackCharsComponent> attackStats;
     ComponentLookup<MovementComponent> movementStats;
     ComponentLookup<VisionCharsComponent> visionStats;
     protected override void OnCreate()
     {
         RequireForUpdate<UnitStatsRequestTag>();
         hpStats = SystemAPI.GetComponentLookup<HpComponent>();
-        attackStats = SystemAPI.GetComponentLookup<AttackComponent>();
+        attackStats = SystemAPI.GetComponentLookup<AttackCharsComponent>();
         movementStats = SystemAPI.GetComponentLookup<MovementComponent>();
         visionStats = SystemAPI.GetComponentLookup<VisionCharsComponent>();
     }

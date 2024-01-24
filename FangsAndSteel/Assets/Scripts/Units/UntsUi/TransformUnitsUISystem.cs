@@ -22,7 +22,7 @@ public partial class TransformUnitsUISystem : SystemBase
 
     protected override void OnCreate()
     {
-        EntityQuery q = new EntityQueryBuilder(Allocator.TempJob).WithAny<AttackComponent, HpComponent>().Build(this);
+        EntityQuery q = new EntityQueryBuilder(Allocator.TempJob).WithAny<AttackCharsComponent, HpComponent>().Build(this);
         RequireAnyForUpdate(q);
         RequireForUpdate<UnitsIconsComponent>();
 
@@ -80,7 +80,7 @@ public partial struct UpdateBarsJob : IJobEntity
 {
     public ComponentLookup<FillFloatOverride> fillBarLookup;
 
-    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackComponent attackComponent)
+    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackCharsComponent attackComponent)
     {
         //Update ReloadBar
         fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = attackComponent.curReload / attackComponent.reloadLen;
@@ -93,7 +93,7 @@ public partial struct InitializeBarsJob : IJobEntity
 {
     public ComponentLookup<FillFloatOverride> fillBarLookup;
 
-    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackComponent attackComponent)
+    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackCharsComponent attackComponent)
     {
         //RefRW<FillFloatOverride> fillComponent = fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity);
         //fillComponent.ValueRW.Value = hpComponent.curHp / hpComponent.maxHp;

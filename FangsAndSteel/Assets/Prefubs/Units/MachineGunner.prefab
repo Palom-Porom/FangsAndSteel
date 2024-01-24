@@ -336,7 +336,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c37f04624e4588d46bbe392c75b84c74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelsGameObject: {fileID: 7081507632882695550}
+  modelsGameObject: {fileID: 7081507632882695550}
+  attackModels: []
+  attackRotationTime: 0.33
 --- !u!114 &1707818578327236224
 MonoBehaviour:
   m_ObjectHideFlags: 0

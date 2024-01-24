@@ -15,8 +15,8 @@ public class DeployableAuthoring : MonoBehaviour
             AddComponent(entity, new Deployable
             {
                 deployedState = false,
-                deployTimeCur = 0,
-                deployTimeMax = authoring.maxDeploy,
+                deployTimeElapsed = 0,
+                deployTime = authoring.maxDeploy,
                 waitingTimeCur = authoring.maxWaiting,
                 waitingTimeMax = authoring.maxWaiting
             });
@@ -30,8 +30,8 @@ public struct Deployable : IComponentData
     /// Means if Unit is deployed/in proccess to become deployed OR undeployed/in proccess to become undeployed
     /// </summary>
     public bool deployedState;
-    public float deployTimeCur;
-    public float deployTimeMax;
+    public float deployTimeElapsed;
+    public float deployTime;
     public float waitingTimeMax;
     public float waitingTimeCur;
 }
