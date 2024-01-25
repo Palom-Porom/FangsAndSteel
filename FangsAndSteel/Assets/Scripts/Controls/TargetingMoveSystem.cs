@@ -97,6 +97,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 /// Changes targets for all selected units if raycast of new target was succesfull
 /// </summary>
 [BurstCompile]
+[WithAll(typeof(SelectTag))]
 public partial struct ChangeTargetJob : IJobEntity
 {
     [ReadOnly]
@@ -106,7 +107,7 @@ public partial struct ChangeTargetJob : IJobEntity
     public ComponentLookup<AnimationCmdData> animCmdLookup;
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
-    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in SelectTag selectTag, in DynamicBuffer<ModelsBuffer> modelsBuf, in AttackSettingsComponent attackSets)
+    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         var result = raycastResult.Value;
         if (!result.hasHit)
@@ -118,16 +119,16 @@ public partial struct ChangeTargetJob : IJobEntity
                 { 
                     target = result.raycastHitInfo.Position, 
                     //Copying the previous settings by default
-                    targettingMinHP = moveComBuf[moveComBuf.Length - 1].targettingMinHP, 
-                    shootingOnMoveMode = moveComBuf[moveComBuf.Length - 1].shootingOnMoveMode 
+                    //targettingMinHP = moveComBuf[moveComBuf.Length - 1].targettingMinHP, 
+                    //shootingOnMoveMode = moveComBuf[moveComBuf.Length - 1].shootingOnMoveMode 
                 });
             else
                 moveComBuf.Add(new MovementCommandsBuffer
                 {
                     target = result.raycastHitInfo.Position,
                     //Copying the current settings by default
-                    targettingMinHP = attackSets.shootingOnMoveMode,
-                    shootingOnMoveMode = attackSets.shootingOnMoveMode
+                    //targettingMinHP = attackSets.shootingOnMoveMode,
+                    //shootingOnMoveMode = attackSets.shootingOnMoveMode
                 });
         }
         else
@@ -135,7 +136,7 @@ public partial struct ChangeTargetJob : IJobEntity
             moveComBuf.Clear();
             movementComponent.target = result.raycastHitInfo.Position;
             movementComponent.hasMoveTarget = true;
-            if (attackSets.isAbleToMove)
+            if (movementComponent.isAbleToMove)
             {
                 //Play move anim
                 foreach (var modelBufElem in modelsBuf)

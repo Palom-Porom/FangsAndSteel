@@ -16,7 +16,6 @@ public partial class BasicButtonSystem : SystemBase
     protected override void OnCreate()
     {
         RequireForUpdate<StaticUIData>();
-        RequireForUpdate<AttackSettingsComponent>();
     }
 
     StaticUIData uiData;
@@ -25,7 +24,8 @@ public partial class BasicButtonSystem : SystemBase
         uiData = SystemAPI.GetSingleton<StaticUIData>();
         if (uiData.stopMoveBut)
         {
-            foreach ((SelectTag selectTag, RefRW<MovementComponent> movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, LocalTransform localTransform) in SystemAPI.Query<SelectTag, RefRW<MovementComponent>, DynamicBuffer<MovementCommandsBuffer>, LocalTransform>())
+            foreach ((RefRW<MovementComponent> movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, LocalTransform localTransform) 
+                in SystemAPI.Query<RefRW<MovementComponent>, DynamicBuffer<MovementCommandsBuffer>, LocalTransform>().WithAll<SelectTag>())
             {
                 moveComBuf.Clear();
                 movementComponent.ValueRW.target = localTransform.Position;
@@ -57,11 +57,11 @@ public partial class BasicButtonSystem : SystemBase
 [WithAll(typeof(SelectTag))]
 public partial struct ChangeShootModeJob : IJobEntity
 {
-    public void Execute(ref AttackSettingsComponent attackSettingsComponent, ref ReloadComponent reloadComponent, ref MovementComponent movement)
+    public void Execute(ref BattleModeComponent battleModeSettings, ref ReloadComponent reloadComponent, ref MovementComponent movement)
     {
-        attackSettingsComponent.shootingOnMoveMode = !(attackSettingsComponent.shootingOnMoveMode);
-        reloadComponent.curDebaff += attackSettingsComponent.shootingOnMoveMode ? reloadComponent.reload_SoM_Debaff : -reloadComponent.reload_SoM_Debaff;
-        movement.curDebaff += attackSettingsComponent.shootingOnMoveMode ? movement.movement_SoM_Debaff : -movement.movement_SoM_Debaff;
+        battleModeSettings.shootingOnMove = !(battleModeSettings.shootingOnMove);
+        reloadComponent.curDebaff += battleModeSettings.shootingOnMove ? reloadComponent.reload_SoM_Debaff : -reloadComponent.reload_SoM_Debaff;
+        movement.curDebaff += battleModeSettings.shootingOnMove ? movement.movement_SoM_Debaff : -movement.movement_SoM_Debaff;
     }
 }
 

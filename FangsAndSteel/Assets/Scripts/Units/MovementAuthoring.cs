@@ -21,9 +21,10 @@ public class MovementAuthoring : MonoBehaviour
                 speed = authoring.speed, 
                 target = authoring.target, 
                 hasMoveTarget = authoring.isMoving,
+                isAbleToMove = true
 
-                rotTimeElapsed = 0,
-                initialRotation = quaternion.identity
+                //rotTimeElapsed = 0,
+                //initialRotation = quaternion.identity
             });
             AddComponent(entity, new RotationToTargetComponent
             {
@@ -53,9 +54,9 @@ public struct MovementComponent : IComponentData
     ///<remarks> Value is 0 to 1 </remarks>
     public float curDebaff;
 
-    public float rotTimeElapsed;
-    public quaternion initialRotation;
-    public quaternion curRotTarget;
+    //public float rotTimeElapsed;
+    //public quaternion initialRotation;
+    //public quaternion curRotTarget;
 }
 
 
@@ -110,6 +111,6 @@ public struct MovementCommandsBuffer : IBufferElementData
     public float3 target;
 
     //AttackSettingsComponent
-    public bool targettingMinHP;
-    public bool shootingOnMoveMode;
+    //public bool targettingMinHP;
+    //public bool shootingOnMoveMode;
 }

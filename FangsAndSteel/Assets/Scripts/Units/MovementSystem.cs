@@ -57,7 +57,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
 
         #region MovementJob
-        var moveJob = new MovementJob
+        JobHandle movementJobHandle = new MovementJob
         {
             deltaTime = SystemAPI.Time.DeltaTime,
             collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld,
@@ -65,8 +65,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
             animCmdLookup = animCmdLookup,
             animStateLookup = animStateLookup,
             restClips = restClips
-        };
-        JobHandle movementJobHandle = moveJob.Schedule(state.Dependency);
+        }.Schedule(state.Dependency);
         #endregion
 
         #region RotationJobs
@@ -75,13 +74,13 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
             deltaTime = SystemAPI.Time.DeltaTime
         }.Schedule(movementJobHandle);
 
-        JobHandle attackRotationJobHandle = new AttackRotationToTargetJob
+        state.Dependency = new AttackRotationToTargetJob
         {
             deltaTime = SystemAPI.Time.DeltaTime,
             transformLookup = transformLookup
-        }.Schedule(movementJobHandle);
+        }.Schedule(rotationJobHandle); // <-- not able to make parallel with simple rotationJob as it is a LocalTransform lookup in this job (so it conflicts with localTransform changes in simple rotationJob)
 
-        state.Dependency = JobHandle.CombineDependencies(attackRotationJobHandle, rotationJobHandle);
+        //state.Dependency = JobHandle.CombineDependencies(attackRotationJobHandle, rotationJobHandle);
         #endregion
     }
 
@@ -102,9 +101,9 @@ public partial struct MovementJob : IJobEntity
     [ReadOnly] public NativeArray<AnimDbEntry> restClips;
 
     public void Execute(ref LocalTransform transform, ref MovementComponent movementComponent, ref RotationToTargetComponent rotation,
-        DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer, in DynamicBuffer<ModelsBuffer> modelsBuf, in AttackSettingsComponent attackSettings)
+        DynamicBuffer<MovementCommandsBuffer> movementCommandsBuffer, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
-        if (!attackSettings.isAbleToMove)
+        if (!movementComponent.isAbleToMove)
             return;
 
         if (!movementComponent.hasMoveTarget)
@@ -190,8 +189,6 @@ public partial struct MovementJob : IJobEntity
     }
 }
 
-
-
 public partial struct RotationToTargetJob : IJobEntity
 {
     public float deltaTime;
@@ -223,12 +220,12 @@ public partial struct AttackRotationToTargetJob : IJobEntity
     public float deltaTime;
     public ComponentLookup<LocalTransform> transformLookup;
 
-    public void Execute(ref AttackRotationToTargetComponent rotation, in DynamicBuffer<AttackModelsBuffer> attackModelsBuf, in AttackCharsComponent attackChars, in LocalTransform localTransform)
+    public void Execute(ref AttackRotationToTargetComponent rotation, in DynamicBuffer<AttackModelsBuffer> attackModelsBuf, in AttackCharsComponent attackChars, in LocalToWorld localToWorld)
     {
         #region Update target and handle automatic return to default rotation
         if (attackChars.target != Entity.Null)
         {
-            rotation.newRotTarget = quaternion.LookRotationSafe(transformLookup[attackChars.target].Position - localTransform.Position, localTransform.Up());
+            rotation.newRotTarget = quaternion.LookRotationSafe(transformLookup[attackChars.target].Position - localToWorld.Position, localToWorld.Up);
             rotation.isInDefaultState = false;
             rotation.isRotatingToDefault = false;
             rotation.noRotTimeElapsed = 0;

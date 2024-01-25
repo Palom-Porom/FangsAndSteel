@@ -86,7 +86,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     }
 }
 
-[BurstCompile]
+//[BurstCompile]
 public partial struct DealingDamageJob : IJobEntity
 {
     public ComponentLookup<HpComponent> hpLookup;
@@ -116,14 +116,14 @@ public partial struct DealingDamageJob : IJobEntity
 
             ecb.RemoveComponent<HpComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<AttackCharsComponent>(chunkIndexInQuery, attackRequest.target);
-            ecb.RemoveComponent<AttackSettingsComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<BattleModeComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementCommandsBuffer>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<VisibilityComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<VisionCharsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<TeamComponent>(chunkIndexInQuery, attackRequest.target);
-            //Destroying Selection Ring (it must be a child with index 1!)
-            ecb.DestroyEntity(chunkIndexInQuery, childrenLookup[attackRequest.target][1].Value);
+            ///TODO: Redo the line below as it shouldn't use children unstable nature
+            ecb.DestroyEntity(chunkIndexInQuery, childrenLookup[attackRequest.target][1].Value); //Destroying Selection Ring (it must be a child with index 1!) 
             ecb.RemoveComponent<SelectTag>(chunkIndexInQuery, attackRequest.target);
             //Destroying all Unit Icons
             UtilityFuncs.DestroyParentAndAllChildren(ecb, childrenLookup, unitsIconsLookup[attackRequest.target].infoQuadsEntity, chunkIndexInQuery);

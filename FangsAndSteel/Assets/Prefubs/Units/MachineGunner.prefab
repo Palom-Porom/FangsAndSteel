@@ -131,13 +131,38 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
+      propertyPath: damage
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
       propertyPath: realodLen
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
+      propertyPath: drumReload
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: maxBullets
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: timeToShoot
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
       propertyPath: attackRadius
       value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: bulletReload
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 4242124373926402225, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
@@ -339,6 +364,7 @@ MonoBehaviour:
   modelsGameObject: {fileID: 7081507632882695550}
   attackModels: []
   attackRotationTime: 0.33
+  timeToReturnRot: 1
 --- !u!114 &1707818578327236224
 MonoBehaviour:
   m_ObjectHideFlags: 0

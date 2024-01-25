@@ -54,12 +54,13 @@ public partial struct NotAbleToMoveForTimeJob : IJobEntity
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
 
-    public void Execute(ref NotAbleToMoveForTimeRqstComponent rqst, ref AttackSettingsComponent attackSettingsComponent, in DynamicBuffer<ModelsBuffer> modelsBuf, Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery)
+    public void Execute(ref NotAbleToMoveForTimeRqstComponent rqst, ref MovementComponent movement,
+        in DynamicBuffer<ModelsBuffer> modelsBuf, Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
         rqst.passedTime += deltaTime;
         if (rqst.passedTime >= rqst.targetTime)
         {
-            attackSettingsComponent.isAbleToMove = true;
+            movement.isAbleToMove = true;
             foreach (var modelBufElem in modelsBuf)
             {
                 RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);

@@ -83,7 +83,7 @@ public partial struct UpdateBarsJob : IJobEntity
     public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackCharsComponent attackComponent)
     {
         //Update ReloadBar
-        fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = attackComponent.curReload / attackComponent.reloadLen;
+        //fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = attackComponent.curReload / attackComponent.reloadLen;
     }
 }
 
@@ -93,13 +93,16 @@ public partial struct InitializeBarsJob : IJobEntity
 {
     public ComponentLookup<FillFloatOverride> fillBarLookup;
 
-    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackCharsComponent attackComponent)
+    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in ReloadComponent reload)
     {
         //RefRW<FillFloatOverride> fillComponent = fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity);
         //fillComponent.ValueRW.Value = hpComponent.curHp / hpComponent.maxHp;
         //Update HealthBar
         fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity).ValueRW.Value = hpComponent.curHp / (float)hpComponent.maxHp;
         //Update ReloadBar
-        fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = attackComponent.curReload / attackComponent.reloadLen;
+        if (reload.curBullets > 0)
+            fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = reload.curBullets / reload.maxBullets;
+        else
+            fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = reload.drumReloadElapsed / reload.drumReloadLen;
     }
 }

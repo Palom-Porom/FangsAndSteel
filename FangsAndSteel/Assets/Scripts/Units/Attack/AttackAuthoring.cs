@@ -6,10 +6,15 @@ using UnityEngine;
 
 public class AttackAuthoring : MonoBehaviour
 {
-    public int damage = 0;
-    public float realodLen = 1;
+    public float damage = 0;
+    //public float realodLen = 1;
     public int attackRadius = 0;
     public float timeToShoot = 1;
+
+    public int maxBullets = 1;
+    public float bulletReload = 0.5f;
+    public float drumReload = 3f;
+    public float reload_SoM_Debuff = 0.5f;
     public class Baker : Baker<AttackAuthoring>
     {
         public override void Bake(AttackAuthoring authoring)
@@ -18,20 +23,46 @@ public class AttackAuthoring : MonoBehaviour
             AddComponent(entity, new AttackCharsComponent 
             { 
                 damage = authoring.damage,
-                reloadLen = authoring.realodLen,
-                curReload = 0,
+                //reloadLen = authoring.realodLen,
+                //curReload = 0,
                 radiusSq = authoring.attackRadius * authoring.attackRadius,
                 target = Entity.Null, 
 
                 timeToShoot = authoring.timeToShoot
             });
 
-            AddComponent(entity, new AttackSettingsComponent 
-            {
-                isAbleToMove = true,
+            //AddComponent(entity, new AttackSettingsComponent 
+            //{
+            //    isAbleToMove = true,
 
-                targettingMinHP = true,
-                shootingOnMoveMode = false
+            //    targettingMinHP = true,
+            //    shootingOnMoveMode = false
+            //});
+
+            AddComponent(entity, new ReloadComponent
+            {
+                maxBullets = authoring.maxBullets,
+                curBullets = 0,
+
+                bulletReloadElapsed = 0,
+                bulletReloadLen = authoring.bulletReload,
+
+                drumReloadElapsed = 0,
+                drumReloadLen = authoring.drumReload,
+
+                reload_SoM_Debaff = authoring.reload_SoM_Debuff,
+                curDebaff = 0
+            });
+
+            AddComponent(entity, new BattleModeComponent
+            {
+                shootingDisabled = false,
+                shootingOnMove = false,
+                
+                autoTriggerMoving = false,
+                autoTriggerRadiusSq = authoring.attackRadius,
+                autoTriggerDropTime = 2f,
+                autoTriggerMaxHpPercent = 100
             });
         }
     }
@@ -39,21 +70,21 @@ public class AttackAuthoring : MonoBehaviour
 public struct AttackCharsComponent : IComponentData
 {
     public float damage;
-    public float reloadLen; //remove
-    public float curReload; //remove
+    //public float reloadLen; //remove
+    //public float curReload; //remove
     public int radiusSq;
     public Entity target;
 
     public float timeToShoot;
 }
 
-public struct AttackSettingsComponent : IComponentData
-{
-    public bool isAbleToMove; // remove to MovementComponent
+//public struct AttackSettingsComponent : IComponentData
+//{
+//    public bool isAbleToMove; // remove to MovementComponent
 
-    public bool targettingMinHP;
-    public bool shootingOnMoveMode;
-}
+//    public bool targettingMinHP;
+//    public bool shootingOnMoveMode;
+//}
 
 
 ///<summary> Info about "bullets" and reload status of unit </summary>>
@@ -76,7 +107,8 @@ public struct ReloadComponent : IComponentData
 
 
     ///<value> Percentage of reload speed debbaf when ShootingOnMove mode is enabled </value>
-    public readonly float reload_SoM_Debaff;
+    ///<remarks> !Value 0 to 1! </remarks>
+    public float reload_SoM_Debaff;
     ///<value> Percentage of current reload speed debbaf </value>
     public float curDebaff;
 }
@@ -87,13 +119,13 @@ public struct ReloadComponent : IComponentData
 public struct BattleModeComponent : IComponentData, IEnableableComponent
 {
     ///<value> No shooting, but searching for targets still enabled </value>
-    bool shootingDisabled;
+    public bool shootingDisabled;
 
     ///<value> Can reload on move, but slower reload + slower movement </value>
     public bool shootingOnMove;
 
     ///<value> Is auto-trigger enabled when unit is not moving </value>
-    public bool autoTriggerStatic;
+    //public bool autoTriggerStatic; <-- suppose it is not so useful option for player 
     ///<value> Is auto-trigger enabled when unit is moving </value>
     public bool autoTriggerMoving;
     ///<value> Radius in which auto-trigger will work </value>
