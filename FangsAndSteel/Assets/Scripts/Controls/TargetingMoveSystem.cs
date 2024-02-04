@@ -7,6 +7,7 @@ using Unity.Jobs;
 using Unity.Physics;
 using UnityEngine;
 using AnimCooker;
+using System.Linq;
 
 [UpdateInGroup(typeof(ControlsSystemGroup), OrderFirst = true)]
 [UpdateAfter(typeof(ControlSystem))]
@@ -96,6 +97,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 /// Changes targets for all selected units if raycast of new target was succesfull
 /// </summary>
 [BurstCompile]
+[WithAll(typeof(SelectTag))]
 public partial struct ChangeTargetJob : IJobEntity
 {
     [ReadOnly]
@@ -105,21 +107,36 @@ public partial struct ChangeTargetJob : IJobEntity
     public ComponentLookup<AnimationCmdData> animCmdLookup;
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
-    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in SelectTag selectTag, in DynamicBuffer<ModelsBuffer> modelsBuf, in AttackSettingsComponent attackSets)
+    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in DynamicBuffer<ModelsBuffer> modelsBuf)
     {
         var result = raycastResult.Value;
         if (!result.hasHit)
             return;
-        if (shiftTargeting && movementComponent.isMoving)
+        if (shiftTargeting && movementComponent.hasMoveTarget)
         {
-            moveComBuf.Add(new MovementCommandsBuffer { target = result.raycastHitInfo.Position });
+            if (!moveComBuf.IsEmpty)
+                moveComBuf.Add(new MovementCommandsBuffer 
+                { 
+                    target = result.raycastHitInfo.Position, 
+                    //Copying the previous settings by default
+                    //targettingMinHP = moveComBuf[moveComBuf.Length - 1].targettingMinHP, 
+                    //shootingOnMoveMode = moveComBuf[moveComBuf.Length - 1].shootingOnMoveMode 
+                });
+            else
+                moveComBuf.Add(new MovementCommandsBuffer
+                {
+                    target = result.raycastHitInfo.Position,
+                    //Copying the current settings by default
+                    //targettingMinHP = attackSets.shootingOnMoveMode,
+                    //shootingOnMoveMode = attackSets.shootingOnMoveMode
+                });
         }
         else
         {
             moveComBuf.Clear();
             movementComponent.target = result.raycastHitInfo.Position;
-            movementComponent.isMoving = true;
-            if (attackSets.isAbleToMove)
+            movementComponent.hasMoveTarget = true;
+            if (movementComponent.isAbleToMove)
             {
                 //Play move anim
                 foreach (var modelBufElem in modelsBuf)

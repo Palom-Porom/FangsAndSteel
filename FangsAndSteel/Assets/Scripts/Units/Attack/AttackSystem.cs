@@ -9,7 +9,6 @@ using AnimCooker;
 using Unity.Mathematics;
 
 //All attacks are processed with a latency in 1 frame. May be there is a better solution?..
-//Not sure about using InitializationGroup as there are a lot of .Complete()-s, as I suppose
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [UpdateAfter(typeof(TargetingAttackSystem))]
 [BurstCompile]
@@ -65,7 +64,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         animStateLookup.Update(ref state);
         modelBufLookup.Update(ref state);
         var ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
-        new AttackJob 
+        new DealingDamageJob 
         { 
             hpLookup = hpLookup, 
             fillBarLookup = fillBarLookup, 
@@ -87,8 +86,8 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     }
 }
 
-[BurstCompile]
-public partial struct AttackJob : IJobEntity
+//[BurstCompile]
+public partial struct DealingDamageJob : IJobEntity
 {
     public ComponentLookup<HpComponent> hpLookup;
     public ComponentLookup<FillFloatOverride> fillBarLookup;
@@ -116,15 +115,15 @@ public partial struct AttackJob : IJobEntity
             ecb.AddComponent(chunkIndexInQuery, attackRequest.target, new DeadComponent { timeToDie = hpComponent.ValueRO.timeToDie});
 
             ecb.RemoveComponent<HpComponent>(chunkIndexInQuery, attackRequest.target);
-            ecb.RemoveComponent<AttackComponent>(chunkIndexInQuery, attackRequest.target);
-            ecb.RemoveComponent<AttackSettingsComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<AttackCharsComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<BattleModeComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<MovementCommandsBuffer>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<VisibilityComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<VisionCharsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<TeamComponent>(chunkIndexInQuery, attackRequest.target);
-            //Destroying Selection Ring (it must be a child with index 1!)
-            ecb.DestroyEntity(chunkIndexInQuery, childrenLookup[attackRequest.target][1].Value);
+            ///TODO: Redo the line below as it shouldn't use children unstable nature
+            ecb.DestroyEntity(chunkIndexInQuery, childrenLookup[attackRequest.target][1].Value); //Destroying Selection Ring (it must be a child with index 1!) 
             ecb.RemoveComponent<SelectTag>(chunkIndexInQuery, attackRequest.target);
             //Destroying all Unit Icons
             UtilityFuncs.DestroyParentAndAllChildren(ecb, childrenLookup, unitsIconsLookup[attackRequest.target].infoQuadsEntity, chunkIndexInQuery);

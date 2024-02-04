@@ -27,7 +27,7 @@ public partial class SelectionSystem : SystemBase
     private bool wasClickedOnUI;
 
     private ComponentLookup<SelectTag> selectLookup;
-    private ComponentLookup<AttackSettingsComponent> attackSetsLookup;
+    //private ComponentLookup<AttackSettingsComponent> attackSetsLookup;
     private ComponentLookup<TeamComponent> teamLookup;
 
     private EntityCommandBuffer ecb;
@@ -48,7 +48,7 @@ public partial class SelectionSystem : SystemBase
         RequireForUpdate<SelectTag>();
 
         selectLookup = GetComponentLookup<SelectTag>();
-        attackSetsLookup = GetComponentLookup<AttackSettingsComponent>();
+        //attackSetsLookup = GetComponentLookup<AttackSettingsComponent>();
         teamLookup = GetComponentLookup<TeamComponent>();
     }
 
@@ -102,7 +102,7 @@ public partial class SelectionSystem : SystemBase
             }
             //Update containers
             selectLookup.Update(this);
-            attackSetsLookup.Update(this);
+            //attackSetsLookup.Update(this);
             teamLookup.Update(this);
             ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
@@ -165,7 +165,7 @@ public partial class SelectionSystem : SystemBase
                     raycastInput = raycastInput,
 
                     selectTagLookup = selectLookup,
-                    attackSetsLookup = attackSetsLookup,
+                    //attackSetsLookup = attackSetsLookup,
                     ecb = ecb,
                     teamLookup = teamLookup
                 }.Schedule(Dependency);
@@ -208,7 +208,7 @@ public partial struct SingleSelectJob : IJob
     [ReadOnly] public CollisionWorld collisionWorld;
     public RaycastInput raycastInput;
     public ComponentLookup<SelectTag> selectTagLookup;
-    public ComponentLookup<AttackSettingsComponent> attackSetsLookup;
+    //public ComponentLookup<BattleModeComponent> attackSetsLookup;
 
     public EntityCommandBuffer ecb;
     public ComponentLookup<TeamComponent> teamLookup;
@@ -227,11 +227,11 @@ public partial struct SingleSelectJob : IJob
                 ecb.AddComponent(raycastHit.Entity, new UnitStatsRequestTag());
 
                 //Change ShootMode color depending on the state of that variable
-                Entity entity = ecb.CreateEntity();
-                if (attackSetsLookup[raycastHit.Entity].shootingOnMoveMode)
-                    ecb.AddComponent(entity, new ShootModeButChangeColorRqst { color = Color.green});
-                else
-                    ecb.AddComponent(entity, new ShootModeButChangeColorRqst { color = Color.red});
+                //Entity entity = ecb.CreateEntity();
+                //if (attackSetsLookup[raycastHit.Entity].shootingOnMoveMode)
+                //    ecb.AddComponent(entity, new ShootModeButChangeColorRqst { color = Color.green});
+                //else
+                //    ecb.AddComponent(entity, new ShootModeButChangeColorRqst { color = Color.red});
 
             }
             else

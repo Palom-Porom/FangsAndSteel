@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class HpAuthoring : MonoBehaviour
 {
-    public int maxHp = 0;
-    public int curHp = 0;
+    public float maxHp = 0;
+    public float curHp = 0;
     public float timeToDie = 0;
     public class Baker : Baker<HpAuthoring>
     {
@@ -19,8 +19,8 @@ public class HpAuthoring : MonoBehaviour
 }
 public struct HpComponent : IComponentData
 {
-    public int maxHp;
-    public int curHp;
+    public float maxHp;
+    public float curHp;
     public float timeToDie;
 }
 

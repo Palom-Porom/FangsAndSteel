@@ -334,7 +334,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c37f04624e4588d46bbe392c75b84c74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelsGameObject: {fileID: 5743986021654833525}
+  modelsGameObject: {fileID: 5743986021654833525}
+  attackModels: []
+  attackRotationTime: 0.33
 --- !u!1 &5743986021654833525 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4450080618980272199, guid: c743507d0fc900b45898c8e09289fb9b,
