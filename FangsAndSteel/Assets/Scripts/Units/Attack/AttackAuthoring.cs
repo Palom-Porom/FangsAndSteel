@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Entities;
 using UnityEngine;
 
 public class AttackAuthoring : MonoBehaviour
 {
     public float damage = 0;
-    //public float realodLen = 1;
     public int attackRadius = 0;
     public float timeToShoot = 1;
 
@@ -15,6 +15,10 @@ public class AttackAuthoring : MonoBehaviour
     public float bulletReload = 0.5f;
     public float drumReload = 3f;
     public float reload_SoM_Debuff = 0.5f;
+
+    public float dropTime = 5f;
+    public float dropDistance = 20f;
+    
     public class Baker : Baker<AttackAuthoring>
     {
         public override void Bake(AttackAuthoring authoring)
@@ -23,35 +27,28 @@ public class AttackAuthoring : MonoBehaviour
             AddComponent(entity, new AttackCharsComponent 
             { 
                 damage = authoring.damage,
-                //reloadLen = authoring.realodLen,
-                //curReload = 0,
                 radiusSq = authoring.attackRadius * authoring.attackRadius,
                 target = Entity.Null, 
 
                 timeToShoot = authoring.timeToShoot
             });
 
-            //AddComponent(entity, new AttackSettingsComponent 
-            //{
-            //    isAbleToMove = true,
-
-            //    targettingMinHP = true,
-            //    shootingOnMoveMode = false
-            //});
-
             AddComponent(entity, new ReloadComponent
             {
                 maxBullets = authoring.maxBullets,
-                curBullets = 0,
+                curBullets = authoring.maxBullets,
 
-                bulletReloadElapsed = 0,
+                bulletReloadElapsed = authoring.bulletReload,
                 bulletReloadLen = authoring.bulletReload,
 
-                drumReloadElapsed = 0,
+                drumReloadElapsed = 0f,
                 drumReloadLen = authoring.drumReload,
 
                 reload_SoM_Debaff = authoring.reload_SoM_Debuff,
-                curDebaff = 0
+                curDebaff = 0,
+
+                shootAnimElapsed = 0,
+                shootAnimLen = authoring.timeToShoot
             });
 
             AddComponent(entity, new BattleModeComponent
@@ -64,30 +61,33 @@ public class AttackAuthoring : MonoBehaviour
                 autoTriggerDropTime = 2f,
                 autoTriggerMaxHpPercent = 100
             });
+
+            AddComponent(entity, new PursuingModeComponent
+            {
+                Target = Entity.Null,
+                
+                dropTime = authoring.dropTime,
+                dropTimeElapsed = 0,
+                
+                maxShootDistanceSq = (authoring.attackRadius - 5f) * (authoring.attackRadius - 5f),
+                dropDistanceSq = authoring.dropDistance * authoring.dropDistance
+            });
+            SetComponentEnabled<PursuingModeComponent>(entity, false);
         }
     }
 }
 public struct AttackCharsComponent : IComponentData
 {
     public float damage;
-    //public float reloadLen; //remove
-    //public float curReload; //remove
     public int radiusSq;
     public Entity target;
 
     public float timeToShoot;
 }
 
-//public struct AttackSettingsComponent : IComponentData
-//{
-//    public bool isAbleToMove; // remove to MovementComponent
-
-//    public bool targettingMinHP;
-//    public bool shootingOnMoveMode;
-//}
-
 
 ///<summary> Info about "bullets" and reload status of unit </summary>>
+[BurstCompile]
 public struct ReloadComponent : IComponentData
 {
     /// <value> Max "bullets" amount in a Drum </value>
@@ -111,6 +111,11 @@ public struct ReloadComponent : IComponentData
     public float reload_SoM_Debaff;
     ///<value> Percentage of current reload speed debbaf </value>
     public float curDebaff;
+
+    public float shootAnimElapsed;
+    public float shootAnimLen;
+
+    public bool isReloaded() { return curBullets > 0 && bulletReloadElapsed >= bulletReloadLen; }
 }
 
 
@@ -150,8 +155,10 @@ public struct PursuingModeComponent : IComponentData, IEnableableComponent
     /// <summary> Elapsed time wihtout a shot </summary>
     public float dropTimeElapsed;
 
-    /// <summary> If distance to target is bigger than this - pursuing will be dropped </summary>
-    public float dropDistance;
+    ///<summary> Order to shoot no further than this distance (squared)</summary>
+    public float maxShootDistanceSq;
+    /// <summary> If distance (squared) to target is bigger than this - pursuing will be dropped </summary>
+    public float dropDistanceSq;
 }
 
 

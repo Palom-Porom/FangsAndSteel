@@ -34,7 +34,7 @@ public class ModelBufferAuthoring : MonoBehaviour
             //if has attack models -> add buffer and component for separate attack-targeting
             if (authoring.attackModels.Length != 0)
             {
-                AddComponent(entity, new AttackRotationToTargetComponent
+                AddComponent(entity, new AttackRotationComponent
                 {
                     rotTime = authoring.attackRotationTime,
                     rotTimeElapsed = 0f,

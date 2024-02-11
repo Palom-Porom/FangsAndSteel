@@ -47,7 +47,7 @@ public class MovementAuthoring : MonoBehaviour
                 isAbleToMove = true
             });
 
-            AddComponent(entity, new RotationToTargetComponent
+            AddComponent(entity, new RotationComponent
             {
                 rotTime = authoring.rotationTime,
                 rotTimeElapsed = 0f,
@@ -100,7 +100,7 @@ public struct MovementComponent : IComponentData
 
 
 ///<summary> Component used for smooth rotating to some target </summary>
-public struct RotationToTargetComponent : IComponentData
+public struct RotationComponent : IComponentData
 {
     ///<value> Time elapsed from setting current rotation target </value>
     public float rotTimeElapsed;
@@ -118,7 +118,7 @@ public struct RotationToTargetComponent : IComponentData
 
 ///<summary> Info about rotation on target for attack </summary>
 ///<remarks> Used only for those Entities which have AttackModelsBuffers </remarks>
-public struct AttackRotationToTargetComponent : IComponentData 
+public struct AttackRotationComponent : IComponentData 
 {
     ///<value> Time elapsed from setting current rotation target </value>
     public float rotTimeElapsed;

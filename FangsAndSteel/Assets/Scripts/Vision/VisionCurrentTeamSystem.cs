@@ -68,7 +68,7 @@ public partial struct VisionCurrentTeamJob : IJobEntity
     const int VIS_MAP_SIZE = 500;
     const int ORIG_TO_VIS_MAP_RATIO = 2;
 
-    public void Execute(in LocalToWorld localtoworld, in TeamComponent team, ref VisibilityComponent visibility, Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery, in UnitsIconsComponent unitsIconsComponent)
+    public void Execute(in LocalToWorld localtoworld, in TeamComponent team, ref VisibilityComponent visibility, Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery, in UnitIconsComponent unitsIconsComponent)
     {
         float2 position;
         position = localtoworld.Position.xz + VIS_MAP_SIZE; 
