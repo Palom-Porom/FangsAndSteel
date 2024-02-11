@@ -29,6 +29,8 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
     ///<value> All units which can reload </value>
     EntityQuery reloaders;
     EntityQuery potentialTargetsQuery;
+    ///<value> All units which are looking for target </value>
+    EntityQuery targetSearchersQuery;
     ///<value> All units who can create attack request </value>
     ///<remarks> Without deployable </remarks>
     EntityQuery usualAttackers;
@@ -84,6 +86,12 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             WithAny<ModelsBuffer, AttackModelsBuffer>().
             Build(ref state);
         potentialTargetsQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<HpComponent, LocalToWorld, TeamComponent>().Build(ref state);
+        targetSearchersQuery = new EntityQueryBuilder(Allocator.Temp).
+            WithAllRW<AttackCharsComponent>().
+            WithPresentRW<BattleModeComponent>().
+            WithDisabledRW<PursuingModeComponent>().
+            WithAll<LocalTransform, TeamComponent>().
+            Build(ref state);
 
         usualAttackers = new EntityQueryBuilder(Allocator.Temp).
             WithAllRW<MovementComponent, ReloadComponent>().
@@ -220,7 +228,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             localToWorldLookup = localToWorldLookup,
             potentialTargetsArr = potentialTargetsArr,
             teamLookup = teamLookup
-        }.Schedule(state.Dependency);
+        }.Schedule(targetSearchersQuery, state.Dependency);
 
         //JobHandle usualCreateAttackRequestsJobHandle = new CreateUsualAttackRequestsJob
         //{
@@ -275,7 +283,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         //    rest_deployedClips = rest_deployedClips
         //}.Schedule(usualCreateAttackRequestsJobHandle);
 
-        state.Dependency = new _CreateDeployableAttackRequestsJob
+        JobHandle deployableCreateAttackRequestsJobHandle = new _CreateDeployableAttackRequestsJob
         {
             localToWorldLookup = localToWorldLookup,
             ecb = ecb,
@@ -299,6 +307,18 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             modelsBuffTypeHandle = modelsBuffTypeHandle,
             attackModelsBuffTypeHandle = attackModelsBuffTypeHandle
         }.Schedule(deployableAttackers, usualCreateAttackRequestsJobHandle);
+
+        state.Dependency = new PursuingJob
+        {
+            deltaTime = deltaTime,
+            localToWorldLookup = localToWorldLookup,
+
+            pursuingModeSettsTypeHandle = pursuingModeTypeHandle,
+            battleModeSetsTypeHandle = battleModeTypeHandle,
+            reloadTypeHandleRO = reloadTypeHandleRO,
+            movementTypeHandle = movementTypeHandle,
+            transformTypeHandleRO = transformTypeHandleRO
+        }.Schedule(pursuiers, deployableCreateAttackRequestsJobHandle);
 
         potentialTargetsArr.Dispose(targetSearchJobHandle);
     }
@@ -344,6 +364,7 @@ public partial struct ReloadJob : IJobEntity
 }
 
 
+///<summary> Update all units' reloadTime values and reload bars </summary>
 public partial struct _ReloadJob : IJobChunk
 {
     public float deltaTime;
@@ -492,7 +513,9 @@ public partial struct UpdateDeployJob : IJobEntity
 
 
 ///<summary> Searching for the most valuable target at the moment for ALL units </summary>
-[BurstCompile]
+//[BurstCompile]
+//[WithPresent(typeof(BattleModeComponent))]
+//[WithDisabled(typeof(PursuingModeComponent))]
 public partial struct AttackTargetSearchJob : IJobEntity
 {
     /// <summary> In other words all units that can be attacked </summary>
@@ -502,7 +525,8 @@ public partial struct AttackTargetSearchJob : IJobEntity
     [ReadOnly] public ComponentLookup<TeamComponent> teamLookup;
     [ReadOnly] public ComponentLookup<HpComponent> hpLookup;
 
-    public void Execute(ref AttackCharsComponent attackChars, in BattleModeComponent modeSettings, in LocalTransform localTransform, in TeamComponent team)
+    public void Execute(ref AttackCharsComponent attackChars, ref BattleModeComponent modeSettings, ref PursuingModeComponent pursuingModeComponent, in LocalTransform localTransform, in TeamComponent team,
+        EnabledRefRW<PursuingModeComponent> pursuingModeEnabledRefRW, EnabledRefRW<BattleModeComponent> battleModeEnabledRefRW)
     {
         float bestScore = float.MinValue;
         Entity bestScoreEntity = Entity.Null;
@@ -526,7 +550,9 @@ public partial struct AttackTargetSearchJob : IJobEntity
                 /*&& *check the type of unit* */)
             {
                 curScore += 10000; // such targets has higher priority than other (auto-trigger has more priority than usual attack)
-                //Enable pursue mode (as at least one target is pursue-able)
+                battleModeEnabledRefRW.ValueRW = false;
+                pursuingModeEnabledRefRW.ValueRW = true;
+                pursuingModeComponent.Target = attackChars.target;
             }
             else if (distanceToPotTargetSq > attackChars.radiusSq)
                 continue; // if pot target is not in any of the radiuses - going to next potential target
@@ -628,6 +654,8 @@ public partial struct CreateUsualAttackRequestsJob : IJobEntity
 }
 
 
+/// <summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
+/// <remarks> That Job is for NON Deployable units! </remarks>
 public partial struct _CreateUsualAttackRequestsJob : IJobChunk
 {
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
@@ -872,7 +900,8 @@ public partial struct CreateDeployableAttackRequestsJob : IJobEntity
 }
 
 
-
+///<summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
+/// <remarks> That Job is for Deployable units! </remarks>
 public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 {
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
@@ -1024,14 +1053,14 @@ public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 public partial struct PursuingJob : IJobChunk
 {
     public float deltaTime;
-
-    public ComponentLookup<LocalToWorld> localToWorldLookup;
+    
+    [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
 
     public ComponentTypeHandle<PursuingModeComponent> pursuingModeSettsTypeHandle;
     public ComponentTypeHandle<BattleModeComponent> battleModeSetsTypeHandle;
     public ComponentTypeHandle<MovementComponent> movementTypeHandle;
-    public ComponentTypeHandle<LocalTransform> transformTypeHandle;
-    public ComponentTypeHandle<ReloadComponent> reloadTypeHandle;
+    [ReadOnly] public ComponentTypeHandle<LocalTransform> transformTypeHandleRO;
+    [ReadOnly] public ComponentTypeHandle<ReloadComponent> reloadTypeHandleRO;
 
     public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
     {
@@ -1039,8 +1068,8 @@ public partial struct PursuingJob : IJobChunk
         {
             PursuingModeComponent* pursuingSetts = chunk.GetComponentDataPtrRW(ref pursuingModeSettsTypeHandle);
             MovementComponent* movements = chunk.GetComponentDataPtrRW(ref movementTypeHandle);
-            LocalTransform* transforms = chunk.GetComponentDataPtrRO(ref transformTypeHandle);
-            ReloadComponent* reloads = chunk.GetComponentDataPtrRO(ref reloadTypeHandle);
+            LocalTransform* transforms = chunk.GetComponentDataPtrRO(ref transformTypeHandleRO);
+            ReloadComponent* reloads = chunk.GetComponentDataPtrRO(ref reloadTypeHandleRO);
 
             ChunkEntityEnumerator chunkEnum = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
             while (chunkEnum.NextEntityIndex(out int i))

@@ -58,7 +58,6 @@ public class AttackAuthoring : MonoBehaviour
                 
                 autoTriggerMoving = false,
                 autoTriggerRadiusSq = authoring.attackRadius,
-                autoTriggerDropTime = 2f,
                 autoTriggerMaxHpPercent = 100
             });
 
@@ -139,7 +138,7 @@ public struct BattleModeComponent : IComponentData, IEnableableComponent
     public int autoTriggerMaxHpPercent;
     //TODO: *list of enemies to auto-trigger* (?enum + [flags]?)
     ///<value> Time of pursuing without a shot until dropping the auto-triggered target </value>
-    public float autoTriggerDropTime;
+    //public float autoTriggerDropTime;
 }
 
 
