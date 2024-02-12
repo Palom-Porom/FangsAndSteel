@@ -37,12 +37,12 @@ public class StaticUIRefs : MonoBehaviour
     
     private void Start()
     {
-        hpText = unitStats.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-        attackText = unitStats.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
-        reloadText = unitStats.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
-        attackRadiusText = unitStats.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
-        movementText = unitStats.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
-        visionRadiusText = unitStats.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
+        //hpText = unitStats.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        //attackText = unitStats.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        //reloadText = unitStats.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+        //attackRadiusText = unitStats.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
+        //movementText = unitStats.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
+        //visionRadiusText = unitStats.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
     }
 
     [HideInInspector] public bool endTurnBut;

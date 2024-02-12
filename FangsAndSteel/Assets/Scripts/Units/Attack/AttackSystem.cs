@@ -16,7 +16,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
 {
     ComponentLookup<HpComponent> hpLookup;
     ComponentLookup<FillFloatOverride> fillBarLookup;
-    ComponentLookup<UnitsIconsComponent> unitsIconsLookup;
+    ComponentLookup<UnitIconsComponent> unitsIconsLookup;
     BufferLookup<Child> childrenLookup;
 
     ComponentLookup<LocalTransform> localTransformLookup;
@@ -33,7 +33,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
 
         hpLookup = state.GetComponentLookup<HpComponent>();
         fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
-        unitsIconsLookup = state.GetComponentLookup<UnitsIconsComponent>(true);
+        unitsIconsLookup = state.GetComponentLookup<UnitIconsComponent>(true);
         childrenLookup = state.GetBufferLookup<Child>(true);
 
         localTransformLookup = state.GetComponentLookup<LocalTransform>();
@@ -91,7 +91,7 @@ public partial struct DealingDamageJob : IJobEntity
 {
     public ComponentLookup<HpComponent> hpLookup;
     public ComponentLookup<FillFloatOverride> fillBarLookup;
-    [ReadOnly] public ComponentLookup<UnitsIconsComponent> unitsIconsLookup;
+    [ReadOnly] public ComponentLookup<UnitIconsComponent> unitsIconsLookup;
     [ReadOnly] public BufferLookup<Child> childrenLookup;
     public EntityCommandBuffer.ParallelWriter ecb;
 
@@ -127,7 +127,7 @@ public partial struct DealingDamageJob : IJobEntity
             ecb.RemoveComponent<SelectTag>(chunkIndexInQuery, attackRequest.target);
             //Destroying all Unit Icons
             UtilityFuncs.DestroyParentAndAllChildren(ecb, childrenLookup, unitsIconsLookup[attackRequest.target].infoQuadsEntity, chunkIndexInQuery);
-            ecb.RemoveComponent<UnitsIconsComponent>(chunkIndexInQuery, attackRequest.target);
+            ecb.RemoveComponent<UnitIconsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<UnitStatsRequestTag>(chunkIndexInQuery, attackRequest.target);
 
             //Play Death anim

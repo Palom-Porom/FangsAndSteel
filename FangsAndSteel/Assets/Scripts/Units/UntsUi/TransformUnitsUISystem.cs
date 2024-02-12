@@ -24,7 +24,7 @@ public partial class TransformUnitsUISystem : SystemBase
     {
         EntityQuery q = new EntityQueryBuilder(Allocator.TempJob).WithAny<AttackCharsComponent, HpComponent>().Build(this);
         RequireAnyForUpdate(q);
-        RequireForUpdate<UnitsIconsComponent>();
+        RequireForUpdate<UnitIconsComponent>();
 
 
         localTransformLookup = GetComponentLookup<LocalTransform>();
@@ -62,7 +62,7 @@ public partial struct TransformUnitsUIJob : IJobEntity
     public float3 camRight;
 
     public ComponentLookup<LocalTransform> localTransformLookup;
-    public void Execute(in UnitsIconsComponent unitsIconsComponent, in LocalToWorld unitL2W)
+    public void Execute(in UnitIconsComponent unitsIconsComponent, in LocalToWorld unitL2W)
     {
         RefRW<LocalTransform> localTransform = localTransformLookup.GetRefRW(unitsIconsComponent.infoQuadsEntity);
 
@@ -80,7 +80,7 @@ public partial struct UpdateBarsJob : IJobEntity
 {
     public ComponentLookup<FillFloatOverride> fillBarLookup;
 
-    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackCharsComponent attackComponent)
+    public void Execute(in UnitIconsComponent unitsIconsComponent, in HpComponent hpComponent, in AttackCharsComponent attackComponent)
     {
         //Update ReloadBar
         //fillBarLookup.GetRefRW(unitsIconsComponent.reloadBarEntity).ValueRW.Value = attackComponent.curReload / attackComponent.reloadLen;
@@ -93,7 +93,7 @@ public partial struct InitializeBarsJob : IJobEntity
 {
     public ComponentLookup<FillFloatOverride> fillBarLookup;
 
-    public void Execute(in UnitsIconsComponent unitsIconsComponent, in HpComponent hpComponent, in ReloadComponent reload)
+    public void Execute(in UnitIconsComponent unitsIconsComponent, in HpComponent hpComponent, in ReloadComponent reload)
     {
         //RefRW<FillFloatOverride> fillComponent = fillBarLookup.GetRefRW(unitsIconsComponent.healthBarEntity);
         //fillComponent.ValueRW.Value = hpComponent.curHp / hpComponent.maxHp;

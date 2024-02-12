@@ -16,7 +16,7 @@ public class UnitsIconsAuthoring : MonoBehaviour
         public override void Bake(UnitsIconsAuthoring authoring)
         {
             Entity entity = GetEntity(TransformUsageFlags.Dynamic);
-            AddComponent(entity, new UnitsIconsComponent
+            AddComponent(entity, new UnitIconsComponent
             {
             infoQuadsEntity = GetEntity(authoring.infoQuadsGO, TransformUsageFlags.Dynamic), 
             healthBarEntity = GetEntity(authoring.healthBarGO, TransformUsageFlags.Dynamic), 
@@ -31,7 +31,7 @@ public class UnitsIconsAuthoring : MonoBehaviour
             
             
         
-public struct UnitsIconsComponent: IComponentData
+public struct UnitIconsComponent: IComponentData
 {
     public Entity infoQuadsEntity;
     public Entity healthBarEntity;

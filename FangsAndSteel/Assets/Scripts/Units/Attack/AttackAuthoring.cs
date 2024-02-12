@@ -1,20 +1,25 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Entities;
 using UnityEngine;
 
 public class AttackAuthoring : MonoBehaviour
 {
     public float damage = 0;
-    //public float realodLen = 1;
     public int attackRadius = 0;
-    public float timeToShoot = 1;
+    ///TODO: automatically get the value below if it is possible
+    public float shootingAnimationLen = 1;
 
     public int maxBullets = 1;
     public float bulletReload = 0.5f;
     public float drumReload = 3f;
     public float reload_SoM_Debuff = 0.5f;
+
+    public float dropTime = 5f;
+    public float dropDistance = 20f;
+    
     public class Baker : Baker<AttackAuthoring>
     {
         public override void Bake(AttackAuthoring authoring)
@@ -23,35 +28,26 @@ public class AttackAuthoring : MonoBehaviour
             AddComponent(entity, new AttackCharsComponent 
             { 
                 damage = authoring.damage,
-                //reloadLen = authoring.realodLen,
-                //curReload = 0,
                 radiusSq = authoring.attackRadius * authoring.attackRadius,
-                target = Entity.Null, 
-
-                timeToShoot = authoring.timeToShoot
+                target = Entity.Null
             });
-
-            //AddComponent(entity, new AttackSettingsComponent 
-            //{
-            //    isAbleToMove = true,
-
-            //    targettingMinHP = true,
-            //    shootingOnMoveMode = false
-            //});
 
             AddComponent(entity, new ReloadComponent
             {
                 maxBullets = authoring.maxBullets,
-                curBullets = 0,
+                curBullets = authoring.maxBullets,
 
-                bulletReloadElapsed = 0,
+                bulletReloadElapsed = authoring.bulletReload,
                 bulletReloadLen = authoring.bulletReload,
 
-                drumReloadElapsed = 0,
+                drumReloadElapsed = 0f,
                 drumReloadLen = authoring.drumReload,
 
                 reload_SoM_Debaff = authoring.reload_SoM_Debuff,
-                curDebaff = 0
+                curDebaff = 0,
+
+                shootAnimElapsed = 0,
+                shootAnimLen = authoring.shootingAnimationLen
             });
 
             AddComponent(entity, new BattleModeComponent
@@ -61,33 +57,40 @@ public class AttackAuthoring : MonoBehaviour
                 
                 autoTriggerMoving = false,
                 autoTriggerRadiusSq = authoring.attackRadius,
-                autoTriggerDropTime = 2f,
                 autoTriggerMaxHpPercent = 100
             });
+
+            AddComponent(entity, new PursuingModeComponent
+            {
+                Target = Entity.Null,
+                
+                dropTime = authoring.dropTime,
+                dropTimeElapsed = 0,
+                
+                maxShootDistanceSq = (authoring.attackRadius - 5f) * (authoring.attackRadius - 5f),
+                dropDistanceSq = authoring.dropDistance * authoring.dropDistance
+            });
+            SetComponentEnabled<PursuingModeComponent>(entity, false);
         }
     }
 }
+
+
+///<summary> General attacker characteristics </summary>
 public struct AttackCharsComponent : IComponentData
 {
+    ///<value> Damage which is done to target during one attack </value>
     public float damage;
-    //public float reloadLen; //remove
-    //public float curReload; //remove
+    ///<value> Square of radius of attack distance of unit </value>
+    ///<remarks> Squared for more efficiency </remarks>
     public int radiusSq;
+    ///<value> Current target of attack. If unit can he will do an attack on him </value>
     public Entity target;
-
-    public float timeToShoot;
 }
-
-//public struct AttackSettingsComponent : IComponentData
-//{
-//    public bool isAbleToMove; // remove to MovementComponent
-
-//    public bool targettingMinHP;
-//    public bool shootingOnMoveMode;
-//}
 
 
 ///<summary> Info about "bullets" and reload status of unit </summary>>
+[BurstCompile]
 public struct ReloadComponent : IComponentData
 {
     /// <value> Max "bullets" amount in a Drum </value>
@@ -111,6 +114,15 @@ public struct ReloadComponent : IComponentData
     public float reload_SoM_Debaff;
     ///<value> Percentage of current reload speed debbaf </value>
     public float curDebaff;
+
+    ///<value> Time elapsed after last attack was made </value>
+    public float shootAnimElapsed;
+    ///<value> Time needed to pass after last attack was made to start reloading process and play reload animation </value>
+    ///<remarks> Basically equals to the length of the attack animation </remarks>
+    public float shootAnimLen; ///TODO: automatically get that value if it is possible
+
+    ///<value> If true then unit is ready to fire </value>
+    public bool isReloaded() { return curBullets > 0 && bulletReloadElapsed >= bulletReloadLen; }
 }
 
 
@@ -132,9 +144,7 @@ public struct BattleModeComponent : IComponentData, IEnableableComponent
     public float autoTriggerRadiusSq;
     ///<value> Max percentage (0 to 1) of Hp which target can have for auto-trigger to work </value>
     public int autoTriggerMaxHpPercent;
-    //TODO: *list of enemies to auto-trigger* (?enum + [flags]?)
-    ///<value> Time of pursuing without a shot until dropping the auto-triggered target </value>
-    public float autoTriggerDropTime;
+    ///TODO: *list of enemies to auto-trigger* (?enum + [flags]?)
 }
 
 
@@ -150,8 +160,10 @@ public struct PursuingModeComponent : IComponentData, IEnableableComponent
     /// <summary> Elapsed time wihtout a shot </summary>
     public float dropTimeElapsed;
 
-    /// <summary> If distance to target is bigger than this - pursuing will be dropped </summary>
-    public float dropDistance;
+    ///<summary> Order to shoot no further than this distance (squared)</summary>
+    public float maxShootDistanceSq;
+    /// <summary> If distance (squared) to target is bigger than this - pursuing will be dropped </summary>
+    public float dropDistanceSq;
 }
 
 

@@ -10,6 +10,7 @@ public partial struct NotAbleToMoveForTimeSystem : ISystem, ISystemStartStop
     ComponentLookup<AnimationCmdData> animCmdLookup;
     ComponentLookup<AnimationStateData> animStateLookup;
     NativeArray<AnimDbEntry> moveClips;
+    NativeArray<AnimDbEntry> restClips;
 
     public void OnCreate(ref SystemState state)
     {
@@ -22,6 +23,7 @@ public partial struct NotAbleToMoveForTimeSystem : ISystem, ISystemStartStop
     public void OnStartRunning(ref SystemState state)
     {
         moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Movement");
+        restClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Rest");
     }
 
     public void OnStopRunning(ref SystemState state)
@@ -39,12 +41,14 @@ public partial struct NotAbleToMoveForTimeSystem : ISystem, ISystemStartStop
 
             animCmdLookup = animCmdLookup,
             animStateLookup = animStateLookup,
-            moveClips = moveClips
+            moveClips = moveClips,
+            restClips = restClips
         }.Schedule(state.Dependency);
     }
 }
 
 
+[WithNone(typeof(AttackModelsBuffer))]
 public partial struct NotAbleToMoveForTimeJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ecb;
@@ -53,6 +57,7 @@ public partial struct NotAbleToMoveForTimeJob : IJobEntity
     public ComponentLookup<AnimationCmdData> animCmdLookup;
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> restClips;
 
     public void Execute(ref NotAbleToMoveForTimeRqstComponent rqst, ref MovementComponent movement,
         in DynamicBuffer<ModelsBuffer> modelsBuf, Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery)
@@ -61,15 +66,67 @@ public partial struct NotAbleToMoveForTimeJob : IJobEntity
         if (rqst.passedTime >= rqst.targetTime)
         {
             movement.isAbleToMove = true;
-            foreach (var modelBufElem in modelsBuf)
+
+            if (movement.hasMoveTarget)
             {
-                RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
-                Debug.Log("changed to movement anim");
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                }
+            }
+            else
+            {
+                foreach (var modelBufElem in modelsBuf)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = restClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                }
             }
             ecb.RemoveComponent<NotAbleToMoveForTimeRqstComponent>(chunkIndexInQuery, entity);
         }
     }
+}
 
+
+
+public partial struct ChangeAnimAfterReloadJob : IJobEntity
+{
+    public EntityCommandBuffer.ParallelWriter ecb;
+    public float deltaTime;
+
+    public ComponentLookup<AnimationCmdData> animCmdLookup;
+    [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
+    [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
+    [ReadOnly] public NativeArray<AnimDbEntry> restClips;
+
+    public void Execute(ref NotAbleToMoveForTimeRqstComponent rqst, ref MovementComponent movement, 
+        in DynamicBuffer<AttackModelsBuffer> attackModels, Entity entity, [ChunkIndexInQuery] int chunkIndexInQuery)
+    {
+        rqst.passedTime += deltaTime;
+        if (rqst.passedTime >= rqst.targetTime)
+        {
+            if (movement.hasMoveTarget)
+            {
+                foreach (var modelBufElem in attackModels)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                }
+            }
+            else
+            {
+                foreach (var modelBufElem in attackModels)
+                {
+                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                    animCmd.ValueRW.ClipIndex = restClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
+                }
+            }
+            ecb.RemoveComponent<NotAbleToMoveForTimeRqstComponent>(chunkIndexInQuery, entity);
+        }
+    }
 }

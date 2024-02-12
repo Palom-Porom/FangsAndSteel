@@ -31,7 +31,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
     ComponentTypeHandle<LocalTransform> transformTypeHandle;
     ComponentTypeHandle<MovementComponent> movementTypeHandle;
-    ComponentTypeHandle<RotationToTargetComponent> rotationTypeHandle;
+    ComponentTypeHandle<RotationComponent> rotationTypeHandle;
     BufferTypeHandle<MovementCommandsBuffer> movementCommandsBuffTypeHandle;
     BufferTypeHandle<ModelsBuffer> modelsBuffTypeHandle;
 
@@ -51,12 +51,13 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
         movementQuery = new EntityQueryBuilder(Allocator.Temp).
             WithAllRW<MovementComponent, LocalTransform>().
-            WithAllRW<RotationToTargetComponent, MovementCommandsBuffer>().
-            WithAll<ModelsBuffer>().Build(ref state);
+            WithAllRW<RotationComponent, MovementCommandsBuffer>().
+            WithAny<ModelsBuffer, VehicleMovementComponent>().
+            Build(ref state);
 
         transformTypeHandle = SystemAPI.GetComponentTypeHandle<LocalTransform>();
         movementTypeHandle = SystemAPI.GetComponentTypeHandle<MovementComponent>();
-        rotationTypeHandle = SystemAPI.GetComponentTypeHandle<RotationToTargetComponent>();
+        rotationTypeHandle = SystemAPI.GetComponentTypeHandle<RotationComponent>();
         movementCommandsBuffTypeHandle = SystemAPI.GetBufferTypeHandle<MovementCommandsBuffer>();
         modelsBuffTypeHandle = SystemAPI.GetBufferTypeHandle<ModelsBuffer>(true);
 
@@ -105,7 +106,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
             deltaTime = SystemAPI.Time.DeltaTime
         }.Schedule(state.Dependency);
 
-        JobHandle movementJobHandle = new _MovementJob
+        JobHandle movementJobHandle = new MovementJob
         {
             deltaTime = SystemAPI.Time.DeltaTime,
             collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld,
@@ -125,12 +126,12 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
         #endregion
 
         #region RotationJobs
-        JobHandle rotationJobHandle = new RotationToTargetJob
+        JobHandle rotationJobHandle = new RotationJob
         {
             deltaTime = SystemAPI.Time.DeltaTime
         }.Schedule(movementJobHandle); // Be careful changing these parallel jobs
 
-        JobHandle attackRotationJobHandle = new AttackRotationToTargetJob 
+        JobHandle attackRotationJobHandle = new AttackRotationJob 
         {
             deltaTime = SystemAPI.Time.DeltaTime,
             transformLookup = transformLookup
@@ -223,7 +224,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
 
 [BurstCompile]
-public partial struct _MovementJob : IJobChunk
+public partial struct MovementJob : IJobChunk
 {
     public float deltaTime;
     [ReadOnly] public CollisionWorld collisionWorld;
@@ -234,7 +235,7 @@ public partial struct _MovementJob : IJobChunk
 
     public ComponentTypeHandle<LocalTransform> transformTypeHandle;
     public ComponentTypeHandle<MovementComponent> movementTypeHandle;
-    public ComponentTypeHandle<RotationToTargetComponent> rotationTypeHandle;
+    public ComponentTypeHandle<RotationComponent> rotationTypeHandle;
     public BufferTypeHandle<MovementCommandsBuffer> movementCommandsBuffTypeHandle;
     public BufferTypeHandle<ModelsBuffer> modelsBuffTypeHandle;
     
@@ -244,7 +245,7 @@ public partial struct _MovementJob : IJobChunk
     {
         NativeArray<LocalTransform> transforms = chunk.GetNativeArray(ref transformTypeHandle);
         NativeArray<MovementComponent> movements = chunk.GetNativeArray(ref movementTypeHandle);
-        NativeArray<RotationToTargetComponent> rotations = chunk.GetNativeArray(ref rotationTypeHandle);
+        NativeArray<RotationComponent> rotations = chunk.GetNativeArray(ref rotationTypeHandle);
         BufferAccessor<MovementCommandsBuffer> movementCommandsBuffs = chunk.GetBufferAccessor(ref movementCommandsBuffTypeHandle);
         BufferAccessor<ModelsBuffer> modelsBuffs = chunk.GetBufferAccessor(ref modelsBuffTypeHandle);
 
@@ -264,15 +265,15 @@ public partial struct _MovementJob : IJobChunk
                 vehiclesPtr = vehicles.GetUnsafePtr();
             }
 
-            ChunkEntityEnumerator enumerator = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+            ChunkEntityEnumerator chunkEnum = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
 
-            while (enumerator.NextEntityIndex(out int i))
+            while (chunkEnum.NextEntityIndex(out int i))
             {
                 if (!movements[i].isAbleToMove)
-                    return;
+                    continue;
 
                 if (!movements[i].hasMoveTarget)
-                    return;
+                    continue;
 
                 if (math.distancesq(movements[i].target, transforms[i].Position) < math.max(deltaTime * movements[i].speed, 0.1f)) // has got to the current target?
                 {
@@ -291,7 +292,7 @@ public partial struct _MovementJob : IJobChunk
                             animCmd.ValueRW.ClipIndex = restClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
                             animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
                         }
-                        return;
+                        continue;
                     }
                 }
 
@@ -308,7 +309,7 @@ public partial struct _MovementJob : IJobChunk
                 }
                 tempDir.y = 0;
                 tempDir = math.normalize(tempDir);
-                Debug.Log(tempDir);
+                //Debug.Log(tempDir);
                 if (speed < 0)
                     Debug.Log("ERROR: Movement debuff is higher than 1!");
 
@@ -325,9 +326,9 @@ public partial struct _MovementJob : IJobChunk
                     if (closestHit.SurfaceNormal.y < 0f)
                         closestHit.SurfaceNormal = -closestHit.SurfaceNormal;
 
-                    UnsafeUtility.ArrayElementAsRef<RotationToTargetComponent>(rotationsPtr, i).newRotTarget = 
+                    UnsafeUtility.ArrayElementAsRef<RotationComponent>(rotationsPtr, i).newRotTarget = 
                         quaternion.LookRotationSafe(closestHit.Position - transforms[i].Position, closestHit.SurfaceNormal); // Update rotation target
-                    Debug.Log($"{closestHit.Position - transforms[i].Position}; ||||| {rotations[i].newRotTarget} --- {rotations[i].curRotTarget}");
+                    //Debug.Log($"{closestHit.Position - transforms[i].Position}; ||||| {rotations[i].newRotTarget} --- {rotations[i].curRotTarget}");
                     UnsafeUtility.ArrayElementAsRef<LocalTransform>(transformsPtr, i).Position = closestHit.Position; // Update position
                     if (isVehicle)
                     {
@@ -365,11 +366,11 @@ public partial struct _MovementJob : IJobChunk
 
 
 //[WithNone(typeof(VehicleMovementComponent))]
-public partial struct RotationToTargetJob : IJobEntity
+public partial struct RotationJob : IJobEntity
 {
     public float deltaTime;
 
-    public void Execute(ref RotationToTargetComponent rotation, ref LocalTransform localTransform)
+    public void Execute(ref RotationComponent rotation, ref LocalTransform localTransform)
     {
         if (UtilityFuncs.Nearly_Equals(rotation.newRotTarget, rotation.curRotTarget))
         //if (rotation.newRotTarget.Equals(rotation.curRotTarget))
@@ -428,12 +429,12 @@ public partial struct VehicleRotationToTargetJob : IJobEntity
         //curForwardAngle += math.min(math.sign(diffAngle) * vehicleMovement.degreesPerSecond, diffAngle);
         vehicleMovement.temporaryTarget = new float3(math.cos(/*math.radians*/(curForwardAngle)), 0, math.sin(/*math.radians*/(curForwardAngle))) + localTransform.Position;
 
-        Debug.Log($"curForwardDir = {curForwardDir}; curForwardAngle = {math.degrees(curForwardAngle)};" +
-            $" initialCurForwardAngle = {math.degrees(initialCurForwardAngle)};" +
-            $" targetForwardDir = {targetForwardDir}; targetForwardAngle = {math.degrees(targetForwardAngle)}; curTargetDir = {vehicleMovement.curTargetDir};" +
-            $"\n cos({math.degrees(curForwardAngle)}) = {math.cos((curForwardAngle))}; sin({math.degrees(curForwardAngle)}) = {math.sin((curForwardAngle))}" +
-            $"\n initialCurForwardDir = {math.mul(localTransform.Rotation, new float3(0, 0, 1))}" +
-            $"\n initialinitialCurForwardAngle = {math.degrees(math.acos(math.dot(new float3(1, 0, 0), curForwardDir)))}");
+        //Debug.Log($"curForwardDir = {curForwardDir}; curForwardAngle = {math.degrees(curForwardAngle)};" +
+        //    $" initialCurForwardAngle = {math.degrees(initialCurForwardAngle)};" +
+        //    $" targetForwardDir = {targetForwardDir}; targetForwardAngle = {math.degrees(targetForwardAngle)}; curTargetDir = {vehicleMovement.curTargetDir};" +
+        //    $"\n cos({math.degrees(curForwardAngle)}) = {math.cos((curForwardAngle))}; sin({math.degrees(curForwardAngle)}) = {math.sin((curForwardAngle))}" +
+        //    $"\n initialCurForwardDir = {math.mul(localTransform.Rotation, new float3(0, 0, 1))}" +
+        //    $"\n initialinitialCurForwardAngle = {math.degrees(math.acos(math.dot(new float3(1, 0, 0), curForwardDir)))}");
 
         //var targetLookingVector = math.mul(vehicleMovement.rotationDiff, new float3(1, 0, 0));
         //targetLookingVector.y = 0;
@@ -521,13 +522,13 @@ public partial struct VehicleRotationToTargetJob : IJobEntity
 
 
 
-public partial struct AttackRotationToTargetJob : IJobEntity
+public partial struct AttackRotationJob : IJobEntity
 {
     public float deltaTime;
     [NativeDisableContainerSafetyRestriction]
     public ComponentLookup<LocalTransform> transformLookup;
 
-    public void Execute(ref AttackRotationToTargetComponent rotation, in DynamicBuffer<AttackModelsBuffer> attackModelsBuf, in AttackCharsComponent attackChars, in LocalToWorld localToWorld)
+    public void Execute(ref AttackRotationComponent rotation, in DynamicBuffer<AttackModelsBuffer> attackModelsBuf, in AttackCharsComponent attackChars, in LocalToWorld localToWorld)
     {
         #region Update target and handle automatic return to default rotation
         if (attackChars.target != Entity.Null)
