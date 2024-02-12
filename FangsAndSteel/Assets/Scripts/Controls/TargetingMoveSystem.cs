@@ -127,66 +127,9 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 }
 
 
-///TODO: Redo with ChunkIteration optimization (so that it doesn't go through all selected units if raycastResult.Value.hasHit == false)
-/// <summary>
-/// Changes targets for all selected units if raycast of new target was succesfull
-/// </summary>
-[BurstCompile]
-[WithAll(typeof(SelectTag))]
-public partial struct ChangeTargetJob : IJobEntity
-{
-    [ReadOnly]
-    public NativeReference<RaycastResult> raycastResult;
-    public bool shiftTargeting;
-
-    public ComponentLookup<AnimationCmdData> animCmdLookup;
-    [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
-    [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
-    public void Execute (ref MovementComponent movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, in DynamicBuffer<ModelsBuffer> modelsBuf)
-    {
-        var result = raycastResult.Value;
-        if (!result.hasHit)
-            return;
-        if (shiftTargeting && movementComponent.hasMoveTarget)
-        {
-            if (!moveComBuf.IsEmpty)
-                moveComBuf.Add(new MovementCommandsBuffer 
-                { 
-                    target = result.raycastHitInfo.Position, 
-                    //Copying the previous settings by default
-                    //targettingMinHP = moveComBuf[moveComBuf.Length - 1].targettingMinHP, 
-                    //shootingOnMoveMode = moveComBuf[moveComBuf.Length - 1].shootingOnMoveMode 
-                });
-            else
-                moveComBuf.Add(new MovementCommandsBuffer
-                {
-                    target = result.raycastHitInfo.Position,
-                    //Copying the current settings by default
-                    //targettingMinHP = attackSets.shootingOnMoveMode,
-                    //shootingOnMoveMode = attackSets.shootingOnMoveMode
-                });
-        }
-        else
-        {
-            moveComBuf.Clear();
-            movementComponent.target = result.raycastHitInfo.Position;
-            movementComponent.hasMoveTarget = true;
-            if (movementComponent.isAbleToMove)
-            {
-                //Play move anim
-                foreach (var modelBufElem in modelsBuf)
-                {
-                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                    animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                    animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
-                }
-            }
-        }
-    }
-}
-
 
 ///<summary> Changes targets for all selected units if raycast of new target was succesfull </summary>
+[BurstCompile]
 public partial struct _ChangeTargetJob : IJobChunk
 {
     [ReadOnly]

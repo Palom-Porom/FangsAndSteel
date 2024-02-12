@@ -28,6 +28,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 
     ///<value> All units which can reload </value>
     EntityQuery reloaders;
+    ///<value> All units which can be a target for another unit </value>
     EntityQuery potentialTargetsQuery;
     ///<value> All units which are looking for target </value>
     EntityQuery targetSearchersQuery;
@@ -191,12 +192,6 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 
 
 
-        //JobHandle reloadJobHandle = new ReloadJob
-        //{
-        //    deltaTime = deltaTime,
-        //    fillBarLookup = fillBarLookup
-        //}.Schedule(state.Dependency);
-
         JobHandle reloadJobHandle = new _ReloadJob
         {
             deltaTime = deltaTime,
@@ -230,19 +225,6 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             teamLookup = teamLookup
         }.Schedule(targetSearchersQuery, state.Dependency);
 
-        //JobHandle usualCreateAttackRequestsJobHandle = new CreateUsualAttackRequestsJob
-        //{
-        //    localToWorldLookup = localToWorldLookup,
-        //    ecb = ecb,
-            
-        //    animCmdLookup = animCmdLookup,
-        //    animStateLookup = animStateLookup,
-        //    attackClips = attackClips,
-        //    reloadClips = reloadClips,
-        //    moveClips = moveClips,
-        //    restClips = restClips
-        //}.Schedule(JobHandle.CombineDependencies(deployJobHandle, targetSearchJobHandle));
-
         JobHandle usualCreateAttackRequestsJobHandle = new _CreateUsualAttackRequestsJob
         {
             localToWorldLookup = localToWorldLookup,
@@ -267,21 +249,6 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             attackModelsBuffTypeHandle = attackModelsBuffTypeHandle
 
         }.Schedule(usualAttackers, JobHandle.CombineDependencies(deployJobHandle, targetSearchJobHandle));
-
-        //state.Dependency = new CreateDeployableAttackRequestsJob
-        //{
-        //    localToWorldLookup = localToWorldLookup,
-        //    ecb = ecb,
-        //    deltaTime = deltaTime,
-
-        //    animCmdLookup = animCmdLookup,
-        //    animStateLookup = animStateLookup,
-        //    attackClips = attackClips,
-        //    reloadClips = reloadClips,
-        //    deployClips = deployClips,
-        //    undeployClips = undeployClips,
-        //    rest_deployedClips = rest_deployedClips
-        //}.Schedule(usualCreateAttackRequestsJobHandle);
 
         JobHandle deployableCreateAttackRequestsJobHandle = new _CreateDeployableAttackRequestsJob
         {
@@ -329,42 +296,6 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 
 ///<summary> Update all units' reloadTime values and reload bars </summary>
 [BurstCompile]
-public partial struct ReloadJob : IJobEntity
-{
-    public float deltaTime;
-
-    public ComponentLookup<FillFloatOverride> fillBarLookup;
-
-    public void Execute(ref ReloadComponent reloadComponent, in UnitIconsComponent unitsIcons)
-    {
-
-        if (reloadComponent.curBullets == 0) // if drum is empty -> drum reload
-        {
-            reloadComponent.drumReloadElapsed += deltaTime;
-            if (reloadComponent.drumReloadElapsed >= reloadComponent.drumReloadLen * (1 - reloadComponent.curDebaff))
-            {
-                reloadComponent.curBullets = reloadComponent.maxBullets;
-                reloadComponent.bulletReloadElapsed = reloadComponent.bulletReloadLen;
-                reloadComponent.drumReloadElapsed = 0f;
-                fillBarLookup.GetRefRW(unitsIcons.reloadBarEntity).ValueRW.Value = 1f;
-                return;
-            }
-            fillBarLookup.GetRefRW(unitsIcons.reloadBarEntity).ValueRW.Value = reloadComponent.drumReloadElapsed / reloadComponent.drumReloadLen;
-
-        }
-
-        else if (reloadComponent.bulletReloadElapsed < reloadComponent.bulletReloadLen) // reload of the bullet
-        {
-            if (reloadComponent.bulletReloadElapsed <= float.Epsilon) //If just shot -> update the ReloadBar
-                fillBarLookup.GetRefRW(unitsIcons.reloadBarEntity).ValueRW.Value = (float)reloadComponent.curBullets / reloadComponent.maxBullets;
-            reloadComponent.bulletReloadElapsed += deltaTime;
-        }
-
-    }
-}
-
-
-///<summary> Update all units' reloadTime values and reload bars </summary>
 public partial struct _ReloadJob : IJobChunk
 {
     public float deltaTime;
@@ -513,9 +444,7 @@ public partial struct UpdateDeployJob : IJobEntity
 
 
 ///<summary> Searching for the most valuable target at the moment for ALL units </summary>
-//[BurstCompile]
-//[WithPresent(typeof(BattleModeComponent))]
-//[WithDisabled(typeof(PursuingModeComponent))]
+[BurstCompile]
 public partial struct AttackTargetSearchJob : IJobEntity
 {
     /// <summary> In other words all units that can be attacked </summary>
@@ -574,88 +503,7 @@ public partial struct AttackTargetSearchJob : IJobEntity
 
 /// <summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
 /// <remarks> That Job is for NON Deployable units! </remarks>
-[WithNone(typeof(Deployable))]
 [BurstCompile]
-public partial struct CreateUsualAttackRequestsJob : IJobEntity
-{
-    [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
-
-    public EntityCommandBuffer.ParallelWriter ecb;
-
-    [NativeDisableContainerSafetyRestriction]
-    public ComponentLookup<AnimationCmdData> animCmdLookup;
-    [NativeDisableContainerSafetyRestriction]
-    public ComponentLookup<AnimationStateData> animStateLookup;
-    [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
-    [ReadOnly] public NativeArray<AnimDbEntry> reloadClips;
-    [ReadOnly] public NativeArray<AnimDbEntry> moveClips;
-    [ReadOnly] public NativeArray<AnimDbEntry> restClips;
-
-    public void Execute(in AttackCharsComponent attackChars, in BattleModeComponent modeSettings, ref MovementComponent movementComponent, Entity entity,
-        in DynamicBuffer<ModelsBuffer> modelsBuf, in LocalTransform localTransform, ref ReloadComponent reloadComponent, [ChunkIndexInQuery] int chunkIndexInQuery,
-        ref RotationComponent rotation)
-    {
-        //if has some target -> shoot
-        if (attackChars.target != Entity.Null) 
-        {
-            if (!(reloadComponent.curBullets > 0 && reloadComponent.bulletReloadElapsed >= reloadComponent.bulletReloadLen)) // if not reloaded -> return
-                return;
-            if (modeSettings.shootingOnMove)
-                ecb.AddComponent(chunkIndexInQuery, entity, new NotAbleToMoveForTimeRqstComponent { passedTime = 0, targetTime = attackChars.timeToShoot });
-            movementComponent.isAbleToMove = false;
-            //Rotate to target
-            rotation.newRotTarget = quaternion.LookRotationSafe(localToWorldLookup[attackChars.target].Position - localTransform.Position, localTransform.Up());
-
-            //Create Attack Request
-            Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
-            ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent 
-            { 
-                target = attackChars.target, 
-                damage = attackChars.damage, 
-                attackerPos = localTransform.Position
-            });
-
-            //Play Attack Anim
-            foreach (var modelBufElem in modelsBuf)
-            {
-                RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                byte reloadIdx = reloadClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                animStateLookup.GetRefRW(modelBufElem.model).ValueRW.ForeverClipIndex = reloadIdx;
-                animCmd.ValueRW.ClipIndex = attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
-            }
-            
-            reloadComponent.curBullets--;
-            reloadComponent.bulletReloadElapsed = 0;
-        }
-        else // this means unit doesn't have a target to shoot
-        {
-            if (!movementComponent.isAbleToMove && // if not able to move
-                reloadComponent.isReloaded()) // and reloaded
-            {// enable to move and adjust the anims
-                if (movementComponent.hasMoveTarget)
-                    foreach (var modelBufElem in modelsBuf)
-                    {
-                        RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                        animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                        animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
-                    }
-                else
-                    foreach (var modelBufElem in modelsBuf)
-                    {
-                        RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                        animCmd.ValueRW.ClipIndex = restClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                        animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
-                    }
-                movementComponent.isAbleToMove = true;
-            }
-        }
-    }
-}
-
-
-/// <summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
-/// <remarks> That Job is for NON Deployable units! </remarks>
 public partial struct _CreateUsualAttackRequestsJob : IJobChunk
 {
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
@@ -723,7 +571,7 @@ public partial struct _CreateUsualAttackRequestsJob : IJobChunk
                         ecb.AddComponent(unfilteredChunkIndex, entities[i], new NotAbleToMoveForTimeRqstComponent 
                         { 
                             passedTime = 0, 
-                            targetTime = attackChars[i].timeToShoot 
+                            targetTime = reloads[i].shootAnimLen
                         });
 
                     if (!hasSeparateAttackModels)//if no turret -> stop and turn to the enemy
@@ -804,104 +652,6 @@ public partial struct _CreateUsualAttackRequestsJob : IJobChunk
 ///<summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
 /// <remarks> That Job is for Deployable units! </remarks>
 [BurstCompile]
-public partial struct CreateDeployableAttackRequestsJob : IJobEntity
-{
-    [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
-
-    public EntityCommandBuffer.ParallelWriter ecb;
-
-    public float deltaTime;
-
-    [NativeDisableContainerSafetyRestriction]
-    public ComponentLookup<AnimationCmdData> animCmdLookup;
-    [NativeDisableContainerSafetyRestriction]
-    public ComponentLookup<AnimationStateData> animStateLookup;
-    [ReadOnly] public NativeArray<AnimDbEntry> attackClips;
-    [ReadOnly] public NativeArray<AnimDbEntry> reloadClips;
-    [ReadOnly] public NativeArray<AnimDbEntry> deployClips;
-    [ReadOnly] public NativeArray<AnimDbEntry> undeployClips;
-    [ReadOnly] public NativeArray<AnimDbEntry> rest_deployedClips;
-
-    public void Execute(ref Deployable deployable, in AttackCharsComponent attackChars, ref MovementComponent movementComponent, in DynamicBuffer<ModelsBuffer> modelsBuf,
-        ref ReloadComponent reloadComponent, [ChunkIndexInQuery] int chunkIndexInQuery, in LocalTransform localTransform, ref RotationComponent rotation)
-    {
-        if (attackChars.target != Entity.Null)
-        {
-            deployable.waitingTimeCur = 0; // remove to other place
-
-            //if Undeployed, than start Deploying
-            if (!deployable.deployedState)
-            {
-                deployable.deployedState = true;
-                movementComponent.isAbleToMove = false;
-
-                //Set Deploy anim PlayOnce
-                foreach (var modelBufElem in modelsBuf)
-                {
-                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                    //animCmd.ValueRW.ClipIndex = rest_deployedClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                    //animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
-                    //byte rest_deployed_idx = rest_deployedClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                    //animStateLookup.GetRefRW(modelBufElem.model).ValueRW.ForeverClipIndex = rest_deployed_idx;
-                    animCmd.ValueRW.ClipIndex = deployClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
-                }
-            }
-            //If fully Deployed and Reloaded -> create Attack Rqst
-            else if (deployable.deployTimeElapsed >= deployable.deployTime && reloadComponent.curBullets > 0 && reloadComponent.bulletReloadElapsed >= reloadComponent.bulletReloadLen)
-            {
-                //Rotate to target
-                rotation.newRotTarget = quaternion.LookRotationSafe(localToWorldLookup[attackChars.target].Position - localTransform.Position, localTransform.Up());
-
-                //Create Attack Request
-                Entity attackRequest = ecb.CreateEntity(chunkIndexInQuery);
-                ecb.AddComponent(chunkIndexInQuery, attackRequest, new AttackRequestComponent 
-                { 
-                    target = attackChars.target, 
-                    damage = attackChars.damage, 
-                    attackerPos =  localTransform.Position
-                });
-
-                //Play Attack Anim
-                foreach (var modelBufElem in modelsBuf)
-                {
-                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                    ///TODO: Reload when the anim on model appear
-                    animCmd.ValueRW.ClipIndex = attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
-                }
-
-                reloadComponent.curBullets--;
-                reloadComponent.bulletReloadElapsed = 0;
-            }
-        }
-        //If has no target and another point to Move -> undeploy and move after waitingTime elapsed
-        else if (movementComponent.hasMoveTarget) 
-        {
-            //Update waiting time
-            if (deployable.waitingTimeCur < deployable.waitingTimeMax)
-                deployable.waitingTimeCur += deltaTime;
-            //if waiting time elapsed -> undeploy and move
-            if (deployable.deployedState && deployable.waitingTimeCur >= deployable.waitingTimeMax && // if deployed and waited enough time
-                reloadComponent.isReloaded()) // and reloaded
-            {// then undelpoy
-                deployable.deployedState = false;
-
-                //Set Undeploy anim PlayOnce
-                foreach (var modelBufElem in modelsBuf)
-                {
-                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                    animCmd.ValueRW.ClipIndex = undeployClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
-                }
-            }
-        }
-    }
-}
-
-
-///<summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
-/// <remarks> That Job is for Deployable units! </remarks>
 public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 {
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
@@ -1050,6 +800,8 @@ public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 }
 
 
+///<summary> Updates some pursuing info for all units with such mode enabled </summary>
+[BurstCompile]
 public partial struct PursuingJob : IJobChunk
 {
     public float deltaTime;
@@ -1096,7 +848,7 @@ public partial struct PursuingJob : IJobChunk
 
 
 
-
+///<summary> Used in temporary "event"-entity for creating an attack request </summary>
 public struct AttackRequestComponent : IComponentData
 {
     public Entity target;

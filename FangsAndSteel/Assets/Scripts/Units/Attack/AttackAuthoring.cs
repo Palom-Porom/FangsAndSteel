@@ -9,7 +9,8 @@ public class AttackAuthoring : MonoBehaviour
 {
     public float damage = 0;
     public int attackRadius = 0;
-    public float timeToShoot = 1;
+    ///TODO: automatically get the value below if it is possible
+    public float shootingAnimationLen = 1;
 
     public int maxBullets = 1;
     public float bulletReload = 0.5f;
@@ -28,9 +29,7 @@ public class AttackAuthoring : MonoBehaviour
             { 
                 damage = authoring.damage,
                 radiusSq = authoring.attackRadius * authoring.attackRadius,
-                target = Entity.Null, 
-
-                timeToShoot = authoring.timeToShoot
+                target = Entity.Null
             });
 
             AddComponent(entity, new ReloadComponent
@@ -48,7 +47,7 @@ public class AttackAuthoring : MonoBehaviour
                 curDebaff = 0,
 
                 shootAnimElapsed = 0,
-                shootAnimLen = authoring.timeToShoot
+                shootAnimLen = authoring.shootingAnimationLen
             });
 
             AddComponent(entity, new BattleModeComponent
@@ -75,13 +74,18 @@ public class AttackAuthoring : MonoBehaviour
         }
     }
 }
+
+
+///<summary> General attacker characteristics </summary>
 public struct AttackCharsComponent : IComponentData
 {
+    ///<value> Damage which is done to target during one attack </value>
     public float damage;
+    ///<value> Square of radius of attack distance of unit </value>
+    ///<remarks> Squared for more efficiency </remarks>
     public int radiusSq;
+    ///<value> Current target of attack. If unit can he will do an attack on him </value>
     public Entity target;
-
-    public float timeToShoot;
 }
 
 
@@ -111,9 +115,13 @@ public struct ReloadComponent : IComponentData
     ///<value> Percentage of current reload speed debbaf </value>
     public float curDebaff;
 
+    ///<value> Time elapsed after last attack was made </value>
     public float shootAnimElapsed;
-    public float shootAnimLen;
+    ///<value> Time needed to pass after last attack was made to start reloading process and play reload animation </value>
+    ///<remarks> Basically equals to the length of the attack animation </remarks>
+    public float shootAnimLen; ///TODO: automatically get that value if it is possible
 
+    ///<value> If true then unit is ready to fire </value>
     public bool isReloaded() { return curBullets > 0 && bulletReloadElapsed >= bulletReloadLen; }
 }
 
@@ -136,9 +144,7 @@ public struct BattleModeComponent : IComponentData, IEnableableComponent
     public float autoTriggerRadiusSq;
     ///<value> Max percentage (0 to 1) of Hp which target can have for auto-trigger to work </value>
     public int autoTriggerMaxHpPercent;
-    //TODO: *list of enemies to auto-trigger* (?enum + [flags]?)
-    ///<value> Time of pursuing without a shot until dropping the auto-triggered target </value>
-    //public float autoTriggerDropTime;
+    ///TODO: *list of enemies to auto-trigger* (?enum + [flags]?)
 }
 
 
