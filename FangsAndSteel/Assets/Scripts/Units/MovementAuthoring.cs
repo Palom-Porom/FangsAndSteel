@@ -213,7 +213,7 @@ public struct MovementCommandsBuffer : IBufferElementData
 {
     public float3 target;
 
-    //AttackSettingsComponent
-    //public bool targettingMinHP;
-    //public bool shootingOnMoveMode;
+    public BattleModeComponent battleModeSetts;
+    public PursuingModeComponent pursuingModeSetts;
+    ///TODO: stealthModeSetts
 }

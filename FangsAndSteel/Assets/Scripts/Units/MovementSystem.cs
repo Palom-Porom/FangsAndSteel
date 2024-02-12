@@ -270,10 +270,10 @@ public partial struct MovementJob : IJobChunk
             while (chunkEnum.NextEntityIndex(out int i))
             {
                 if (!movements[i].isAbleToMove)
-                    return;
+                    continue;
 
                 if (!movements[i].hasMoveTarget)
-                    return;
+                    continue;
 
                 if (math.distancesq(movements[i].target, transforms[i].Position) < math.max(deltaTime * movements[i].speed, 0.1f)) // has got to the current target?
                 {
@@ -292,7 +292,7 @@ public partial struct MovementJob : IJobChunk
                             animCmd.ValueRW.ClipIndex = restClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
                             animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
                         }
-                        return;
+                        continue;
                     }
                 }
 
