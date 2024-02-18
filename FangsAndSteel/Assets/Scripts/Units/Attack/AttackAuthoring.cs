@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class AttackAuthoring : MonoBehaviour
@@ -71,6 +73,14 @@ public class AttackAuthoring : MonoBehaviour
                 dropDistanceSq = authoring.dropDistance * authoring.dropDistance
             });
             SetComponentEnabled<PursuingModeComponent>(entity, false);
+
+            AddComponent(entity, new SimpleAttackPrioritiesComponent
+            {
+                distanceModifier = 1,
+                minHpModifier = 0
+            });
+            AddBuffer<UnitsPrioritiesBuffer>(entity);
+            AddBuffer<ZonesPrioritiesBuffer>(entity);
         }
     }
 }
@@ -144,7 +154,8 @@ public struct BattleModeComponent : IComponentData, IEnableableComponent
     public float autoTriggerRadiusSq;
     ///<value> Max percentage (0 to 1) of Hp which target can have for auto-trigger to work </value>
     public int autoTriggerMaxHpPercent;
-    ///TODO: *list of enemies to auto-trigger* (?enum + [flags]?)
+    ///<value> Unit types for which auto-trigger will work </value>
+    public uint autoTriggerUnitTypes;
 }
 
 
@@ -164,6 +175,82 @@ public struct PursuingModeComponent : IComponentData, IEnableableComponent
     public float maxShootDistanceSq;
     /// <summary> If distance (squared) to target is bigger than this - pursuing will be dropped </summary>
     public float dropDistanceSq;
+}
+
+
+public struct SimpleAttackPrioritiesComponent : IComponentData
+{
+    public float distanceModifier;
+    public float minHpModifier;
+}
+
+[InternalBufferCapacity(7)]
+public struct UnitsPrioritiesBuffer : IBufferElementData
+{
+    public uint types;
+    public float modifier;
+}
+
+[InternalBufferCapacity(10)]
+public struct ZonesPrioritiesBuffer : IBufferElementData
+{
+    public float2 leftCorner;
+    public float2 rightCorner;
+    public float modifier;
+}
+
+public readonly partial struct AttackPrioritiesAspect : IAspect
+{
+    public readonly RefRW<SimpleAttackPrioritiesComponent> simplePriorities;
+    public readonly DynamicBuffer<UnitsPrioritiesBuffer> unitsPriorities;
+    public readonly DynamicBuffer<ZonesPrioritiesBuffer> zonesPriorities;
+
+    public float DistanceModifier { get => simplePriorities.ValueRO.distanceModifier; set => simplePriorities.ValueRW.distanceModifier = value; }
+    public float MinHpModifier { get => simplePriorities.ValueRO.minHpModifier; set => simplePriorities.ValueRW.minHpModifier = value; }
+
+    public void UnitsPriority_Add(uint types, float modifier) => unitsPriorities.Add(new UnitsPrioritiesBuffer { modifier = modifier, types = types });
+    public void UnitsPriority_Delete(uint types)
+    {
+        int curLen = unitsPriorities.Length;
+        for (int i = 0; i < curLen; i++)
+        {
+            unitsPriorities.ElementAt(i).types &= ~types;
+            if (unitsPriorities.ElementAt(i).types == 0)
+            {
+                unitsPriorities.RemoveAtSwapBack(i);
+                curLen--;
+                i--;
+            }
+        }
+    }
+    public void UnitsPriority_ChangeModifier(uint types, float newModifier)
+    {
+        for (int i = 0; i < unitsPriorities.Length; i++)
+        {
+            if (unitsPriorities.ElementAt(i).types == types)
+            {
+                unitsPriorities.ElementAt(i).modifier = newModifier;
+                return;
+            }
+        }
+        Debug.Log("ERROR: Changed units modifier of unknown cell!");
+    }
+    public void UnitsPriority_ExchangeTypes(uint types1, uint types2)
+    {
+        int idx1 = -1, idx2 = -1;
+        for(int i = 0; i < unitsPriorities.Length; i++)
+        {
+            if (idx1 == -1 && unitsPriorities.ElementAt(i).types == types1)
+                idx1 = i;
+            if (idx2 == -1 && unitsPriorities.ElementAt(i).types == types2)
+                idx2 = i;
+        }
+        var temp = unitsPriorities.ElementAt(idx1).types;
+        unitsPriorities.ElementAt(idx1).types = unitsPriorities.ElementAt(idx2).types;
+        unitsPriorities.ElementAt(idx2).types = temp;
+    }
+
+    ///TODO: zones priorities methods
 }
 
 

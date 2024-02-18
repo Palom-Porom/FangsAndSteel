@@ -12,7 +12,7 @@ public class VisionAuthoring : MonoBehaviour
         {
             Entity entity = GetEntity(TransformUsageFlags.None);
             AddComponent(entity, new VisionCharsComponent { radius = authoring.VisionRadius });
-            AddComponent(entity, new VisibilityComponent { });
+            AddComponent(entity, new VisibilityComponent { visibleToTeams = 0 });
         }
     }
 }
