@@ -178,27 +178,38 @@ public struct PursuingModeComponent : IComponentData, IEnableableComponent
 }
 
 
+///<summary> Attack priorities which need only modifier value </summary>
 public struct SimpleAttackPrioritiesComponent : IComponentData
 {
+    ///<value> Closer target -> better target </value>
     public float distanceModifier;
+    ///<value> Target with less hp percentage -> better target </value>
     public float minHpModifier;
 }
 
+
+///<summary> Attack priorities depending on the type of target </summary>
 [InternalBufferCapacity(7)]
 public struct UnitsPrioritiesBuffer : IBufferElementData
 {
+    ///<value> Target of such types -> better target </value>
     public uint types;
     public float modifier;
 }
 
+
+///<summary> Attack priorities depending on the world position of target </summary>
 [InternalBufferCapacity(10)]
 public struct ZonesPrioritiesBuffer : IBufferElementData
 {
-    public float2 leftCorner;
-    public float2 rightCorner;
+    ///<value> Upper left corner of zone where targets are more preferable </value>
+    public float2 upperLeftCorner;
+    ///<value> Lower right corner of zone where targets are more preferable </value>
+    public float2 lowerRightCorner;
     public float modifier;
 }
 
+///<summary> Aspect with all AttackPriorities functionality </summary>
 public readonly partial struct AttackPrioritiesAspect : IAspect
 {
     public readonly RefRW<SimpleAttackPrioritiesComponent> simplePriorities;
@@ -208,7 +219,10 @@ public readonly partial struct AttackPrioritiesAspect : IAspect
     public float DistanceModifier { get => simplePriorities.ValueRO.distanceModifier; set => simplePriorities.ValueRW.distanceModifier = value; }
     public float MinHpModifier { get => simplePriorities.ValueRO.minHpModifier; set => simplePriorities.ValueRW.minHpModifier = value; }
 
+    ///<summary> Add new modifier for units priorities </summary>
     public void UnitsPriority_Add(uint types, float modifier) => unitsPriorities.Add(new UnitsPrioritiesBuffer { modifier = modifier, types = types });
+    ///<summary> Exclude given unitTypes from modifiers </summary>
+    ///<remarks> If UnitsPrioritiesBuffer contains zero units after this operation -> this cell will be deleted </remarks>
     public void UnitsPriority_Delete(uint types)
     {
         int curLen = unitsPriorities.Length;
@@ -223,6 +237,8 @@ public readonly partial struct AttackPrioritiesAspect : IAspect
             }
         }
     }
+    ///<summary> Change modifier for the cell with given types </summary>
+    ///<param name="types"> Need to be fully equal to the containment of some cell </param>
     public void UnitsPriority_ChangeModifier(uint types, float newModifier)
     {
         for (int i = 0; i < unitsPriorities.Length; i++)
@@ -235,6 +251,9 @@ public readonly partial struct AttackPrioritiesAspect : IAspect
         }
         Debug.Log("ERROR: Changed units modifier of unknown cell!");
     }
+    ///<summary> Exchange modifiers for the cells with given types </summary>
+    ///<param name="types1"> Need to be fully equal to the containment of some cell and not equal to types2 </param>
+    ///<param name="types2"> Need to be fully equal to the containment of some cell and not equal to types1</param>
     public void UnitsPriority_ExchangeTypes(uint types1, uint types2)
     {
         int idx1 = -1, idx2 = -1;

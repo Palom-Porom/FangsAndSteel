@@ -31,6 +31,7 @@ public enum UnitTypes
     Everything = 31
 }
 
+///<summary> Contains info about to what types of unit this one belongs to </summary>
 public struct UnitTypeComponent : IComponentData
 {
     public UnitTypes value;
