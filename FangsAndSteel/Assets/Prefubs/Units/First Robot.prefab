@@ -309,6 +309,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 9179573562683204008}
+    - targetCorrespondingSourceObject: {fileID: 7064979545767166671, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8840689488925259946}
   m_SourcePrefab: {fileID: 100100000, guid: c743507d0fc900b45898c8e09289fb9b, type: 3}
 --- !u!4 &23183233628817174 stripped
 Transform:
@@ -337,6 +341,20 @@ MonoBehaviour:
   modelsGameObject: {fileID: 5743986021654833525}
   attackModels: []
   attackRotationTime: 0.33
+  timeToReturnRot: 1
+--- !u!114 &8840689488925259946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1188027894341469181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 442e31c9b21679447b2de5306ecd98e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  typeOfUnit: 2
 --- !u!1 &5743986021654833525 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4450080618980272199, guid: c743507d0fc900b45898c8e09289fb9b,
