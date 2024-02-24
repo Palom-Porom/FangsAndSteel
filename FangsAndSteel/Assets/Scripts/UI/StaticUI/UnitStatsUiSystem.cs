@@ -8,28 +8,30 @@ using UnityEngine;
 [UpdateInGroup(typeof(NoJobsSystemGroup))]
 public partial class UnitStatsUiSystem : SystemBase
 {
-    ComponentLookup<HpComponent> hpStats;
+    /*ComponentLookup<HpComponent> hpStats;
     ComponentLookup<AttackCharsComponent> attackStats;
     ComponentLookup<ReloadComponent> reloadStats;
     ComponentLookup<MovementComponent> movementStats;
     ComponentLookup<VisionCharsComponent> visionStats;
+    */
     protected override void OnCreate()
-    {
+    {/*
         RequireForUpdate<UnitStatsRequestTag>();
         hpStats = SystemAPI.GetComponentLookup<HpComponent>();
         attackStats = SystemAPI.GetComponentLookup<AttackCharsComponent>();
         movementStats = SystemAPI.GetComponentLookup<MovementComponent>();
         visionStats = SystemAPI.GetComponentLookup<VisionCharsComponent>();
-    }
+      */
+     }
 
     protected override void OnStartRunning()
     {
-        StaticUIRefs.Instance.HpText.transform.parent.gameObject.SetActive(true);
+     //   StaticUIRefs.Instance.HpText.transform.parent.gameObject.SetActive(true);
     }
 
     protected override void OnUpdate()
     {
-        hpStats.Update(this);
+       /* hpStats.Update(this);
         attackStats.Update(this);
         reloadStats.Update(this);
         movementStats.Update(this);
@@ -41,11 +43,12 @@ public partial class UnitStatsUiSystem : SystemBase
         StaticUIRefs.Instance.AttackRadiusText.text = $"Радиус атаки: {math.sqrt(attackStats[entity].radiusSq)}";
         StaticUIRefs.Instance.MovementText.text = $"Скорость: {movementStats[entity].speed}";
         StaticUIRefs.Instance.VisionRadiusText.text = $"Радиус обзора: {visionStats[entity].radius}";
+       */
     }
 
     protected override void OnStopRunning()
     {
-        StaticUIRefs.Instance.HpText.transform.parent.gameObject.SetActive(false);
+     //   StaticUIRefs.Instance.HpText.transform.parent.gameObject.SetActive(false);
     }
 }
 
