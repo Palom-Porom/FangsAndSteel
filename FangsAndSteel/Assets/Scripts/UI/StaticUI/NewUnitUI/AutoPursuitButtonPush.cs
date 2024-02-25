@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class AutoPursuitButtonPush : MonoBehaviour
 {
     Button AutoPursuitButton;
-    //Image AutoPursuitButtonColor;
+    
     public void ActivateAutoPursuit()
     {
         if (AutoPursuitButton.image.color == Color.green)
