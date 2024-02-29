@@ -12,7 +12,7 @@ public class CurrentTeamAuthoring : MonoBehaviour
         public override void Bake(CurrentTeamAuthoring authoring)
         {
             Entity entity = GetEntity(TransformUsageFlags.None);
-            AddComponent(entity, new CurrentTeamComponent { currentTeam = authoring.currentTeam });
+            AddComponent(entity, new CurrentTeamComponent { value = authoring.currentTeam });
         }
 
     }
@@ -20,5 +20,5 @@ public class CurrentTeamAuthoring : MonoBehaviour
 
 public struct CurrentTeamComponent : IComponentData
 {
-    public int currentTeam;
+    public int value;
 }

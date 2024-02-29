@@ -77,7 +77,7 @@ public partial struct VisionCurrentTeamJob : IJobEntity
         visibility.visibleToTeams = visionMap[k];
 
         // if not visible to current team
-        if ((visibility.visibleToTeams & currentTeamComponent.currentTeam) == 0)
+        if ((visibility.visibleToTeams & currentTeamComponent.value) == 0)
         {
             if (!disableRendLookup.HasComponent(unitsIconsComponent.VisualizationEntity))
                 DisableParentAndAllChildrenRender(unitsIconsComponent.VisualizationEntity, chunkIndexInQuery);

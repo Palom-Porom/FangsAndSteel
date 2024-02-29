@@ -30,6 +30,9 @@ public class StaticUIRefs : MonoBehaviour
     public Image ShootModeButton { get { return shootModeButton; } }
     [SerializeField] private Image shootModeButton;
 
+    public GameObject NewTurnPanel { get { return newTurnPanel; } }
+    [SerializeField] private GameObject newTurnPanel;
+
     void Awake()
     {
         Instance = this;
@@ -48,4 +51,6 @@ public class StaticUIRefs : MonoBehaviour
     [HideInInspector] public bool endTurnBut;
     [HideInInspector] public bool stopMoveBut;
     [HideInInspector] public bool shootModeBut;
+
+    [HideInInspector] public bool newTurnStartBut;
 }
