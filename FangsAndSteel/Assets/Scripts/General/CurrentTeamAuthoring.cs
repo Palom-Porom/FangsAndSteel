@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-//TransformUsageFlags отвечает за движение компонентов. Отвечает ли этот скрипт за движение? Если нет, то пиши спокойно .None
+
 public class CurrentTeamAuthoring : MonoBehaviour
 {
     public int currentTeam;

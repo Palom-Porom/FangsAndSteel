@@ -13,6 +13,7 @@ namespace AnimCooker
         public float FovRad;
     }
 
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial class CameraDataSystem : SystemBase
     {
         UnityEngine.Camera m_cam = UnityEngine.Camera.main;

@@ -10,12 +10,13 @@ using AnimCooker;
 using System.Linq;
 using Unity.Burst.Intrinsics;
 
+[WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
 [UpdateInGroup(typeof(ControlsSystemGroup), OrderFirst = true)]
-[UpdateAfter(typeof(ControlSystem))]
+//[UpdateAfter(typeof(ControlSystem))] <-- exists only in the ClientWorld
 [BurstCompile]
 public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 {
-    private InputData inputData;
+    //private GlobalInputData inputData;
 
     ComponentLookup<AnimationCmdData> animCmdLookup;
     ComponentLookup<AnimationStateData> animStateLookup;
@@ -26,6 +27,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
     ComponentTypeHandle<MovementComponent> movementTypeHandle;
     ComponentTypeHandle<BattleModeComponent> battleModeTypeHandleRO;
     ComponentTypeHandle<PursuingModeComponent> pursuingModeTypeHandleRO;
+    ComponentTypeHandle<TeamComponent> teamTypeHandleRO;
     BufferTypeHandle<MovementCommandsBuffer> moveComsBuffTypeHandle;
     BufferTypeHandle<ModelsBuffer> modelsBuffsTypeHandle;
 
@@ -34,7 +36,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
     {
         state.RequireForUpdate<GameTag>();
         state.RequireForUpdate<PhysicsWorldSingleton>();
-        state.RequireForUpdate<InputData>();
+        state.RequireForUpdate<GlobalInputData>();
         state.RequireForUpdate<MovementComponent>();
         state.RequireForUpdate<AnimDbRefData>();
 
@@ -51,6 +53,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
         movementTypeHandle = SystemAPI.GetComponentTypeHandle<MovementComponent>();
         battleModeTypeHandleRO = SystemAPI.GetComponentTypeHandle<BattleModeComponent>(true);
         pursuingModeTypeHandleRO = SystemAPI.GetComponentTypeHandle<PursuingModeComponent>(true);
+        teamTypeHandleRO = SystemAPI.GetComponentTypeHandle<TeamComponent>(true);
         moveComsBuffTypeHandle = SystemAPI.GetBufferTypeHandle<MovementCommandsBuffer>();
         modelsBuffsTypeHandle = SystemAPI.GetBufferTypeHandle<ModelsBuffer>(true);
     }
@@ -70,59 +73,64 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        inputData = SystemAPI.GetSingleton<InputData>();
-
-        if (!inputData.neededTargeting)
-            return;
-
-        animCmdLookup.Update(ref state);
-        animStateLookup.Update(ref state);
-
-        movementTypeHandle.Update(ref state);
-        battleModeTypeHandleRO.Update(ref state);
-        pursuingModeTypeHandleRO.Update(ref state);
-        moveComsBuffTypeHandle.Update(ref state);
-        modelsBuffsTypeHandle.Update(ref state);
-
-
-        RaycastInput raycastInput = new RaycastInput
+        foreach (GlobalInputData inputData in SystemAPI.Query<GlobalInputData>())
         {
-            Start = inputData.cameraPosition,
-            End = inputData.mouseTargetingPoint,
-            Filter = new CollisionFilter
+            //inputData = SystemAPI.GetSingleton<GlobalInputData>();
+
+            if (!inputData.neededTargeting.IsSet)
+                continue;
+
+            animCmdLookup.Update(ref state);
+            animStateLookup.Update(ref state);
+
+            movementTypeHandle.Update(ref state);
+            battleModeTypeHandleRO.Update(ref state);
+            pursuingModeTypeHandleRO.Update(ref state);
+            moveComsBuffTypeHandle.Update(ref state);
+            modelsBuffsTypeHandle.Update(ref state);
+
+            RaycastInput raycastInput = new RaycastInput
             {
-                BelongsTo = (uint)layers.Everything,
-                CollidesWith = (uint)layers.Terrain,
-                GroupIndex = 0
-            }
-        };
+                Start = inputData.cameraPosition,
+                End = inputData.mouseTargetingPoint,
+                Filter = new CollisionFilter
+                {
+                    BelongsTo = (uint)layers.Everything,
+                    CollidesWith = (uint)layers.Terrain,
+                    GroupIndex = 0
+                }
+            };
 
-        NativeReference<RaycastResult> raycastResult = new NativeReference<RaycastResult>(Allocator.TempJob);
+            NativeReference<RaycastResult> raycastResult = new NativeReference<RaycastResult>(Allocator.TempJob);
 
-        JobHandle targetRayCastJobHandle = new TargetRayCastJob
-        {
-            collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld,
-            raycastInput = raycastInput,
-            raycastResult = raycastResult
-        }.Schedule(state.Dependency);
+            JobHandle targetRayCastJobHandle = new TargetRayCastJob
+            {
+                collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld,
+                raycastInput = raycastInput,
+                raycastResult = raycastResult
+            }.Schedule(state.Dependency);
 
-        state.Dependency = new _ChangeTargetJob 
-        { 
-            raycastResult = raycastResult,
-            shiftTargeting = inputData.shiftTargeting,
+            state.Dependency = new _ChangeTargetJob
+            {
+                teamInd = inputData.teamInd,
 
-            animCmdLookup = animCmdLookup,
-            animStateLookup = animStateLookup,
-            moveClips = moveClips,
+                raycastResult = raycastResult,
+                shiftTargeting = inputData.shiftTargeting.IsSet,
 
-            movementTypeHandle = movementTypeHandle,
-            battleModeTypeHandleRO = battleModeTypeHandleRO,
-            pursuingModeTypeHandleRO = pursuingModeTypeHandleRO,
-            moveComsBuffTypeHandle = moveComsBuffTypeHandle,
-            modelsBuffTypeHandle = modelsBuffsTypeHandle
-        }.Schedule(changeTargetJobQuery, targetRayCastJobHandle);
+                animCmdLookup = animCmdLookup,
+                animStateLookup = animStateLookup,
+                moveClips = moveClips,
 
-        raycastResult.Dispose(state.Dependency);
+                movementTypeHandle = movementTypeHandle,
+                battleModeTypeHandleRO = battleModeTypeHandleRO,
+                pursuingModeTypeHandleRO = pursuingModeTypeHandleRO,
+                teamTypeHandleRO = teamTypeHandleRO,
+                moveComsBuffTypeHandle = moveComsBuffTypeHandle,
+                modelsBuffTypeHandle = modelsBuffsTypeHandle
+            }.Schedule(changeTargetJobQuery, targetRayCastJobHandle);
+
+            raycastResult.Dispose(state.Dependency);
+        }
     }
 }
 
@@ -132,6 +140,8 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 [BurstCompile]
 public partial struct _ChangeTargetJob : IJobChunk
 {
+    public int teamInd;
+
     [ReadOnly]
     public NativeReference<RaycastResult> raycastResult;
     public bool shiftTargeting;
@@ -143,6 +153,7 @@ public partial struct _ChangeTargetJob : IJobChunk
     public ComponentTypeHandle<MovementComponent> movementTypeHandle;
     [ReadOnly] public ComponentTypeHandle<BattleModeComponent> battleModeTypeHandleRO;
     [ReadOnly] public ComponentTypeHandle<PursuingModeComponent> pursuingModeTypeHandleRO;
+    [ReadOnly] public ComponentTypeHandle<TeamComponent> teamTypeHandleRO;
     public BufferTypeHandle<MovementCommandsBuffer> moveComsBuffTypeHandle;
     [ReadOnly] public BufferTypeHandle<ModelsBuffer> modelsBuffTypeHandle;
 
@@ -157,6 +168,7 @@ public partial struct _ChangeTargetJob : IJobChunk
             MovementComponent* movements = chunk.GetComponentDataPtrRW(ref movementTypeHandle);
             NativeArray<BattleModeComponent> battleModeSettsArr = chunk.GetNativeArray(ref battleModeTypeHandleRO);
             NativeArray<PursuingModeComponent> pursuingModeSettsArr = chunk.GetNativeArray(ref pursuingModeTypeHandleRO);
+            NativeArray<TeamComponent> teamArr = chunk.GetNativeArray(ref teamTypeHandleRO);
             BufferAccessor<MovementCommandsBuffer> moveComsBuffs = chunk.GetBufferAccessor(ref moveComsBuffTypeHandle);
             BufferAccessor<ModelsBuffer> modelsBuffs = chunk.GetBufferAccessor(ref modelsBuffTypeHandle);
 
@@ -164,6 +176,7 @@ public partial struct _ChangeTargetJob : IJobChunk
 
             while (chunkEnum.NextEntityIndex(out int i))
             {
+                if (teamArr[i].teamInd != teamInd) continue;
                 if (shiftTargeting && movements[i].hasMoveTarget)
                 {
                     if (!moveComsBuffs[i].IsEmpty)

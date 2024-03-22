@@ -12,6 +12,7 @@ namespace AnimCooker
 {
 
     [RequireMatchingQueriesForUpdate]
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial class SimpleLodInitSystem : SystemBase
     {
         EntitiesGraphicsSystem m_hybridRenderer;

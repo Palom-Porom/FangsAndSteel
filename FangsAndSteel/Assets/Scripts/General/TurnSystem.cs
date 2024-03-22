@@ -40,7 +40,7 @@ public partial class TurnSystem : SystemBase
         if (orderPhase)
         {
             uIData = SystemAPI.GetSingleton<StaticUIData>();
-            if (uIData.endTurnBut)
+            if (uIData.endTurnBut.IsSet)
             {
                 //Start all Engage systems
                 EnableEngageSystems(true);

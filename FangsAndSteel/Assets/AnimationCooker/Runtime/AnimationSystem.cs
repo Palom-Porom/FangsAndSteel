@@ -77,6 +77,7 @@ namespace AnimCooker
         }
     }
 
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     [RequireMatchingQueriesForUpdate]
     [BurstCompile]
     public partial struct AnimationSystem : ISystem

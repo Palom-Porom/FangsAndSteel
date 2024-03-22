@@ -54,8 +54,7 @@ public class ClientState : IWorldState
             //await UniTask.Yield(ct);
         }
 
-        using var drvQuery =
-                Client.EntityManager.CreateEntityQuery(ComponentType.ReadWrite<NetworkStreamDriver>());
+        using var drvQuery = Client.EntityManager.CreateEntityQuery(ComponentType.ReadWrite<NetworkStreamDriver>());
         var connection = drvQuery.GetSingletonRW<NetworkStreamDriver>().ValueRW
             .Connect(Client.EntityManager, _networkEndpoint);
         Client.EntityManager.AddComponent<AuthorizeConnectionAsPlayer>(connection);

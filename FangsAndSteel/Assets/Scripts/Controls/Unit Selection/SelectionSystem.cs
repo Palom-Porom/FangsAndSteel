@@ -14,6 +14,7 @@ using UnityEngine.EventSystems;
 using Unity.VisualScripting;
 using Unity.Rendering;
 
+[WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
 [UpdateInGroup(typeof(ControlsSystemGroup))]
 public partial class SelectionSystem : SystemBase
 {

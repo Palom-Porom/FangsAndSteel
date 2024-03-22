@@ -13,6 +13,7 @@ namespace AnimCooker
 {
     [RequireMatchingQueriesForUpdate]
     [BurstCompile]
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial struct SimpleLodSystem : ISystem
     {
         UpdateTimer m_timer;

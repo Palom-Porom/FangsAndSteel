@@ -16,6 +16,7 @@ using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 using static UnityEngine.EventSystems.EventTrigger;
 
+[WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
 public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
