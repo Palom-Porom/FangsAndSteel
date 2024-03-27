@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class RadiusEndSliderContollerScript : MonoBehaviour
+public class RadiusEndSliderControllerScript : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI endSliderText = null;
     [SerializeField] private float maxEndSliderAmount = 100.0f;
