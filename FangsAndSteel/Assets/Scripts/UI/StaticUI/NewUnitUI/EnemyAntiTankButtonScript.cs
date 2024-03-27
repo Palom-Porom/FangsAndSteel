@@ -10,6 +10,9 @@ public class EnemyAntiTankButtonScript : MonoBehaviour
     public void EnemyAntiTankButtonClick()
     {
         Debug.Log("ѕротивник противотанковый пехотинец");
+        var x = EnemyAntiTankButton.GetComponent<Image>();
+        if (x.color == Color.green) { x.color = Color.red; }
+        else { x.color = Color.green; }
     }
     private void Awake()
     {

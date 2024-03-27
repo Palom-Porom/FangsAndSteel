@@ -10,6 +10,9 @@ public class EnemyArtilleryButtonScript : MonoBehaviour
     public void EnemyArtilleryButtonClick()
     {
         Debug.Log("Противник артиллерия");
+        var x = EnemyArtilleryButton.GetComponent<Image>();
+        if (x.color == Color.green) { x.color = Color.red; }
+        else { x.color = Color.green; }
     }
     private void Awake()
     {

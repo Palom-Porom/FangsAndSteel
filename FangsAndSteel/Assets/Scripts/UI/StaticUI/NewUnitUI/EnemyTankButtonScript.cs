@@ -5,21 +5,24 @@ using UnityEngine.UI;
 
 public class EnemyTankButtonScript : MonoBehaviour
 {
-    Button EnemyAntiTankButton;
+    Button EnemyTankButton;
 
     public void EnemyTankButtonClick()
     {
         Debug.Log("Противник танк");
+        var x = EnemyTankButton.GetComponent<Image>();
+        if (x.color == Color.green) { x.color = Color.red; }
+        else { x.color = Color.green; }
     }
     private void Awake()
     {
-        EnemyAntiTankButton = GetComponent<Button>();
-        EnemyAntiTankButton.onClick.AddListener(EnemyTankButtonClick);
+        EnemyTankButton = GetComponent<Button>();
+        EnemyTankButton.onClick.AddListener(EnemyTankButtonClick);
     }
 
     private void OnDestroy()
     {
-        EnemyAntiTankButton.onClick.RemoveListener(EnemyTankButtonClick);
+        EnemyTankButton.onClick.RemoveListener(EnemyTankButtonClick);
 
     }
 }
