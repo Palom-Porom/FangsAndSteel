@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public struct EndTurnRpc : IRpcCommand { }
+public struct StartEngageModeRpc : IRpcCommand { }
 
 [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
 public partial class _TurnSystem : SystemBase
@@ -44,13 +45,14 @@ public partial class _TurnSystem : SystemBase
     {
         if (orderPhase)
         {
-            foreach (var request in SystemAPI.Query<RefRO<ReceiveRpcCommandRequest>>().WithAll<EndTurnRpc>())
+            foreach (var (request, requestEntity) in SystemAPI.Query<RefRO<ReceiveRpcCommandRequest>>().WithAll<EndTurnRpc>().WithEntityAccess())
             {
                 readyPlayersInds.Add(request.ValueRO.SourceConnection.Index);
                 if (readyPlayersInds.Count == NUM_OF_PLAYERS)
                 {
                     StartEngageMode();
                 }
+                EntityManager.DestroyEntity(requestEntity);
             }
         }
         else
@@ -70,6 +72,8 @@ public partial class _TurnSystem : SystemBase
         timeToRun = TURN_LEN;
         EnableEngageSystems(true);
         orderPhase = false;
+
+        EntityManager.CreateEntity(typeof(StartEngageModeRpc), typeof(SendRpcCommandRequest));
     }
 
     private void StartOrderMode()

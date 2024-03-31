@@ -14,6 +14,7 @@ using UnityEngine.UIElements;
 
 
 [UpdateInGroup(typeof(AfterUnitsSystemGroup))]
+[WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
 public partial class TransformUnitsUISystem : SystemBase
 {
     Transform cameraTransform;

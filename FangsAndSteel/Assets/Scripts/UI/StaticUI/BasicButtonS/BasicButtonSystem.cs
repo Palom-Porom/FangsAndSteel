@@ -17,9 +17,15 @@ public partial class BasicButtonSystem : SystemBase
 
     StaticUIData uiData;
 
+    bool isOrderPhase;
+    float timeToRun;
+    const int TURN_LEN = 10;
+
     protected override void OnCreate()
     {
         RequireForUpdate<StaticUIData>();
+        isOrderPhase = true;
+        timeToRun = 0;
     }
 
     protected override void OnUpdate()
@@ -28,7 +34,39 @@ public partial class BasicButtonSystem : SystemBase
         foreach (StaticUIData uiData in SystemAPI.Query<StaticUIData>().WithAll<GhostOwnerIsLocal>())
         {
 
-            //if (uiData.stopMoveBut) <- must be done in the server
+            if (uiData.endTurnBut.IsSet)
+            {
+                EntityManager.CreateEntity(typeof(EndTurnRpc), typeof(SendRpcCommandRequest));
+                StaticUIRefs.Instance.TurnIndicator.color = Color.green;
+            }
+
+            if (isOrderPhase)
+            {
+                foreach (var (request, requestEntity) in SystemAPI.Query<RefRO<ReceiveRpcCommandRequest>>().WithAll<StartEngageModeRpc>().WithEntityAccess())
+                {
+                    EnableEngageSystems(true);
+                    EntityManager.DestroyEntity(requestEntity);
+                    timeToRun = TURN_LEN;
+                    isOrderPhase = false;
+                }
+            }
+            else
+            {
+                timeToRun -= SystemAPI.Time.DeltaTime;
+                StaticUIRefs.Instance.TurnTimer.text = $"0:{(int)timeToRun:D2}";
+                if (timeToRun <= 0)
+                {
+                    StaticUIRefs.Instance.TurnTimer.text = "0:00";
+                    //Stop all Engage systems
+                    EnableEngageSystems(false);
+
+                    StaticUIRefs.Instance.TurnIndicator.color = Color.red;
+
+                    isOrderPhase = true;
+                }
+            }
+
+            //if (uiData.stopMoveBut) <- is done in the server
             //{
             //    foreach ((RefRW<MovementComponent> movementComponent, DynamicBuffer<MovementCommandsBuffer> moveComBuf, LocalTransform localTransform) 
             //        in SystemAPI.Query<RefRW<MovementComponent>, DynamicBuffer<MovementCommandsBuffer>, LocalTransform>().WithAll<SelectTag>())
@@ -45,10 +83,11 @@ public partial class BasicButtonSystem : SystemBase
                 ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
                 ecb.DestroyEntity(SystemAPI.GetSingletonEntity<ShootModeButChangeColorRqst>());
             }
+
             if (uiData.shootModeBut.Count == 1)
             {
                 //Debug.Log("1");
-                //new ChangeShootModeJob().Schedule(); <-- must be done in the server
+                //new ChangeShootModeJob().Schedule(); <-- is done in the server
                 Color c = StaticUIRefs.Instance.ShootModeButton.color;
                 if (c.r != c.g)
                 {
@@ -58,6 +97,16 @@ public partial class BasicButtonSystem : SystemBase
                 Debug.Log("shootModeBut Client func (changed color) is done");
             }
         }
+    }
+
+    private void EnableEngageSystems(bool enable)
+    {
+        //World.Unmanaged.GetExistingSystemState<UnitsSystemGroup>().Enabled = enable;
+        //World.Unmanaged.GetExistingSystemState<VisionMapSystem>().Enabled = enable;
+        //World.Unmanaged.GetExistingSystemState<AnimationSystem>().Enabled = enable;
+
+        World.Unmanaged.GetExistingSystemState<TargetingMoveSystem>().Enabled = !enable;
+        World.Unmanaged.GetExistingSystemState<BasicButtonSystem>().Enabled = !enable;
     }
 }
 

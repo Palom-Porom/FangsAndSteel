@@ -133,21 +133,21 @@ public struct GlobalInputData : IInputComponentData
     public InputEvent shiftTargeting;
 }
 
-/// <summary>
-/// Contains all input data for access from any place of code (even in the ISystem)
-/// </summary>
-public struct InputData : IComponentData
-{
-    //Camera Controls
-    public float2 cameraMoveInputs;
-    public float2 cameraRotateInputs;
-    public float cameraZoomInputs;
+///// <summary>
+///// Contains all input data for access from any place of code (even in the ISystem)
+///// </summary>
+//public struct InputData : IComponentData
+//{
+//    //Camera Controls
+//    public float2 cameraMoveInputs;
+//    public float2 cameraRotateInputs;
+//    public float cameraZoomInputs;
 
-    //Targeting
-    public float3 cameraPosition;
-    public float3 mouseTargetingPoint;
-    public bool neededTargeting;
-    public bool shiftTargeting;
+//    //Targeting
+//    public float3 cameraPosition;
+//    public float3 mouseTargetingPoint;
+//    public bool neededTargeting;
+//    public bool shiftTargeting;
 
-    public bool cameraBordersDisabled;
-}
+//    public bool cameraBordersDisabled;
+//}

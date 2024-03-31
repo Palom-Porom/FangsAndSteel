@@ -18,6 +18,7 @@ public partial class StaticUISystemGroup : ComponentSystemGroup{ }
 public partial class ControlsSystemGroup : ComponentSystemGroup { }
 
 [UpdateAfter(typeof(ControlsSystemGroup))]
+[WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
 public partial class UnitsSystemGroup : ComponentSystemGroup { }
 
 [UpdateAfter(typeof(UnitsSystemGroup))]
