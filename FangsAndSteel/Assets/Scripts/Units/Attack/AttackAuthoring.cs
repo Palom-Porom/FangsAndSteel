@@ -5,6 +5,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using UnityEngine;
 
 public class AttackAuthoring : MonoBehaviour
@@ -86,6 +87,7 @@ public class AttackAuthoring : MonoBehaviour
 }
 
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> General attacker characteristics </summary>
 public struct AttackCharsComponent : IComponentData
 {
@@ -99,6 +101,7 @@ public struct AttackCharsComponent : IComponentData
 }
 
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> Info about "bullets" and reload status of unit </summary>>
 [BurstCompile]
 public struct ReloadComponent : IComponentData
@@ -136,6 +139,7 @@ public struct ReloadComponent : IComponentData
 }
 
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> One of units ActionModes </summary>
 ///<remarks> Usual mode of unit </remarks>
 public struct BattleModeComponent : IComponentData, IEnableableComponent
@@ -159,6 +163,7 @@ public struct BattleModeComponent : IComponentData, IEnableableComponent
 }
 
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> One of units ActionModes </summary>
 ///<remarks> Represents the state of pusuing some particular target </remarks>
 public struct PursuingModeComponent : IComponentData, IEnableableComponent
@@ -178,6 +183,7 @@ public struct PursuingModeComponent : IComponentData, IEnableableComponent
 }
 
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> Attack priorities which need only modifier value </summary>
 public struct SimpleAttackPrioritiesComponent : IComponentData
 {
@@ -188,6 +194,7 @@ public struct SimpleAttackPrioritiesComponent : IComponentData
 }
 
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> Attack priorities depending on the type of target </summary>
 [InternalBufferCapacity(7)]
 public struct UnitsPrioritiesBuffer : IBufferElementData
@@ -198,6 +205,7 @@ public struct UnitsPrioritiesBuffer : IBufferElementData
 }
 
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> Attack priorities depending on the world position of target </summary>
 [InternalBufferCapacity(10)]
 public struct ZonesPrioritiesBuffer : IBufferElementData
@@ -209,6 +217,7 @@ public struct ZonesPrioritiesBuffer : IBufferElementData
     public float modifier;
 }
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> Aspect with all AttackPriorities functionality </summary>
 public readonly partial struct AttackPrioritiesAspect : IAspect
 {
@@ -273,6 +282,7 @@ public readonly partial struct AttackPrioritiesAspect : IAspect
 }
 
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 /// <summary>
 /// Used to put <c>isAbleToMove = false</c> for some time
 /// </summary>

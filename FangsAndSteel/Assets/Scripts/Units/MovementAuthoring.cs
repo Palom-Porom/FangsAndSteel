@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using UnityEngine;
 
 [HelpURL("dsjaklf")]
@@ -82,6 +83,7 @@ public class MovementAuthoring : MonoBehaviour
 }
 
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 public struct MovementComponent : IComponentData
 {
     public float speed;
@@ -98,7 +100,7 @@ public struct MovementComponent : IComponentData
 }
 
 
-
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> Component used for smooth rotating to some target </summary>
 public struct RotationComponent : IComponentData
 {
@@ -115,7 +117,7 @@ public struct RotationComponent : IComponentData
 }
 
 
-
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 ///<summary> Info about rotation on target for attack </summary>
 ///<remarks> Used only for those Entities which have AttackModelsBuffers </remarks>
 public struct AttackRotationComponent : IComponentData 
@@ -141,7 +143,7 @@ public struct AttackRotationComponent : IComponentData
     public bool isInDefaultState;
 }
 
-
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 [BurstCompile]
 public struct VehicleMovementComponent: IComponentData
 {
@@ -207,7 +209,7 @@ public struct VehicleMovementComponent: IComponentData
 }
 
 
-
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 [InternalBufferCapacity(10)]
 public struct MovementCommandsBuffer : IBufferElementData
 {

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 public class VisionAuthoring : MonoBehaviour
@@ -17,10 +18,12 @@ public class VisionAuthoring : MonoBehaviour
     }
 }
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 public struct VisionCharsComponent : IComponentData
 {
     public int radius;
 }
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 public struct VisibilityComponent : IComponentData
 {
     public int visibleToTeams;

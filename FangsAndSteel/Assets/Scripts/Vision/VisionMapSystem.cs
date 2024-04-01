@@ -14,7 +14,8 @@ using Unity.Transforms;
 using UnityEngine;
 
 
-[UpdateAfter(typeof(FillVisionMapTextureSystem))]
+[WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
+[UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
 [BurstCompile]
 public partial struct VisionMapSystem : ISystem, ISystemStartStop
 {

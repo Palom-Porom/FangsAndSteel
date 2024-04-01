@@ -6,6 +6,7 @@ using Unity.Transforms;
 using Unity.Collections;
 using UnityEngine;
 using Unity.Burst;
+using Unity.NetCode;
 
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
@@ -67,6 +68,7 @@ public partial struct DestroyingDeadJob : IJobEntity
     }
 }
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 public struct DeadComponent : IComponentData
 {
     public float timeToDie;

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 public class HpAuthoring : MonoBehaviour
@@ -17,6 +18,8 @@ public class HpAuthoring : MonoBehaviour
         }
     }
 }
+
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 public struct HpComponent : IComponentData
 {
     public float maxHp;

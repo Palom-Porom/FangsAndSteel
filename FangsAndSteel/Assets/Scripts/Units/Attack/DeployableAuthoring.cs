@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 public class DeployableAuthoring : MonoBehaviour
@@ -24,6 +25,7 @@ public class DeployableAuthoring : MonoBehaviour
     }
 }
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 public struct Deployable : IComponentData
 {
     /// <summary>

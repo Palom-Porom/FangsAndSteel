@@ -10,7 +10,7 @@ public class ExitButtonScript : MonoBehaviour
     Button button;
     public void GoInMainMenu()
     {
-        TurnSystem.timeToRun = 0;
+        _TurnSystem.timeToRun = 0;
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 

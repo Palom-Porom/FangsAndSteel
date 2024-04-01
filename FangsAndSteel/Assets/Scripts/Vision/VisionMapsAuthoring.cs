@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 public class VisionMapsAuthoring : MonoBehaviour
@@ -37,11 +38,12 @@ public class VisionMapsAuthoring : MonoBehaviour
 
 // public struct VisionMapsComponent : IComponentData 
 //{
-  //  public int value;
- //   public NativeArray<int> VisionMap;
- //   public NativeArray<int> HeightsMap;
+//  public int value;
+//   public NativeArray<int> VisionMap;
+//   public NativeArray<int> HeightsMap;
 //}
 
+[GhostComponent(PrefabType = GhostPrefabType.All)]
 [InternalBufferCapacity(0)] 
 public struct VisionMapBuffer : IBufferElementData
 {

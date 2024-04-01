@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 public class UnitsIconsAuthoring : MonoBehaviour
@@ -28,9 +29,9 @@ public class UnitsIconsAuthoring : MonoBehaviour
         }
     }
 }
-            
-            
-        
+
+
+//[GhostComponent(PrefabType = GhostPrefabType.All)]
 public struct UnitIconsComponent: IComponentData
 {
     public Entity infoQuadsEntity;

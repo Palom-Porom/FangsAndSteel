@@ -2,15 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 
-//ISystem - более производительный, но нельзя использовать ссылочный тип данных (классы)
-//SystemBase - менее производительный, но можно использовать ссылочный тип данных (классы)
+
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [BurstCompile]
 public partial struct VisionCurrentTeamSystem : ISystem 
@@ -23,7 +24,6 @@ public partial struct VisionCurrentTeamSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        // Если нет ни единого экземпляра компонента, который мы указали в <>, то система не будет обновляться вплоть до момента, пока не появится хотя бы один экземпляр
         state.RequireForUpdate<VisionMapBuffer>();
         state.RequireForUpdate<TeamComponent>();
         state.RequireForUpdate<VisibilityComponent>();
@@ -40,10 +40,16 @@ public partial struct VisionCurrentTeamSystem : ISystem
         ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
         DynamicBuffer<VisionMapBuffer> visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>();
+
+        int teamInd = -1;
+        foreach (var inputData in SystemAPI.Query<GlobalInputData>().WithAll<GhostOwnerIsLocal>())
+            teamInd = inputData.teamInd;
+
         VisionCurrentTeamJob visionCurrentTeamJob = new VisionCurrentTeamJob
         {
             visionMap = visionMap,
-            currentTeamComponent = SystemAPI.GetSingleton<CurrentTeamComponent>(),
+            //currentTeamComponent = SystemAPI.GetSingleton<CurrentTeamComponent>(),
+            teamInd = teamInd,
             childrenLookup = children,
             disableRendLookup = disableRendLookup,
             ecb = ecb.AsParallelWriter()
@@ -58,7 +64,8 @@ public partial struct VisionCurrentTeamJob : IJobEntity
 {
     // in - чтение компонента, ref - чтение и запись (Возможность редактирования) компонента
     public DynamicBuffer<VisionMapBuffer>  visionMap;
-    public CurrentTeamComponent currentTeamComponent;
+    //public CurrentTeamComponent currentTeamComponent;
+    public int teamInd;
     public BufferLookup<Child> childrenLookup;
     public ComponentLookup<DisableRendering> disableRendLookup;
 
@@ -77,7 +84,7 @@ public partial struct VisionCurrentTeamJob : IJobEntity
         visibility.visibleToTeams = visionMap[k];
 
         // if not visible to current team
-        if ((visibility.visibleToTeams & currentTeamComponent.currentTeam) == 0)
+        if ((visibility.visibleToTeams & teamInd) == 0)
         {
             if (!disableRendLookup.HasComponent(unitsIconsComponent.VisualizationEntity))
                 DisableParentAndAllChildrenRender(unitsIconsComponent.VisualizationEntity, chunkIndexInQuery);

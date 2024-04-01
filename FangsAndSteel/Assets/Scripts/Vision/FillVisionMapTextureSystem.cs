@@ -5,8 +5,10 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using Unity.Burst;
+using Unity.NetCode;
 
 [UpdateAfter(typeof(BeginSimulationEntityCommandBufferSystem))]
+[WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
 public partial class FillVisionMapTextureSystem : SystemBase
 {
     Material material;
@@ -23,7 +25,10 @@ public partial class FillVisionMapTextureSystem : SystemBase
         material = FogMaterial.material;
         computeBuffer = new ComputeBuffer(250000, sizeof(int), ComputeBufferType.Default, ComputeBufferMode.SubUpdates);
         material.SetBuffer("_VisionMap", computeBuffer);
-        material.SetInteger("_curTeam", SystemAPI.GetSingleton<CurrentTeamComponent>().currentTeam);    
+        int teamInd = -1;
+        foreach (GlobalInputData inputData in SystemAPI.Query<GlobalInputData>().WithAll<GhostOwnerIsLocal>())
+            teamInd = inputData.teamInd;
+        material.SetInteger("_curTeam", teamInd);    
     }
 
     protected override void OnUpdate()
