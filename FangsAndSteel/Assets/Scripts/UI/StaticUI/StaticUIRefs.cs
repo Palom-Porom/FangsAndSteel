@@ -53,4 +53,7 @@ public class StaticUIRefs : MonoBehaviour
     [HideInInspector] public bool shootModeBut;
 
     [HideInInspector] public bool newTurnStartBut;
+
+
+    public void SetNewTurnButton() { newTurnStartBut = true; }
 }
