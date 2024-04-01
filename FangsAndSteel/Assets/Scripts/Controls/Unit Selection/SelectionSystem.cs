@@ -109,6 +109,8 @@ public partial class SelectionSystem : SystemBase
             if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
                 unitStatsRqstEntity = Entity.Null;
 
+            int curTeam = SystemAPI.GetSingleton<CurrentTeamComponent>().value;
+
             if (isDragging)
             {
                 isDragging = false;
@@ -125,7 +127,7 @@ public partial class SelectionSystem : SystemBase
 
                 //Change ShootMode color to the neutral
                 Entity colorRqstEntity = ecb.CreateEntity();
-                ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
+                //ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
 
                 new MultipleSelectJob
                 {
@@ -133,7 +135,8 @@ public partial class SelectionSystem : SystemBase
                     rect = GUI_Utilities.GetScreenRect(mouseStartPos, curMousePosition),
 
                     selectTagLookup = selectLookup,
-                    ecb = ecb.AsParallelWriter()
+                    ecb = ecb.AsParallelWriter(),
+                    curTeam = curTeam
                 }.Schedule(allSelectable);
             }
 
@@ -167,7 +170,8 @@ public partial class SelectionSystem : SystemBase
                     selectTagLookup = selectLookup,
                     //attackSetsLookup = attackSetsLookup,
                     ecb = ecb,
-                    teamLookup = teamLookup
+                    teamLookup = teamLookup,
+                    curTeam = curTeam
                 }.Schedule(Dependency);
             }
         }
@@ -180,7 +184,7 @@ public partial class SelectionSystem : SystemBase
 /// <summary>
 /// Disable all SelectTag-s (as they are IEnableable-s)
 /// </summary>
-[BurstCompile]
+//[BurstCompile]
 public partial struct DeselectAllUnitsJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ecb;
@@ -201,7 +205,7 @@ public partial struct DeselectAllUnitsJob : IJobEntity
 /// <summary>
 /// Raycasts with the given RaycastInput and enables a SelectionTag if Selectable is hit
 /// </summary>
-[BurstCompile]
+//[BurstCompile]
 public partial struct SingleSelectJob : IJob
 {
 
@@ -212,12 +216,13 @@ public partial struct SingleSelectJob : IJob
 
     public EntityCommandBuffer ecb;
     public ComponentLookup<TeamComponent> teamLookup;
+    public int curTeam;
 
     public void Execute()
     {
         if (collisionWorld.CastRay(raycastInput, out RaycastHit raycastHit))
         {
-            if (selectTagLookup.HasComponent(raycastHit.Entity) && teamLookup[raycastHit.Entity].teamInd == 1)
+            if (selectTagLookup.HasComponent(raycastHit.Entity) && (teamLookup[raycastHit.Entity].teamInd & curTeam) != 0)
             {
                 selectTagLookup.SetComponentEnabled(raycastHit.Entity, true);
                 ecb.RemoveComponent<DisableRendering>(selectTagLookup[raycastHit.Entity].selectionRing);
@@ -237,8 +242,8 @@ public partial struct SingleSelectJob : IJob
             else
             {
                 //Change ShootMode color to the neutral
-                Entity colorRqstEntity = ecb.CreateEntity();
-                ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
+                //Entity colorRqstEntity = ecb.CreateEntity();
+                //ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
             }
         }
     }
@@ -250,7 +255,7 @@ public partial struct SingleSelectJob : IJob
 /// Selects all units, which are inside of the rect (which is in the screen coordinates)
 /// All other units are deselected
 /// </summary>
-[BurstCompile]
+//[BurstCompile]
 public partial struct MultipleSelectJob : IJobEntity
 {
     public WorldToScreen worldToScreen;
@@ -258,10 +263,11 @@ public partial struct MultipleSelectJob : IJobEntity
 
     public ComponentLookup<SelectTag> selectTagLookup;
     public EntityCommandBuffer.ParallelWriter ecb;
+    public int curTeam;
 
     public void Execute(Entity entity, in LocalTransform transform, [ChunkIndexInQuery] int chunkIndexInQuery, in TeamComponent team)
     {
-        if (rect.Contains(transform.Position.WorldToScreenCoordinatesNative(worldToScreen)) && team.teamInd == 1)
+        if (rect.Contains(transform.Position.WorldToScreenCoordinatesNative(worldToScreen)) && (team.teamInd & curTeam) != 0)
         {
             selectTagLookup.SetComponentEnabled(entity, true);
             ecb.RemoveComponent<DisableRendering>(chunkIndexInQuery, selectTagLookup[entity].selectionRing);

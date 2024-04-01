@@ -23,13 +23,14 @@ public partial class FillVisionMapTextureSystem : SystemBase
         material = FogMaterial.material;
         computeBuffer = new ComputeBuffer(250000, sizeof(int), ComputeBufferType.Default, ComputeBufferMode.SubUpdates);
         material.SetBuffer("_VisionMap", computeBuffer);
-        material.SetInteger("_curTeam", SystemAPI.GetSingleton<CurrentTeamComponent>().currentTeam);    
+        //material.SetInteger("_curTeam", SystemAPI.GetSingleton<CurrentTeamComponent>().value);    
     }
 
     protected override void OnUpdate()
     {
         if ((UnityEngine.Time.frameCount + 2) % 5 == 0)
         {
+            material.SetInteger("_curTeam", SystemAPI.GetSingleton<CurrentTeamComponent>().value);
             EntityManager.CompleteDependencyBeforeRO<VisionMapBuffer>();
             
             var visionMap = SystemAPI.GetSingletonBuffer<VisionMapBuffer>(true);
