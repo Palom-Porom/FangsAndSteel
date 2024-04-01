@@ -104,73 +104,75 @@ public partial class TurnSystem : SystemBase
                 {
                     //1 player finished order phase -> now 2 player
                     case 1:
-                        //EntityCommandBuffer ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
-                        //EntityCommandBuffer.ParallelWriter ecb_parallel = ecb.AsParallelWriter();
-                        Dependency = new DeselectAllUnitsJob
                         {
-                            ecb = ecb.AsParallelWriter(),
-                            selectLookup = selectLookup
-                        }.Schedule(allSelected, Dependency);
-
-                        //Change cur team
-                        curTeam.ValueRW.value = 2;
-
-                        //Disable actual units, copy and enable ReplayStartCopies (if no ReplayStartCopies -> no "copy and enable" as it is the first turn)
-                        if (!replayStartCopiesQuery.IsEmpty)
-                        {
-                            
-
-                            Dependency = new DisableActualEntitiesJob
+                            //EntityCommandBuffer ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+                            EntityCommandBuffer.ParallelWriter ecb_parallel = ecb.AsParallelWriter();
+                            Dependency = new DeselectAllUnitsJob
                             {
-                                ecb = ecb.AsParallelWriter(),
-                                //disabledHandle = disabledHandle,
-                                disabledLookup = disabledLookup,
-                                entityHandle = entityHandle,
-                                linkedEntityGroupHandle = linkedEntityGroupHandle
-                            }.Schedule(actualEntitiesQuery, Dependency);
+                                ecb = ecb_parallel,
+                                selectLookup = selectLookup
+                            }.Schedule(allSelected, Dependency);
 
-                            Dependency = new CopyAndEnableReplayStartEntitiesJob
+                            //Change cur team
+                            curTeam.ValueRW.value = 2;
+
+                            //Disable actual units, copy and enable ReplayStartCopies (if no ReplayStartCopies -> no "copy and enable" as it is the first turn)
+                            if (!replayStartCopiesQuery.IsEmpty)
                             {
-                                ecb = ecb.AsParallelWriter(),
-                                //wasDisabledHandle = wasDisabledHandle,
-                                wasDisabledLookup = wasDisabledLookup,
-                                disabledLookup = disabledLookup,
-                                entityHandle = entityHandle,
-                                linkedEntityGroupLookup = linkedEntityGroupLookup
-                            }.Schedule(replayStartCopiesQuery, Dependency);
+
+
+                                Dependency = new DisableActualEntitiesJob
+                                {
+                                    ecb = ecb_parallel,
+                                    //disabledHandle = disabledHandle,
+                                    disabledLookup = disabledLookup,
+                                    entityHandle = entityHandle,
+                                    linkedEntityGroupHandle = linkedEntityGroupHandle
+                                }.Schedule(actualEntitiesQuery, Dependency);
+
+                                Dependency = new CopyAndEnableReplayStartEntitiesJob
+                                {
+                                    ecb = ecb_parallel,
+                                    //wasDisabledHandle = wasDisabledHandle,
+                                    wasDisabledLookup = wasDisabledLookup,
+                                    disabledLookup = disabledLookup,
+                                    entityHandle = entityHandle,
+                                    linkedEntityGroupLookup = linkedEntityGroupLookup
+                                }.Schedule(replayStartCopiesQuery, Dependency);
+                            }
+                            else
+                                Debug.Log("First turn - no Engage phase");
                         }
-                        else
-                            Debug.Log("First turn - no Engage phase");
-
                         break;
 
                     //2 player finished order phase -> now saving the cur gameState and playing results of turn to 1 player
                     case 2:
-                        //Destroy old ReplayStartCopies
-                        ecb.DestroyEntity(replayStartCopiesQuery, EntityQueryCaptureMode.AtRecord);
-
-                        //EntityCommandBuffer ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
-                        EntityCommandBuffer.ParallelWriter ecb_parallel = ecb.AsParallelWriter();
-                        Dependency = new DeselectAllUnitsJob
                         {
-                            ecb = ecb_parallel,
-                            selectLookup = selectLookup
-                        }.Schedule(allSelected, Dependency);
+                            //Destroy old ReplayStartCopies
+                            ecb.DestroyEntity(replayStartCopiesQuery, EntityQueryCaptureMode.AtRecord);
 
-                        //Change cur team
-                        curTeam.ValueRW.value = 1;
+                            //EntityCommandBuffer ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+                            EntityCommandBuffer.ParallelWriter ecb_parallel = ecb.AsParallelWriter();
+                            Dependency = new DeselectAllUnitsJob
+                            {
+                                ecb = ecb_parallel,
+                                selectLookup = selectLookup
+                            }.Schedule(allSelected, Dependency);
 
-                        //Create new ReplayStartCopies
-                        Dependency = new CreateNewReplayStartEntitiesJob
-                        {
-                            ecb = ecb_parallel,
-                            entityHandle = entityHandle,
-                            //disabledHandle = disabledHandle,
-                            disabledLookup = disabledLookup,
-                            wasDisabledLookup = wasDisabledLookup,
-                            linkedEntityGroupLookup= linkedEntityGroupLookup
-                        }.Schedule(actualEntitiesQuery, Dependency);
+                            //Change cur team
+                            curTeam.ValueRW.value = 1;
 
+                            //Create new ReplayStartCopies
+                            Dependency = new CreateNewReplayStartEntitiesJob
+                            {
+                                ecb = ecb_parallel,
+                                entityHandle = entityHandle,
+                                //disabledHandle = disabledHandle,
+                                disabledLookup = disabledLookup,
+                                wasDisabledLookup = wasDisabledLookup,
+                                linkedEntityGroupLookup = linkedEntityGroupLookup
+                            }.Schedule(actualEntitiesQuery, Dependency);
+                        }
                         break;
                 }
             }

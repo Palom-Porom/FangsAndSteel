@@ -127,7 +127,7 @@ public partial class SelectionSystem : SystemBase
 
                 //Change ShootMode color to the neutral
                 Entity colorRqstEntity = ecb.CreateEntity();
-                ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
+                //ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
 
                 new MultipleSelectJob
                 {
@@ -242,8 +242,8 @@ public partial struct SingleSelectJob : IJob
             else
             {
                 //Change ShootMode color to the neutral
-                Entity colorRqstEntity = ecb.CreateEntity();
-                ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
+                //Entity colorRqstEntity = ecb.CreateEntity();
+                //ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
             }
         }
     }
