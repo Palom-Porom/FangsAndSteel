@@ -1,0 +1,24 @@
+Model: Tank_Hands_Fixed
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.038
+   8fps, 1024x512, 8388KB
+     0 Armature_Tank_Hands|Hands_Rest : 0,75s 6f [0..5]
+     1 Armature_Tank_Hands|Hands_Move : 0,75s 6f [6..11]
+     2 Armature_Tank_Hands|Hands_Death : 2,5s 20f [12..31]
+     3 Armature_Tank_Hands|Hands_Attack : 1,875s 15f [32..46]
+     4 Armature_Tank_Hands|Hands_Reload : 5,125s 41f [47..87]
+   Frame Count> Expected: 88, Actual: 88
+   Point Count> Expected: 467072, Actual: 467072
+   Fill ratio: 89,25781%.
+   5 clips, 8fps, 11s, 88f
+Started: 4/2/2024 12:33:01 AM
+Output files were saved to: Assets/ExampleScene/Baked\Tank_Hands_Fixed
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 69,3074 seconds.

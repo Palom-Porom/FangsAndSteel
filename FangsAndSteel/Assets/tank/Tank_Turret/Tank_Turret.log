@@ -1,0 +1,24 @@
+Model: Tank_Turret
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.002
+   11fps, 512x512, 4194KB
+     0 Armature_Tank_Turret|Turret_Rest : 0,8182s 9f [0..8]
+     1 Armature_Tank_Turret|Turret_Move : 0,8182s 9f [9..17]
+     2 Armature_Tank_Turret|Turret_Death : 2,4545s 27f [18..44]
+     3 Armature_Tank_Turret|Turret_Attack : 1,8182s 20f [45..64]
+     4 Armature_Tank_Turret|Turret_Reload : 5,1818s 57f [65..121]
+   Frame Count> Expected: 122, Actual: 122
+   Point Count> Expected: 245366, Actual: 245366
+   Fill ratio: 93,75%.
+   5 clips, 11fps, 11,0909s, 122f
+Started: 4/2/2024 12:14:15 AM
+Output files were saved to: Assets/ExampleScene/Baked\Tank_Turret
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 12,6152 seconds.

@@ -1,0 +1,24 @@
+Model: Tank_Hull
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: HBone.015
+   8fps, 1024x512, 8388KB
+     0 Armature_Tank_Hull|Hull_Rest : 0,75s 6f [0..5]
+     1 Armature_Tank_Hull|Hull_Move : 0,75s 6f [6..11]
+     2 Armature_Tank_Hull|Hull_Death : 2,5s 20f [12..31]
+     3 Armature_Tank_Hull|Hull_Attack : 1,875s 15f [32..46]
+     4 Armature_Tank_Hull|Hull_Reload : 5,125s 41f [47..87]
+   Frame Count> Expected: 88, Actual: 88
+   Point Count> Expected: 464080, Actual: 464080
+   Fill ratio: 88,67188%.
+   5 clips, 8fps, 11s, 88f
+Started: 4/2/2024 12:05:56 AM
+Output files were saved to: Assets/ExampleScene/Baked\Tank_Hull
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 67,1021 seconds.
