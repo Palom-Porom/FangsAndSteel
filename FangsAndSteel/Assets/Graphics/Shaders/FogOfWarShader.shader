@@ -115,7 +115,7 @@ Shader"Unlit/FogOfWarShader"
                 for (int j = 0; j < 25; j++)
                 {
                     int idx = (int) (floor((x + offset[j].x) / 2) + floor((y + offset[j].y) / 2) * 500);
-                    float4 visInfoCol = float4(0, 0, 0, (abs((_VisionMap[idx] & _curTeam) - _curTeam)) * 0.6);
+                    float4 visInfoCol = float4(0, 0, 0, (abs((_VisionMap[idx] & _curTeam) / _curTeam - 1)) * 0.6);
                     sum += visInfoCol * kernel[j];
                 }
 
