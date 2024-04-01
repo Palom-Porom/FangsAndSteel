@@ -308,28 +308,33 @@ public partial struct CopyAndEnableReplayStartEntitiesJob : IJobChunk
         //BufferAccessor<LinkedEntityGroup> linkedEntityBuffs = chunk.GetBufferAccessor(ref linkedEntityGroupLookup);
         for (int i = 0; i < chunk.Count; i++)
         {
-            foreach (var child in linkedEntityGroupLookup[entities[i]])
+            DynamicBuffer<LinkedEntityGroup> entityGroup = linkedEntityGroupLookup[entities[i]];
+            NativeArray<bool> hadWasDisabled = new NativeArray<bool>(entityGroup.Length, Allocator.Temp);
+            //foreach (var child in linkedEntityGroupLookup[entities[i]])
+            for (int j = 0; j < entityGroup.Length; j++)
             {
-                if (wasDisabledLookup.HasComponent(child.Value))
-                    ecb.RemoveComponent<WasDisabledTag>(unfilteredChunkIndex, child.Value);
+                hadWasDisabled[j] = wasDisabledLookup.HasComponent(entityGroup[j].Value);
+                if (hadWasDisabled[j])
+                    ecb.RemoveComponent<WasDisabledTag>(unfilteredChunkIndex, entityGroup[j].Value);
                 else
-                    ecb.RemoveComponent<Disabled>(unfilteredChunkIndex, child.Value);
+                    ecb.RemoveComponent<Disabled>(unfilteredChunkIndex, entityGroup[j].Value);
             }
 
             Entity tmp = ecb.Instantiate(unfilteredChunkIndex, entities[i]);
             ecb.RemoveComponent<ReplayStartCopyTag>(unfilteredChunkIndex, tmp);
             ecb.AddComponent<ReplayCopyTag>(unfilteredChunkIndex, tmp);
-            if (wasDisabledLookup.HasComponent(entities[i]))
-                ecb.RemoveComponent<WasDisabledTag>(unfilteredChunkIndex, tmp);
-            else
-                ecb.RemoveComponent<Disabled>(unfilteredChunkIndex, tmp);
+            //if (wasDisabledLookup.HasComponent(entities[i]))
+            //    ecb.RemoveComponent<WasDisabledTag>(unfilteredChunkIndex, tmp);
+            //else
+            //    ecb.RemoveComponent<Disabled>(unfilteredChunkIndex, tmp);
 
-            foreach (var child in linkedEntityGroupLookup[entities[i]])
+            //foreach (var child in linkedEntityGroupLookup[entities[i]])
+            for (int j = 0; j < entityGroup.Length; j++)
             {
-                if (disabledLookup.HasComponent(child.Value))
-                    ecb.AddComponent<WasDisabledTag>(unfilteredChunkIndex, child.Value);
+                if (hadWasDisabled[j])
+                    ecb.AddComponent<WasDisabledTag>(unfilteredChunkIndex, entityGroup[j].Value);
                 else
-                    ecb.AddComponent<Disabled>(unfilteredChunkIndex, child.Value);
+                    ecb.AddComponent<Disabled>(unfilteredChunkIndex, entityGroup[j].Value);
             }
 
             //foreach (var child in linkedEntityGroupLookup[tmp])
@@ -359,29 +364,41 @@ public partial struct CreateNewReplayStartEntitiesJob : IJobChunk
         //bool isDisabled = chunk.Has(ref disabledHandle);
         for (int i = 0; i < chunk.Count; i++)
         {
-            foreach (var child in linkedEntityGroupLookup[entities[i]])
+            DynamicBuffer<LinkedEntityGroup> entityGroup = linkedEntityGroupLookup[entities[i]];
+            NativeArray<bool> hadDisabled = new NativeArray<bool>(entityGroup.Length, Allocator.Temp);
+            for (int j = 0; j < entityGroup.Length; j++)
             {
-                if (disabledLookup.HasComponent(child.Value))
-                    ecb.AddComponent<WasDisabledTag>(unfilteredChunkIndex, child.Value);
+                hadDisabled[j] = disabledLookup.HasComponent(entityGroup[j].Value);
+                if (hadDisabled[j])
+                    ecb.AddComponent<WasDisabledTag>(unfilteredChunkIndex, entityGroup[j].Value);
                 else
-                    ecb.AddComponent<Disabled>(unfilteredChunkIndex, child.Value);
+                    ecb.AddComponent<Disabled>(unfilteredChunkIndex, entityGroup[j].Value);
             }
 
             Entity tmp = ecb.Instantiate(unfilteredChunkIndex, entities[i]);
             ecb.RemoveComponent<ActualEntityTag>(unfilteredChunkIndex, tmp);
             ecb.AddComponent<ReplayStartCopyTag>(unfilteredChunkIndex, tmp);
-            if (disabledLookup.HasComponent(entities[i]))
-                ecb.AddComponent<WasDisabledTag>(unfilteredChunkIndex, tmp);
-            else
-                ecb.AddComponent<Disabled>(unfilteredChunkIndex, tmp);
+            //if (disabledLookup.HasComponent(entities[i]))
+            //    ecb.AddComponent<WasDisabledTag>(unfilteredChunkIndex, tmp);
+            //else
+            //    ecb.AddComponent<Disabled>(unfilteredChunkIndex, tmp);
 
-            foreach (var child in linkedEntityGroupLookup[entities[i]])
+            for (int j = 0; j < entityGroup.Length; j++)
             {
-                if (wasDisabledLookup.HasComponent(child.Value))
-                    ecb.RemoveComponent<WasDisabledTag>(unfilteredChunkIndex, child.Value);
+                if (hadDisabled[j])
+                    ecb.RemoveComponent<WasDisabledTag>(unfilteredChunkIndex, entityGroup[j].Value);
                 else
-                    ecb.RemoveComponent<Disabled>(unfilteredChunkIndex, child.Value);
+                    ecb.RemoveComponent<Disabled>(unfilteredChunkIndex, entityGroup[j].Value);
             }
+
+            //foreach (var child in linkedEntityGroupLookup[entities[i]])
+            //{
+            //    if (wasDisabledLookup.HasComponent(child.Value))
+            //        ecb.RemoveComponent<WasDisabledTag>(unfilteredChunkIndex, child.Value);
+            //    else
+            //        ecb.RemoveComponent<Disabled>(unfilteredChunkIndex, child.Value);
+            //}
+
 
             //foreach (var child in linkedEntityGroupLookup[tmp])
             //{
