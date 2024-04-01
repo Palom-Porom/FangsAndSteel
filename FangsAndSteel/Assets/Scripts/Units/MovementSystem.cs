@@ -66,7 +66,14 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
     public void OnStartRunning(ref SystemState state)
     {
-        restClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Rest");        
+        restClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Rest");
+        //foreach (var w in World.All)
+        //{
+        //    if (w.Name == "ReplayStartWorld")
+        //        w.EntityManager.CopyAndReplaceEntitiesFrom(World.DefaultGameObjectInjectionWorld.EntityManager);
+
+        //    Debug.Log($"{w.Name} --- {w.EntityManager.GetAllEntities(Allocator.Temp).Length}");
+        //}
     }
 
     public void OnStopRunning(ref SystemState state)

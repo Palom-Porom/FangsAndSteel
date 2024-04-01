@@ -91,7 +91,8 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             WithAllRW<AttackCharsComponent>().
             WithPresentRW<BattleModeComponent>().
             WithDisabledRW<PursuingModeComponent>().
-            WithAll<LocalTransform, TeamComponent>().
+            WithAll<LocalTransform, TeamComponent, UnitTypeComponent>().
+            WithAspect<AttackPrioritiesAspect>().
             Build(ref state);
 
         usualAttackers = new EntityQueryBuilder(Allocator.Temp).
@@ -444,7 +445,7 @@ public partial struct UpdateDeployJob : IJobEntity
 
 
 ///<summary> Searching for the most valuable target at the moment for ALL units </summary>
-[BurstCompile]
+//[BurstCompile]
 public partial struct AttackTargetSearchJob : IJobEntity
 {
     /// <summary> In other words all units that can be attacked </summary>
@@ -455,9 +456,9 @@ public partial struct AttackTargetSearchJob : IJobEntity
     [ReadOnly] public ComponentLookup<HpComponent> hpLookup;
 
     public void Execute(ref AttackCharsComponent attackChars, ref BattleModeComponent modeSettings, ref PursuingModeComponent pursuingModeComponent, in LocalTransform localTransform, in TeamComponent team,
-        EnabledRefRW<PursuingModeComponent> pursuingModeEnabledRefRW, EnabledRefRW<BattleModeComponent> battleModeEnabledRefRW)
+        EnabledRefRW<PursuingModeComponent> pursuingModeEnabledRefRW, EnabledRefRW<BattleModeComponent> battleModeEnabledRefRW, in UnitTypeComponent unitType, AttackPrioritiesAspect attackPriorities)
     {
-        float bestScore = float.MinValue;
+        double bestScore = double.MinValue;
         Entity bestScoreEntity = Entity.Null;
 
         foreach (Entity potentialTarget in potentialTargetsArr)
@@ -466,17 +467,19 @@ public partial struct AttackTargetSearchJob : IJobEntity
             if (teamLookup[potentialTarget].teamInd - team.teamInd == 0)
                 continue;
 
-            float curScore = 0;
+            double curScore = 0;
 
             float distanceToPotTargetSq = math.distancesq(localTransform.Position, localToWorldLookup[potentialTarget].Position);
+            float targetHpPercentage = (hpLookup[potentialTarget].curHp / hpLookup[potentialTarget].maxHp) * 100;
 
-            //auto-trigger check
+            #region auto-trigger and radius
             if ((modeSettings.autoTriggerMoving /*|| (modeSettings.autoTriggerStatic && (!movement.hasMoveTarget || !movement.isAbleToMove))*/) // <-- suppose autoTriggerStatic is not so useful option for player
                 &&
                 distanceToPotTargetSq < modeSettings.autoTriggerRadiusSq
                 &&
-                (hpLookup[potentialTarget].curHp / hpLookup[potentialTarget].maxHp) <= modeSettings.autoTriggerMaxHpPercent
-                /*&& *check the type of unit* */)
+                targetHpPercentage <= modeSettings.autoTriggerMaxHpPercent
+                &&
+                ((uint)unitType.value & modeSettings.autoTriggerUnitTypes) != 0)
             {
                 curScore += 10000; // such targets has higher priority than other (auto-trigger has more priority than usual attack)
                 battleModeEnabledRefRW.ValueRW = false;
@@ -485,9 +488,21 @@ public partial struct AttackTargetSearchJob : IJobEntity
             }
             else if (distanceToPotTargetSq > attackChars.radiusSq)
                 continue; // if pot target is not in any of the radiuses - going to next potential target
+            #endregion
 
-            curScore -= distanceToPotTargetSq;
-            ///TODO Other score affectors
+            #region Modifiers Calculations
+            curScore -= distanceToPotTargetSq * attackPriorities.DistanceModifier;
+            curScore += (100 - targetHpPercentage) * attackPriorities.MinHpModifier;
+            foreach(var unitPrior in attackPriorities.unitsPriorities)
+            {
+                if ((unitPrior.types & (uint)unitType.value) != 0)
+                {
+                    curScore += unitPrior.modifier * 50; // 50 is a base for modifier multiplication (so it has some weight; not just +1 to curScore)
+                    break;
+                }
+            }
+            ///TODO: ZonePriorities
+            #endregion
 
             if (curScore > bestScore)
             {

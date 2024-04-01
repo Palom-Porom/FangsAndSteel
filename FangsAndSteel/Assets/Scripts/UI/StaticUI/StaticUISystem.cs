@@ -29,7 +29,8 @@ public partial class StaticUISystem : SystemBase
         uiData.ValueRW.shootModeBut = StaticUIRefs.Instance.shootModeBut;
         StaticUIRefs.Instance.shootModeBut = false;
 
-        
+        uiData.ValueRW.newTurnStartBut = StaticUIRefs.Instance.newTurnStartBut;
+        StaticUIRefs.Instance.newTurnStartBut = false;
 
     }
 }
@@ -39,4 +40,6 @@ public struct StaticUIData : IComponentData
     public bool endTurnBut;
     public bool stopMoveBut;
     public bool shootModeBut;
+
+    public bool newTurnStartBut;
 }

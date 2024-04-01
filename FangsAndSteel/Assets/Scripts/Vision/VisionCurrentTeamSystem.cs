@@ -9,9 +9,7 @@ using Unity.Transforms;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 
-//ISystem - более производительный, но нельзя использовать ссылочный тип данных (классы)
-//SystemBase - менее производительный, но можно использовать ссылочный тип данных (классы)
-[UpdateInGroup(typeof(UnitsSystemGroup))]
+[UpdateAfter(typeof(UnitsSystemGroup))]
 [BurstCompile]
 public partial struct VisionCurrentTeamSystem : ISystem 
 {
@@ -77,7 +75,7 @@ public partial struct VisionCurrentTeamJob : IJobEntity
         visibility.visibleToTeams = visionMap[k];
 
         // if not visible to current team
-        if ((visibility.visibleToTeams & currentTeamComponent.currentTeam) == 0)
+        if ((visibility.visibleToTeams & currentTeamComponent.value) == 0)
         {
             if (!disableRendLookup.HasComponent(unitsIconsComponent.VisualizationEntity))
                 DisableParentAndAllChildrenRender(unitsIconsComponent.VisualizationEntity, chunkIndexInQuery);

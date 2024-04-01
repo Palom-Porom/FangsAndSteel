@@ -860,6 +860,7 @@ CanvasRenderer:
   m_GameObject: {fileID: 153524855948509817}
   m_CullTransparentMesh: 1
 --- !u!114 &784458743458744564
+
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
