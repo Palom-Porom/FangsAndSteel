@@ -1,0 +1,28 @@
+Model: Artillery_Hull
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.036
+   6fps, 1024x1024, 16777KB
+     0 Armature_Arta_Hull|Hull_Rest : 0,8333s 5f [0..4]
+     1 Armature_Arta_Hull|Hull_Move : 1,6667s 10f [5..14]
+     2 Armature_Arta_Hull|Hull_Death : 1s 6f [15..20]
+     3 Armature_Arta_Hull|Hull_Attack : 8,5s 51f [21..71]
+     4 Armature_Arta_Hull|Hull_Reload : 12,6667s 76f [72..147]
+     5 Armature_Arta_Hull|Hull_Deploy : 3s 18f [148..165]
+     6 Armature_Arta_Hull|Hull_Undeploy : 3s 18f [166..183]
+     7 Armature_Arta_Hull|Hull_Deployed_Rest : 0,8333s 5f [184..188]
+     8 Armature_Arta_Hull|Hull_Deployed_Death : 0,8333s 5f [189..193]
+   Frame Count> Expected: 194, Actual: 194
+   Point Count> Expected: 1028836, Actual: 1028836
+   Fill ratio: 98,14453%.
+   9 clips, 6fps, 32,3333s, 194f
+Started: 4/2/2024 1:04:38 AM
+Output files were saved to: Assets/ExampleScene/Baked\Artillery_Hull
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 139,7498 seconds.

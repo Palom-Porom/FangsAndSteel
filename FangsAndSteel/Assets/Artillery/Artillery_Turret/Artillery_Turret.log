@@ -1,0 +1,28 @@
+Model: Artillery_Turret
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: TBone.012
+   7fps, 1024x1024, 16777KB
+     0 Armature_Arta_Turret|Turret_Rest : 0,7143s 5f [0..4]
+     1 Armature_Arta_Turret|Turret_Move : 1,5714s 11f [5..15]
+     2 Armature_Arta_Turret|Turret_Death : 1s 7f [16..22]
+     3 Armature_Arta_Turret|Turret_Attack : 8,4286s 59f [23..81]
+     4 Armature_Arta_Turret|Turret_Reload : 12,5714s 88f [82..169]
+     5 Armature_Arta_Turret|Turret_Deploy : 3s 21f [170..190]
+     6 Armature_Arta_Turret|Turret_Undeploy : 3s 21f [191..211]
+     7 Armature_Arta_Turret|Turret_Deployed_Rest : 0,7143s 5f [212..216]
+     8 Armature_Arta_Turret|Turret_Deployed_Death : 0,8571s 6f [217..222]
+   Frame Count> Expected: 223, Actual: 223
+   Point Count> Expected: 929373, Actual: 929373
+   Fill ratio: 88,67188%.
+   9 clips, 7fps, 31,8571s, 223f
+Started: 4/2/2024 1:14:12 AM
+Output files were saved to: Assets/ExampleScene/Baked\Artillery_Turret
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 132,6504 seconds.
