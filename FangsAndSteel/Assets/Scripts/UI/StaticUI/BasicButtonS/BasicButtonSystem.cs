@@ -74,6 +74,25 @@ public partial class BasicButtonSystem : SystemBase
         {
             new ChangeAutoTriggerUnitsJob { inputUnits = (uint)uiData.newPursuiteUnitType }.Schedule();
         }
+
+        #region Sliders
+        if (uiData.newPursuitStartRadius != -1)
+        {
+            new ChangeAutoTriggerStartRadiusJob { newValue = uiData.newPursuitStartRadius }.Schedule();
+        }
+        if (uiData.newPursuitmaxHp != -1)
+        {
+            new ChangeAutoTriggerMaxHpJob { newValue = uiData.newPursuitmaxHp }.Schedule();
+        }
+        if (uiData.newPursuitEndRadius != -1)
+        {
+            new ChangeAutoTriggerEndRadiusJob { newValue = uiData.newPursuitEndRadius }.Schedule();
+        }
+        if (uiData.newPursuitMinAttackRadius != -1)
+        {
+            new ChangeAutoTriggerMinAttackDistJob { newValue = uiData.newPursuitMinAttackRadius }.Schedule();
+        }
+        #endregion
     }
 
     private void UpdateButColor(Image but)
@@ -91,7 +110,7 @@ public partial struct ChangeShootModeJob : IJobEntity
 {
     public void Execute(ref BattleModeComponent battleModeSettings, ref ReloadComponent reloadComponent, ref MovementComponent movement, EnabledRefRO<SelectTag> selectTag)
     {
-        if (selectTag.ValueRO == false) return;
+        if (!selectTag.ValueRO) return;
         battleModeSettings.shootingOnMove = !(battleModeSettings.shootingOnMove);
         reloadComponent.curDebaff += battleModeSettings.shootingOnMove ? reloadComponent.reload_SoM_Debaff : -reloadComponent.reload_SoM_Debaff;
         movement.curDebaff += battleModeSettings.shootingOnMove ? movement.movement_SoM_Debaff : -movement.movement_SoM_Debaff;
@@ -104,7 +123,7 @@ public partial struct ChangeShootOffModeJob : IJobEntity
 {
     public void Execute(ref BattleModeComponent battleModeSettings, EnabledRefRO<SelectTag> selectTag)
     {
-        if (selectTag.ValueRO == false) return;
+        if (!selectTag.ValueRO) return;
         battleModeSettings.shootingDisabled = !battleModeSettings.shootingDisabled;
     }
 }
@@ -115,7 +134,7 @@ public partial struct ChangeAutoTriggerModeJob : IJobEntity
 {
     public void Execute(ref BattleModeComponent battleModeSettings, EnabledRefRO<SelectTag> selectTag)
     {
-        if (selectTag.ValueRO == false) return;
+        if (!selectTag.ValueRO) return;
         battleModeSettings.isAutoTrigger = !battleModeSettings.isAutoTrigger;
     }
 }
@@ -128,7 +147,7 @@ public partial struct ChangeAutoTriggerUnitsJob : IJobEntity
 
     public void Execute(ref BattleModeComponent battleModeSettings, EnabledRefRO<SelectTag> selectTag)
     {
-        if (selectTag.ValueRO == false) return;
+        if (!selectTag.ValueRO) return;
 
         if ((inputUnits & (uint)UnitTypes.BaseInfantry) != 0)
             if ((battleModeSettings.autoTriggerUnitTypes & (uint)UnitTypes.BaseInfantry) != 0)
@@ -164,7 +183,67 @@ public partial struct ChangeAutoTriggerUnitsJob : IJobEntity
     }
 }
 
-    public struct ShootModeButChangeColorRqst : IComponentData
+#region Sliders
+
+[WithAll(typeof(SelectTag))]
+[WithOptions(EntityQueryOptions.IgnoreComponentEnabledState)]
+public partial struct ChangeAutoTriggerStartRadiusJob : IJobEntity
+{
+    public float newValue;
+
+    public void Execute(ref BattleModeComponent battleModeSettings, EnabledRefRO<SelectTag> selectTag)
+    {
+        if (!selectTag.ValueRO) return;
+
+        battleModeSettings.autoTriggerRadiusSq = newValue * newValue;
+    }
+}
+
+[WithAll(typeof(SelectTag))]
+[WithOptions(EntityQueryOptions.IgnoreComponentEnabledState)]
+public partial struct ChangeAutoTriggerMaxHpJob : IJobEntity
+{
+    public float newValue;
+
+    public void Execute(ref BattleModeComponent battleModeSettings, EnabledRefRO<SelectTag> selectTag)
+    {
+        if (!selectTag.ValueRO) return;
+
+        battleModeSettings.autoTriggerMaxHpPercent = (int)newValue;
+    }
+}
+
+[WithAll(typeof(SelectTag))]
+[WithOptions(EntityQueryOptions.IgnoreComponentEnabledState)]
+public partial struct ChangeAutoTriggerEndRadiusJob : IJobEntity
+{
+    public float newValue;
+
+    public void Execute(ref PursuingModeComponent pursueModeSettings, EnabledRefRO<SelectTag> selectTag)
+    {
+        if (!selectTag.ValueRO) return;
+
+        pursueModeSettings.dropDistanceSq = newValue * newValue;
+    }
+}
+
+[WithAll(typeof(SelectTag))]
+[WithOptions(EntityQueryOptions.IgnoreComponentEnabledState)]
+public partial struct ChangeAutoTriggerMinAttackDistJob : IJobEntity
+{
+    public float newValue;
+
+    public void Execute(ref PursuingModeComponent pursueModeSettings, EnabledRefRO<SelectTag> selectTag)
+    {
+        if (!selectTag.ValueRO) return;
+
+        pursueModeSettings.maxShootDistanceSq = newValue * newValue;
+    }
+}
+
+#endregion
+
+public struct ShootModeButChangeColorRqst : IComponentData
 {
     public Color color;
 }

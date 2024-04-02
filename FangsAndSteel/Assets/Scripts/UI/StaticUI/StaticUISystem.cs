@@ -41,6 +41,21 @@ public partial class StaticUISystem : SystemBase
         uiData.ValueRW.newPursuiteUnitType = StaticUIRefs.Instance.newPursuiteUnitType;
         StaticUIRefs.Instance.newPursuiteUnitType = 0;
 
+        #region Sliders
+        uiData.ValueRW.newPursuitStartRadius = StaticUIRefs.Instance.newPursuitStartRadius;
+        StaticUIRefs.Instance.newPursuitStartRadius = -1;
+
+        uiData.ValueRW.newPursuitmaxHp = StaticUIRefs.Instance.newPursuitmaxHp;
+        StaticUIRefs.Instance.newPursuitmaxHp = -1;
+
+        uiData.ValueRW.newPursuitEndRadius = StaticUIRefs.Instance.newPursuitEndRadius;
+        StaticUIRefs.Instance.newPursuitEndRadius = -1;
+
+        uiData.ValueRW.newPursuitMinAttackRadius = StaticUIRefs.Instance.newPursuitMinAttackRadius;
+        StaticUIRefs.Instance.newPursuitMinAttackRadius = -1;
+        #endregion
+
+
 
         uiData.ValueRW.newTurnStartBut = StaticUIRefs.Instance.newTurnStartBut;
         StaticUIRefs.Instance.newTurnStartBut = false;
@@ -59,6 +74,10 @@ public struct StaticUIData : IComponentData
     public bool autoPursuitBut;
     public bool enemyListBut;
     public UnitTypes newPursuiteUnitType;
+    public float newPursuitStartRadius;
+    public float newPursuitmaxHp;
+    public float newPursuitEndRadius;
+    public float newPursuitMinAttackRadius;
 
     public bool newTurnStartBut;
 }

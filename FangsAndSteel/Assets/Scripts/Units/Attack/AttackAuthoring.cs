@@ -58,7 +58,7 @@ public class AttackAuthoring : MonoBehaviour
                 shootingOnMove = false,
                 
                 isAutoTrigger = false,
-                autoTriggerRadiusSq = authoring.attackRadius,
+                autoTriggerRadiusSq = authoring.attackRadius * authoring.attackRadius,
                 autoTriggerMaxHpPercent = 100
             });
 

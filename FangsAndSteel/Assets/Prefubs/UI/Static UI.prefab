@@ -3484,6 +3484,10 @@ MonoBehaviour:
   autoPursuitBut: 0
   enemyListBut: 0
   newPursuiteUnitType: 0
+  newPursuitStartRadius: 0
+  newPursuitmaxHp: 0
+  newPursuitEndRadius: 0
+  newPursuitMinAttackRadius: 0
   newTurnStartBut: 0
 --- !u!114 &5427605767883339875
 MonoBehaviour:
@@ -3896,6 +3900,7 @@ GameObject:
   m_Component:
   - component: {fileID: 445349236245668107}
   - component: {fileID: 3308865945443691690}
+  - component: {fileID: 6468961739708265962}
   m_Layer: 5
   m_Name: RadiusStartSlider
   m_TagString: Untagged
@@ -3976,7 +3981,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5333845771646529865}
+      - m_Target: {fileID: 6468961739708265962}
         m_TargetAssemblyTypeName: RadiusSliderControllerScript, Assembly-CSharp
         m_MethodName: StartSliderChange
         m_Mode: 0
@@ -3988,6 +3993,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &6468961739708265962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458401350509126286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 991a34e3042263840877fdb79951bdee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startSliderText: {fileID: 8908445349953749578}
+  maxStartSliderAmount: 200
+  isCosmeticChangeOfValue: 0
 --- !u!1 &1543209349786626453
 GameObject:
   m_ObjectHideFlags: 0
@@ -4229,10 +4249,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2599763739146726444}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.72933674, y: 0.03846535}
-  m_AnchorMax: {x: 0.7903391, y: 0.17300001}
-  m_AnchoredPosition: {x: 0, y: 0.22802734}
-  m_SizeDelta: {x: -0.5636997, y: -1.0556998}
+  m_AnchorMin: {x: 0.71047217, y: 0.03846535}
+  m_AnchorMax: {x: 0.7903391, y: 0.17847236}
+  m_AnchoredPosition: {x: 7, y: -0.27197266}
+  m_SizeDelta: {x: -14.5637, y: -2.0556998}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3884478121737954406
 CanvasRenderer:
@@ -4325,7 +4345,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -15.743368, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -7409,7 +7429,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.16100001, y: 0.28}
   m_AnchorMax: {x: 0.2415208, y: 0.305}
-  m_AnchoredPosition: {x: 1, y: 1.7999268}
+  m_AnchoredPosition: {x: 1, y: 1.7998962}
   m_SizeDelta: {x: 4, y: 3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7429860464497071761
@@ -8864,7 +8884,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &765803822219406859
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8898,6 +8918,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHpSliderText: {fileID: 6377828347051096783}
   maxHpSliderAmount: 100
+  isCosmeticChangeOfValue: 0
 --- !u!1 &2963412305890332243
 GameObject:
   m_ObjectHideFlags: 0
@@ -9580,7 +9601,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4699197065311883878
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9612,8 +9633,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad5b8fd49ef5124408f4af561a927d00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AttackDistSliderText: {fileID: 3095480588610071864}
+  attackDistSliderText: {fileID: 0}
   maxAttackDistSliderAmount: 100
+  isCosmeticChangeOfValue: 0
 --- !u!1 &3125818500178253385
 GameObject:
   m_ObjectHideFlags: 0
@@ -9758,6 +9780,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7506365306920790586}
   - component: {fileID: 2165264685885709074}
+  - component: {fileID: 3320672490409879674}
   m_Layer: 5
   m_Name: MaxHpForPursuitSlider
   m_TagString: Untagged
@@ -9839,7 +9862,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6909452956278500744}
+      - m_Target: {fileID: 3320672490409879674}
         m_TargetAssemblyTypeName: MaxHpForPursuitSliderControllerScript, Assembly-CSharp
         m_MethodName: StartSliderChange
         m_Mode: 0
@@ -9851,6 +9874,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &3320672490409879674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3128762156639893087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25a773a5c94356844a982b7d3fb0d1fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHpSliderText: {fileID: 6377828347051096783}
+  maxHpSliderAmount: 100
+  isCosmeticChangeOfValue: 0
 --- !u!1 &3133917529426706546
 GameObject:
   m_ObjectHideFlags: 0
@@ -11748,6 +11786,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3440915923328925910}
   - component: {fileID: 1132716941685995612}
+  - component: {fileID: 2672009968198585221}
   m_Layer: 5
   m_Name: RadiusEndSlider
   m_TagString: Untagged
@@ -11829,9 +11868,9 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1113664342190052543}
+      - m_Target: {fileID: 2672009968198585221}
         m_TargetAssemblyTypeName: RadiusEndSliderControllerScript, Assembly-CSharp
-        m_MethodName: EndSliderChange
+        m_MethodName: StartSliderChange
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11841,6 +11880,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2672009968198585221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3909468489738059853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e4b283a43da95644bc8ebb6178821fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  endSliderText: {fileID: 2236278422259358640}
+  maxEndSliderAmount: 400
+  isCosmeticChangeOfValue: 0
 --- !u!1 &3941196273191701027
 GameObject:
   m_ObjectHideFlags: 0
@@ -12505,10 +12559,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2599763739146726444}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -0.21}
-  m_AnchorMin: {x: 0.72933674, y: 0.77746534}
-  m_AnchorMax: {x: 0.7903391, y: 0.91146535}
-  m_AnchoredPosition: {x: -0.2000122, y: 0.5999985}
-  m_SizeDelta: {x: -0.41080093, y: 0.09399986}
+  m_AnchorMin: {x: 0.71047217, y: 0.77746534}
+  m_AnchorMax: {x: 0.7903391, y: 0.9116383}
+  m_AnchoredPosition: {x: 6.799988, y: 0.5999985}
+  m_SizeDelta: {x: -14.410801, y: 0.09399986}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8417920399281451475
 CanvasRenderer:
@@ -12565,7 +12619,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.7
+  m_fontSize: 21.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12601,7 +12655,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -0.07367682, y: 0.1432867, z: -0.28789142, w: 0.14973402}
+  m_margin: {x: -11.107357, y: 0.1432867, z: -0.28789142, w: 0.14973402}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -12792,6 +12846,14 @@ MonoBehaviour:
   pursuiteAntyTankBut: {fileID: 1606147379075810088}
   pursuiteTankBut: {fileID: 3646482979521105493}
   pursuiteArtilleryBut: {fileID: 6269772027948011022}
+  pursuiteStartRadiusSlider: {fileID: 3308865945443691690}
+  pursuiteStartRadiusSliderText: {fileID: 8908445349953749578}
+  pursuiteMaxHpSlider: {fileID: 2165264685885709074}
+  pursuiteMaxHpSliderText: {fileID: 6377828347051096783}
+  pursuiteEndRadiusSlider: {fileID: 1132716941685995612}
+  pursuiteEndRadiusSliderText: {fileID: 2236278422259358640}
+  pursuiteMinAttackDistSlider: {fileID: 5723312065713890682}
+  pursuiteMinAttackDistSliderText: {fileID: 3095480588610071864}
 --- !u!1 &4496243129089103536
 GameObject:
   m_ObjectHideFlags: 0
@@ -16699,7 +16761,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7103201347881672531
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18889,7 +18951,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1602929497534037542
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18922,7 +18984,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startSliderText: {fileID: 8908445349953749578}
-  maxStartSliderAmount: 100
+  maxStartSliderAmount: 200
+  isCosmeticChangeOfValue: 0
 --- !u!1 &6576177655633716089
 GameObject:
   m_ObjectHideFlags: 0
@@ -19440,10 +19503,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2599763739146726444}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.72933674, y: 0.51646537}
-  m_AnchorMax: {x: 0.7903391, y: 0.65500003}
-  m_AnchoredPosition: {x: -0.63830566, y: 0.19688988}
-  m_SizeDelta: {x: -1.0649996, y: -0.9935999}
+  m_AnchorMin: {x: 0.71047217, y: 0.51646537}
+  m_AnchorMax: {x: 0.7903391, y: 0.6604724}
+  m_AnchoredPosition: {x: 6.3616943, y: -0.30311012}
+  m_SizeDelta: {x: -15.065, y: -1.9935999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3758272165775491864
 CanvasRenderer:
@@ -19536,7 +19599,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -14.4502125, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -20595,6 +20658,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7326912878144694368}
   - component: {fileID: 5723312065713890682}
+  - component: {fileID: 4316585320833855812}
   m_Layer: 5
   m_Name: AttackDistSlider
   m_TagString: Untagged
@@ -20676,9 +20740,9 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6264592153296729124}
+      - m_Target: {fileID: 4316585320833855812}
         m_TargetAssemblyTypeName: AttackDistSliderControllerScript, Assembly-CSharp
-        m_MethodName: EndSliderChange
+        m_MethodName: StartSliderChange
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -20688,6 +20752,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &4316585320833855812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7104704985938529809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad5b8fd49ef5124408f4af561a927d00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackDistSliderText: {fileID: 3095480588610071864}
+  maxAttackDistSliderAmount: 300
+  isCosmeticChangeOfValue: 0
 --- !u!1 &7131337379097521599
 GameObject:
   m_ObjectHideFlags: 0
@@ -22409,7 +22488,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &724212884668819086
 RectTransform:
   m_ObjectHideFlags: 0
@@ -22443,6 +22522,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   endSliderText: {fileID: 2236278422259358640}
   maxEndSliderAmount: 100
+  isCosmeticChangeOfValue: 0
 --- !u!1 &7648408051208658786
 GameObject:
   m_ObjectHideFlags: 0
@@ -23763,10 +23843,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2599763739146726444}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.72933674, y: 0.266}
-  m_AnchorMax: {x: 0.7903391, y: 0.39273018}
-  m_AnchoredPosition: {x: 0.25164795, y: -0.0025177002}
-  m_SizeDelta: {x: -0.9659996, y: 0.36969995}
+  m_AnchorMin: {x: 0.71047217, y: 0.266}
+  m_AnchorMax: {x: 0.7903391, y: 0.4145916}
+  m_AnchoredPosition: {x: 7.251648, y: -2.0025215}
+  m_SizeDelta: {x: -14.966, y: -3.6303}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6172708282326840023
 CanvasRenderer:
@@ -23859,7 +23939,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0.15842342}
+  m_margin: {x: -15.051107, y: 0, z: 0, w: 0.15842342}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -25756,7 +25836,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2057879047924376208
 RectTransform:
   m_ObjectHideFlags: 0

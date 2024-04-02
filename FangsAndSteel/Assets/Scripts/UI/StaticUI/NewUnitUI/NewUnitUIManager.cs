@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,6 +30,30 @@ public class NewUnitUIManager : MonoBehaviour
     [SerializeField] private Image pursuiteTankBut;
     public Image PursuiteArtilleryBut { get { return pursuiteArtilleryBut; } }
     [SerializeField] private Image pursuiteArtilleryBut;
+
+    #region Sliders
+
+    public Slider PursuiteStartRadiusSlider { get { return pursuiteStartRadiusSlider; } }
+    [SerializeField] private Slider pursuiteStartRadiusSlider;
+    public TextMeshProUGUI PursuiteStartRadiusSliderText { get { return pursuiteStartRadiusSliderText; } }
+    [SerializeField] private TextMeshProUGUI pursuiteStartRadiusSliderText;
+
+    public Slider PursuiteMaxHpSlider { get { return pursuiteMaxHpSlider; } }
+    [SerializeField] private Slider pursuiteMaxHpSlider;
+    public TextMeshProUGUI PursuiteMaxHpSliderText { get { return pursuiteMaxHpSliderText; } }
+    [SerializeField] private TextMeshProUGUI pursuiteMaxHpSliderText;
+
+    public Slider PursuiteEndRadiusSlider { get { return pursuiteEndRadiusSlider; } }
+    [SerializeField] private Slider pursuiteEndRadiusSlider;
+    public TextMeshProUGUI PursuiteEndRadiusSliderText { get { return pursuiteEndRadiusSliderText; } }
+    [SerializeField] private TextMeshProUGUI pursuiteEndRadiusSliderText;
+
+    public Slider PursuiteMaxAttackDistSlider { get { return pursuiteMaxAttackDistSlider; } }
+    [SerializeField] private Slider pursuiteMaxAttackDistSlider;
+    public TextMeshProUGUI PursuiteMaxAttackDistSliderText { get { return pursuiteMaxAttackDistSliderText; } }
+    [SerializeField] private TextMeshProUGUI pursuiteMaxAttackDistSliderText;
+
+    #endregion
 
     void Awake()
     {

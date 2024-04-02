@@ -214,8 +214,27 @@ public partial class SelectionSystem : SystemBase
         HashSet<bool> diffVals_tankBut = new HashSet<bool>();
         HashSet<bool> diffVals_artilleryBut = new HashSet<bool>();
 
-        foreach (var battleModeSets in SystemAPI.Query<BattleModeComponent>().WithAll<SelectTag>())
+        HashSet<float> diffVals_pursuiteStartRadius = new HashSet<float>();
+        HashSet<float> diffVals_pursuiteMaxHp = new HashSet<float>();
+        HashSet<float> diffVals_pursuiteEndRadius = new HashSet<float>();
+        HashSet<float> diffVals_pursuiteMaxAttackDist = new HashSet<float>();
+
+        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, PursuingModeComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
+        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, PursuingModeComponent, SelectTag>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
+        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, SelectTag>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
+        ////Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, SelectTag>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
+        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, SelectTag>().Build(this).ToEntityArray(Allocator.Temp).Length);
+        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, PursuingModeComponent, SelectTag>().Build(this).ToEntityArray(Allocator.Temp).Length);
+        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<PursuingModeComponent, SelectTag>().Build(this).ToEntityArray(Allocator.Temp).Length);
+
+        
+
+        foreach (var (battleModeSets, pursueModeSets, selectTag_EnabledRO) 
+            in SystemAPI.Query<BattleModeComponent, PursuingModeComponent, EnabledRefRO<SelectTag>>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
         {
+            //Debug.Log($"Entered foreach; SelectEnabled = {selectTag_EnabledRO.ValueRO}");
+            if (!selectTag_EnabledRO.ValueRO) continue;
+
             NewUnitUIManager.Instance.ShootOnMoveButton.color = battleModeSets.shootingOnMove ? Color.green : Color.red;
             diffVals_shootOnMove.Add(battleModeSets.shootingOnMove);
 
@@ -242,7 +261,52 @@ public partial class SelectionSystem : SystemBase
             //Debug.Log($"tankMultiplier = {battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Tank}");
 
             #endregion
+
+            #region Sliders
+
+            {
+                float pursuiteTmpVal = (math.sqrt(battleModeSets.autoTriggerRadiusSq)) / 200f;
+                NewUnitUIManager.Instance.PursuiteStartRadiusSlider.GetComponent<RadiusSliderControllerScript>().isCosmeticChangeOfValue = true;
+                NewUnitUIManager.Instance.PursuiteStartRadiusSlider.value = pursuiteTmpVal;
+                diffVals_pursuiteStartRadius.Add(pursuiteTmpVal);
+                //NewUnitUIManager.Instance.PursuiteRadiusSliderText.text = ((int)pursuiteRadVal * 200).ToString();
+            }
+
+            {
+                float pursuiteTmpVal = battleModeSets.autoTriggerMaxHpPercent / 100f;
+                NewUnitUIManager.Instance.PursuiteMaxHpSlider.GetComponent<MaxHpForPursuitSliderControllerScript>().isCosmeticChangeOfValue = true;
+                NewUnitUIManager.Instance.PursuiteMaxHpSlider.value = pursuiteTmpVal;
+                diffVals_pursuiteMaxHp.Add(pursuiteTmpVal);
+                //NewUnitUIManager.Instance.PursuiteRadiusSliderText.text = ((int)pursuiteRadVal * 200).ToString();
+            }
+
+            {
+                float pursuiteTmpVal = (math.sqrt(pursueModeSets.maxShootDistanceSq)) / 400f;
+                NewUnitUIManager.Instance.PursuiteMaxAttackDistSlider.GetComponent<AttackDistSliderControllerScript>().isCosmeticChangeOfValue = true;
+                NewUnitUIManager.Instance.PursuiteMaxAttackDistSlider.value = pursuiteTmpVal;
+                diffVals_pursuiteMaxAttackDist.Add(pursuiteTmpVal);
+                //NewUnitUIManager.Instance.PursuiteRadiusSliderText.text = ((int)pursuiteRadVal * 200).ToString();
+            }
+
+            {
+                float pursuiteTmpVal = (math.sqrt(pursueModeSets.dropDistanceSq)) / 300f;
+                NewUnitUIManager.Instance.PursuiteEndRadiusSlider.GetComponent<RadiusEndSliderControllerScript>().isCosmeticChangeOfValue = true;
+                NewUnitUIManager.Instance.PursuiteEndRadiusSlider.value = pursuiteTmpVal;
+                diffVals_pursuiteEndRadius.Add(pursuiteTmpVal);
+                //NewUnitUIManager.Instance.PursuiteRadiusSliderText.text = ((int)pursuiteRadVal * 200).ToString();
+            }
+
+            #endregion
         }
+
+        //int i = 0;
+        //foreach (var (battleModeSets, pursueModeSets, selectTag_EnabledRO)
+        //    in SystemAPI.Query<BattleModeComponent, PursuingModeComponent, EnabledRefRO<SelectTag>>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
+        //{
+        //    i++;
+        //    Debug.Log(i);
+        //}
+        //Debug.Log(i);
 
         if (diffVals_shootOnMove.Count > 1)
         {
@@ -300,6 +364,38 @@ public partial class SelectionSystem : SystemBase
         //NewUnitUIManager.Instance.PursuiteAntyTankBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.AntyTank) != 0 ? Color.green : Color.red;
         //NewUnitUIManager.Instance.PursuiteTankBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Tank) != 0 ? Color.green : Color.red;
         //NewUnitUIManager.Instance.PursuiteArtilleryBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Artillery) != 0 ? Color.green : Color.red;
+
+        #endregion
+
+        #region Sliders
+
+        if (diffVals_pursuiteStartRadius.Count > 1)
+        {
+            //Debug.Log("Entered");
+            //NewUnitUIManager.Instance.PursuiteRadiusSlider.value = 0;
+            NewUnitUIManager.Instance.PursuiteStartRadiusSliderText.text = "Разн.";
+        }
+
+        if (diffVals_pursuiteMaxHp.Count > 1)
+        {
+            //Debug.Log("Entered");
+            //NewUnitUIManager.Instance.PursuiteRadiusSlider.value = 0;
+            NewUnitUIManager.Instance.PursuiteMaxHpSliderText.text = "Разн.";
+        }
+
+        if (diffVals_pursuiteEndRadius.Count > 1)
+        {
+            //Debug.Log("Entered");
+            //NewUnitUIManager.Instance.PursuiteRadiusSlider.value = 0;
+            NewUnitUIManager.Instance.PursuiteEndRadiusSliderText.text = "Разн.";
+        }
+
+        if (diffVals_pursuiteMaxAttackDist.Count > 1)
+        {
+            //Debug.Log("Entered");
+            //NewUnitUIManager.Instance.PursuiteRadiusSlider.value = 0;
+            NewUnitUIManager.Instance.PursuiteMaxAttackDistSliderText.text = "Разн.";
+        }
 
         #endregion
     }

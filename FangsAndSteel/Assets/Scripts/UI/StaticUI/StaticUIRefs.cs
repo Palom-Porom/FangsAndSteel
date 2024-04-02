@@ -39,6 +39,8 @@ public class StaticUIRefs : MonoBehaviour
     void Awake()
     {
         Instance = this;
+
+        newPursuitStartRadius = -1;
     }
     
     private void Start()
@@ -60,6 +62,11 @@ public class StaticUIRefs : MonoBehaviour
     [HideInInspector] public bool autoPursuitBut;
     [HideInInspector] public bool enemyListBut;
     [HideInInspector] public UnitTypes newPursuiteUnitType;
+    [HideInInspector] public float newPursuitStartRadius;
+    [HideInInspector] public float newPursuitmaxHp;
+    [HideInInspector] public float newPursuitEndRadius;
+    [HideInInspector] public float newPursuitMinAttackRadius;
+
 
     [HideInInspector] public bool newTurnStartBut;
 
