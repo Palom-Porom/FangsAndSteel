@@ -29,7 +29,7 @@ public class ShowCloseUnitStats : MonoBehaviour
         attackRadius.text = $"Радиус атаки: {unitStats.attackRadius}";
 
         var reload = StatsPanel.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
-        reload.text = $"Скорость перезарядки: {unitStats.reload}";
+        reload.text = $"Скорость перезарядки: {unitStats.reload:F2}";
 
         if (unitStats.tapePresence == true) 
         {
@@ -73,7 +73,7 @@ public class ShowCloseUnitStats : MonoBehaviour
         public int speed;
         public int damage;
         public int attackRadius;
-        public int reload;
+        public float reload;
         public bool tapePresence;
         public int bullets;
     }

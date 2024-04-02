@@ -228,8 +228,13 @@ public partial class SelectionSystem : SystemBase
         bool prioritiesArrWasFilled = false;
         bool prioritiesAreSame = true;
 
-        foreach (var (battleModeSets, pursueModeSets, attackPriorities, selectTag_EnabledRO) 
-            in SystemAPI.Query<BattleModeComponent, PursuingModeComponent, AttackPrioritiesAspect, EnabledRefRO<SelectTag>>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
+
+        UnitTypes curUnitType = UnitTypes.None;
+        bool sameUnitType = true;
+        ShowCloseUnitStats.UnitStats stats = new ShowCloseUnitStats.UnitStats();
+
+        foreach (var (battleModeSets, pursueModeSets, attackPriorities, selectTag_EnabledRO, unitType) 
+            in SystemAPI.Query<BattleModeComponent, PursuingModeComponent, AttackPrioritiesAspect, EnabledRefRO<SelectTag>, UnitTypeComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
         {
             if (!selectTag_EnabledRO.ValueRO) continue;
 
@@ -375,6 +380,16 @@ public partial class SelectionSystem : SystemBase
             }
 
             #endregion
+
+            if (curUnitType == UnitTypes.None)
+            {
+                curUnitType = unitType.value;
+            }
+            else
+            {
+                if (sameUnitType)
+                    sameUnitType = (curUnitType == unitType.value);
+            }
         }
 
         if (diffVals_shootOnMove.Count > 1)
@@ -489,6 +504,28 @@ public partial class SelectionSystem : SystemBase
         }
 
         #endregion
+
+        if (sameUnitType)
+        {
+            foreach (var (selectTag_EnabledRO, hp, movement, attack, reload)
+            in SystemAPI.Query<EnabledRefRO<SelectTag>, HpComponent, MovementComponent, AttackCharsComponent, ReloadComponent>().WithAll<BattleModeComponent, PursuingModeComponent, AttackPrioritiesAspect>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
+            {
+                if (!selectTag_EnabledRO.ValueRO) continue;
+
+                stats.hp = (int)hp.maxHp;
+                stats.speed = (int)movement.speed;
+                stats.damage = (int)attack.damage;
+                stats.attackRadius = (int)(math.sqrt(attack.radiusSq));
+                stats.reload = reload.drumReloadLen;
+                stats.tapePresence = (reload.maxBullets > 1);
+                stats.bullets = reload.maxBullets;
+
+                break;
+            }
+            ShowCloseUnitStats.ShowStats(stats);
+        }
+        else
+            ShowCloseUnitStats.CloseStats();
     }
 }
 
