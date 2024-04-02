@@ -15,13 +15,13 @@ public class HintScript : MonoBehaviour
     public void HintOpen()
     {
         HintText.SetActive(true);
-        Debug.Log("включилась");
+        //Debug.Log("включилась");
         
     }
 
     public void HintClose()
     {
         HintText.SetActive(false);
-        Debug.Log("выключилась");
+        //Debug.Log("выключилась");
     }
 }

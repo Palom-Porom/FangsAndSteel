@@ -27,8 +27,11 @@ public class StaticUIRefs : MonoBehaviour
     public TextMeshProUGUI TurnTimer { get { return turnTimer; } }
     [SerializeField] private TextMeshProUGUI turnTimer;
 
-    public Image ShootModeButton { get { return shootModeButton; } }
-    [SerializeField] private Image shootModeButton;
+    public GameObject UnitsUI { get { return unitsUI; } }
+    [SerializeField] private GameObject unitsUI;
+
+    public Image ShootOnMoveButton { get { return shootOnMoveButton; } }
+    [SerializeField] private Image shootOnMoveButton;
 
     public GameObject NewTurnPanel { get { return newTurnPanel; } }
     [SerializeField] private GameObject newTurnPanel;
@@ -50,7 +53,13 @@ public class StaticUIRefs : MonoBehaviour
 
     [HideInInspector] public bool endTurnBut;
     [HideInInspector] public bool stopMoveBut;
-    [HideInInspector] public bool shootModeBut;
+
+
+    [HideInInspector] public bool shootOnMoveBut;
+    [HideInInspector] public bool shootOffBut;
+    [HideInInspector] public bool autoPursuitBut;
+    [HideInInspector] public bool enemyListBut;
+    [HideInInspector] public UnitTypes newPursuiteUnitType;
 
     [HideInInspector] public bool newTurnStartBut;
 

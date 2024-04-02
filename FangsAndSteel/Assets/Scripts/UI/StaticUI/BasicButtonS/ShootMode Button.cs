@@ -8,7 +8,7 @@ public class ShootModeButton : MonoBehaviour
     Button button;
     public void ShootMode()
     {
-        StaticUIRefs.Instance.shootModeBut = true;
+        StaticUIRefs.Instance.shootOnMoveBut = true;
     }
 
     private void Awake()

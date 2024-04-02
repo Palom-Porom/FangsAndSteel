@@ -25,7 +25,7 @@ public enum UnitTypes
     None = 0,
     BaseInfantry = 1,
     MachineGunner = 2,
-    AntiTankInf = 4,
+    AntyTank = 4,
     Tank = 8,
     Artillery = 16,
     Everything = 31

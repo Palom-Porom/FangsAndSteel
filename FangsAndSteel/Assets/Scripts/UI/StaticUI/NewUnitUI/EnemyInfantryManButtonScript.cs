@@ -9,7 +9,8 @@ public class EnemyInfantryManButtonScript : MonoBehaviour
 
     public void EnemyInfantryManButtonClick()
     {
-        Debug.Log("Противник пехотинец");
+        //Debug.Log("Противник пехотинец");
+        StaticUIRefs.Instance.newPursuiteUnitType |= UnitTypes.BaseInfantry;
         var x = EnemyInfantryManButton.GetComponent<Image>();
         if (x.color == Color.green) { x.color = Color.red; }
         else { x.color = Color.green; }

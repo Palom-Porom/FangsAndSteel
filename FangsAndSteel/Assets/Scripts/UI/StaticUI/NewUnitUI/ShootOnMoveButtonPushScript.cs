@@ -9,8 +9,9 @@ public class ShootOnMoveButtonPushScript : MonoBehaviour
     Button ShootOnMoveButton;
     public void ShootOnMoveButtonPush()
     { 
-        if (ShootOnMoveButton.image.color == Color.red) { ShootOnMoveButton.image.color = Color.green; }
-        else if (ShootOnMoveButton.image.color == Color.green) { ShootOnMoveButton.image.color = Color.red; }
+        //if (ShootOnMoveButton.image.color == Color.red) { ShootOnMoveButton.image.color = Color.green; }
+        //else if (ShootOnMoveButton.image.color == Color.green) { ShootOnMoveButton.image.color = Color.red; }
+        StaticUIRefs.Instance.shootOnMoveBut = true;
     }
     private void Awake()
     {

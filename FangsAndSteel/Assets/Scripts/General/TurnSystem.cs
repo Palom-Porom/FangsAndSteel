@@ -100,6 +100,8 @@ public partial class TurnSystem : SystemBase
                 StaticUIRefs.Instance.NewTurnPanel.SetActive(true);
                 ///TODO: Create some animation to hide the changing players process
                 
+                SelectionSystem.needUpdateUIPanelInfo = true;
+
                 switch (curTeam.ValueRO.value)
                 {
                     //1 player finished order phase -> now 2 player

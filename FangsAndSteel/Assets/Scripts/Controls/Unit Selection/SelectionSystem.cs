@@ -13,6 +13,8 @@ using Unity.Transforms;
 using UnityEngine.EventSystems;
 using Unity.VisualScripting;
 using Unity.Rendering;
+using UnityEngine.UI;
+using TMPro;
 
 [UpdateInGroup(typeof(ControlsSystemGroup))]
 public partial class SelectionSystem : SystemBase
@@ -25,6 +27,8 @@ public partial class SelectionSystem : SystemBase
     private float2 mouseStartPos;
     private bool isDragging;
     private bool wasClickedOnUI;
+
+    static public bool needUpdateUIPanelInfo;
 
     private ComponentLookup<SelectTag> selectLookup;
     //private ComponentLookup<AttackSettingsComponent> attackSetsLookup;
@@ -63,16 +67,24 @@ public partial class SelectionSystem : SystemBase
 
         if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
             unitStatsRqstEntity = Entity.Null;
-        new DeselectAllUnitsJob 
+        Dependency = new DeselectAllUnitsJob 
         { 
             ecb = ecb.AsParallelWriter(),
             selectLookup = selectLookup,
             unitStatsRqstEntity = unitStatsRqstEntity
-        }.Schedule(allSelected);
+        }.Schedule(allSelected, Dependency);
+        Dependency.Complete();
+
+        needUpdateUIPanelInfo = true;
     }
 
     protected override void OnUpdate()
     {
+        allSelected.CompleteDependency();
+        EntityManager.CompleteDependencyBeforeRO<SelectTag>();
+        if (needUpdateUIPanelInfo) { UpdateUIPanelInfo(); }
+
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             wasClickedOnUI = EventSystem.current.IsPointerOverGameObject();
@@ -110,6 +122,8 @@ public partial class SelectionSystem : SystemBase
                 unitStatsRqstEntity = Entity.Null;
 
             int curTeam = SystemAPI.GetSingleton<CurrentTeamComponent>().value;
+
+            needUpdateUIPanelInfo = true;
 
             if (isDragging)
             {
@@ -177,7 +191,118 @@ public partial class SelectionSystem : SystemBase
         }
     }
 
-    
+    private void UpdateUIPanelInfo()
+    {
+        needUpdateUIPanelInfo = false;
+        StaticUIRefs.Instance.UnitsUI.SetActive(!allSelected.IsEmpty);
+        if (allSelected.IsEmpty) return; 
+
+        bool isMultipleSelected = (allSelected.ToEntityArray(Allocator.Temp).Length > 1);
+
+        //List<(HashSet<bool>, Image)> diffButs = new List<(HashSet<bool>, Image)>
+        //{
+        //    (new HashSet<bool>(), NewUnitUIManager.Instance.ShootOnMoveButton),
+        //    (new HashSet<bool>(), NewUnitUIManager.Instance.ShootOffButton)
+        //};
+        HashSet<bool> diffVals_shootOnMove = new HashSet<bool>();
+        HashSet<bool> diffVals_shootOff = new HashSet<bool>();
+        HashSet<bool> diffVals_autoTrigger = new HashSet<bool>();
+
+        HashSet<bool> diffVals_baseInfBut = new HashSet<bool>();
+        HashSet<bool> diffVals_machineGunnerBut = new HashSet<bool>();
+        HashSet<bool> diffVals_antyTankBut = new HashSet<bool>();
+        HashSet<bool> diffVals_tankBut = new HashSet<bool>();
+        HashSet<bool> diffVals_artilleryBut = new HashSet<bool>();
+
+        foreach (var battleModeSets in SystemAPI.Query<BattleModeComponent>().WithAll<SelectTag>())
+        {
+            NewUnitUIManager.Instance.ShootOnMoveButton.color = battleModeSets.shootingOnMove ? Color.green : Color.red;
+            diffVals_shootOnMove.Add(battleModeSets.shootingOnMove);
+
+            NewUnitUIManager.Instance.ShootOffButton.color = battleModeSets.shootingDisabled ? Color.green : Color.red;
+            diffVals_shootOff.Add(battleModeSets.shootingDisabled);
+
+            NewUnitUIManager.Instance.AutoPursuitButton.color = battleModeSets.isAutoTrigger ? Color.green : Color.red;
+            diffVals_autoTrigger.Add(battleModeSets.isAutoTrigger);
+            AutoPursuitButtonPush autoPursuitButtonPushScript = NewUnitUIManager.Instance.AutoPursuitButton.GetComponent<AutoPursuitButtonPush>();
+            autoPursuitButtonPushScript.HidePursuitPanelPanel.SetActive(!battleModeSets.isAutoTrigger);
+
+            #region Pursuite Units Priorities update
+            
+            NewUnitUIManager.Instance.PursuiteInfantryBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.BaseInfantry) != 0 ? Color.green : Color.red;
+            diffVals_baseInfBut.Add((battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.BaseInfantry) != 0);
+            NewUnitUIManager.Instance.PursuiteMachineGunnerBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.MachineGunner) != 0 ? Color.green : Color.red;
+            diffVals_machineGunnerBut.Add((battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.MachineGunner) != 0);
+            NewUnitUIManager.Instance.PursuiteAntyTankBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.AntyTank) != 0 ? Color.green : Color.red;
+            diffVals_antyTankBut.Add((battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.AntyTank) != 0);
+            NewUnitUIManager.Instance.PursuiteTankBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Tank) != 0 ? Color.green : Color.red;
+            diffVals_tankBut.Add((battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Tank) != 0);
+            NewUnitUIManager.Instance.PursuiteArtilleryBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Artillery) != 0 ? Color.green : Color.red;
+            diffVals_artilleryBut.Add((battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Artillery) != 0);
+            //Debug.Log($"tankMultiplier = {battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Tank}");
+
+            #endregion
+        }
+
+        if (diffVals_shootOnMove.Count > 1)
+        {
+            NewUnitUIManager.Instance.ShootOnMoveButton.color = Color.white;
+            NewUnitUIManager.Instance.ShootOnMoveButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = Color.black;
+        }
+        else
+            NewUnitUIManager.Instance.ShootOnMoveButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+
+        if (diffVals_shootOff.Count > 1)
+        {
+            NewUnitUIManager.Instance.ShootOffButton.color = Color.white;
+            NewUnitUIManager.Instance.ShootOffButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = Color.black;
+        }
+        else
+            NewUnitUIManager.Instance.ShootOffButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+
+        
+        if (diffVals_autoTrigger.Count > 1)
+        {
+            NewUnitUIManager.Instance.AutoPursuitButton.color = Color.white;
+            NewUnitUIManager.Instance.AutoPursuitButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = Color.black;
+            AutoPursuitButtonPush autoPursuitButtonPushScript = NewUnitUIManager.Instance.AutoPursuitButton.GetComponent<AutoPursuitButtonPush>();
+            autoPursuitButtonPushScript.HidePursuitPanelPanel.SetActive(true);
+        }
+        else
+            NewUnitUIManager.Instance.AutoPursuitButton.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+
+        NewUnitUIManager.Instance.EnemyListBut.color = Color.red;
+        NewUnitUIManager.Instance.EnemyListBut.GetComponent<EnemyListButtonScript>().EnemyListPanel.SetActive(false);
+
+        #region Pursuite Units Priorities White update
+
+        if (diffVals_baseInfBut.Count > 1)
+        {
+            NewUnitUIManager.Instance.PursuiteInfantryBut.color = Color.white;
+        }
+        if (diffVals_machineGunnerBut.Count > 1)
+        {
+            NewUnitUIManager.Instance.PursuiteMachineGunnerBut.color = Color.white;
+        }
+        if (diffVals_antyTankBut.Count > 1)
+        {
+            NewUnitUIManager.Instance.PursuiteAntyTankBut.color = Color.white;
+        }
+        if (diffVals_tankBut.Count > 1)
+        {
+            NewUnitUIManager.Instance.PursuiteTankBut.color = Color.white;
+        }
+        if (diffVals_artilleryBut.Count > 1)
+        {
+            NewUnitUIManager.Instance.PursuiteArtilleryBut.color = Color.white;
+        }
+        //NewUnitUIManager.Instance.PursuiteMachineGunnerBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.MachineGunner) != 0 ? Color.green : Color.red;
+        //NewUnitUIManager.Instance.PursuiteAntyTankBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.AntyTank) != 0 ? Color.green : Color.red;
+        //NewUnitUIManager.Instance.PursuiteTankBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Tank) != 0 ? Color.green : Color.red;
+        //NewUnitUIManager.Instance.PursuiteArtilleryBut.color = (battleModeSets.autoTriggerUnitTypes & (uint)UnitTypes.Artillery) != 0 ? Color.green : Color.red;
+
+        #endregion
+    }
 }
 
 
@@ -279,3 +404,4 @@ public partial struct MultipleSelectJob : IJobEntity
         }
     }
 }
+

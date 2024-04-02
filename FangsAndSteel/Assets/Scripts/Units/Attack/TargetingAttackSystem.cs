@@ -473,7 +473,7 @@ public partial struct AttackTargetSearchJob : IJobEntity
             float targetHpPercentage = (hpLookup[potentialTarget].curHp / hpLookup[potentialTarget].maxHp) * 100;
 
             #region auto-trigger and radius
-            if ((modeSettings.autoTriggerMoving /*|| (modeSettings.autoTriggerStatic && (!movement.hasMoveTarget || !movement.isAbleToMove))*/) // <-- suppose autoTriggerStatic is not so useful option for player
+            if ((modeSettings.isAutoTrigger /*|| (modeSettings.autoTriggerStatic && (!movement.hasMoveTarget || !movement.isAbleToMove))*/) // <-- suppose autoTriggerStatic is not so useful option for player
                 &&
                 distanceToPotTargetSq < modeSettings.autoTriggerRadiusSq
                 &&

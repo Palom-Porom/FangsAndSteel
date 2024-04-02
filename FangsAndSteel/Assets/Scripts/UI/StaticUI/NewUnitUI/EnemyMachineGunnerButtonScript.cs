@@ -9,7 +9,8 @@ public class EnemyMachineGunnerButtonScript : MonoBehaviour
 
     public void EnemyMachineGunnerButtonClick()
     {
-        Debug.Log("Противник пулеметчик");
+        //Debug.Log("Противник пулеметчик");
+        StaticUIRefs.Instance.newPursuiteUnitType |= UnitTypes.MachineGunner;
         var x = EnemyMachineGunnerButton.GetComponent<Image>();
         if (x.color == Color.green) { x.color = Color.red; }
         else { x.color = Color.green; }

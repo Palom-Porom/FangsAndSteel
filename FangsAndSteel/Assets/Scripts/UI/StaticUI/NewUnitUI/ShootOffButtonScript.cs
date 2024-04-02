@@ -9,10 +9,13 @@ public class ShootOffButtonScript : MonoBehaviour
     Button ShootOffButton;
     public void ClickShootOffButton()
     {
-        if (ShootOffButton.image.color == Color.green)
-        { ShootOffButton.image.color = Color.red; }
-        else if (ShootOffButton.image.color == Color.red)
-        { ShootOffButton.image.color = Color.green; }
+        //if (ShootOffButton.image.color == Color.green)
+        //{ 
+        //    ShootOffButton.image.color = Color.red;
+        //}
+        //else if (ShootOffButton.image.color == Color.red)
+        //{ ShootOffButton.image.color = Color.green; }
+        StaticUIRefs.Instance.shootOffBut = true;
     }
     private void Awake()
     {

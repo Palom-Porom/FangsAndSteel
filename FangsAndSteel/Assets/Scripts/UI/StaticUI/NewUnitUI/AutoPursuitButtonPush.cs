@@ -11,17 +11,21 @@ public class AutoPursuitButtonPush : MonoBehaviour
     public Button EnemyListButton;
     public void ActivateAutoPursuit()
     {
-        if (AutoPursuitButton.image.color == Color.green)
-        { AutoPursuitButton.image.color = Color.red; }
-        else if (AutoPursuitButton.image.color == Color.red)
-        {AutoPursuitButton.image.color = Color.green; }
+        //if (StaticUIRefs.Instance.TurnIndicator.color == Color.green) return;
 
-        HidePursuitPanelPanel.SetActive(!HidePursuitPanelPanel.activeSelf);
-        if (EnemyListPanel.activeSelf) 
-        { 
-            EnemyListPanel.SetActive(false);
-            EnemyListButton.image.color = Color.red; 
-        }
+        //if (AutoPursuitButton.image.color == Color.green)
+        //{ AutoPursuitButton.image.color = Color.red; }
+        //else if (AutoPursuitButton.image.color == Color.red)
+        //{AutoPursuitButton.image.color = Color.green; }
+
+        //HidePursuitPanelPanel.SetActive(!HidePursuitPanelPanel.activeSelf);
+        //if (EnemyListPanel.activeSelf) 
+        //{ 
+        //    EnemyListPanel.SetActive(false);
+        //    EnemyListButton.image.color = Color.red; 
+        //}
+
+        StaticUIRefs.Instance.autoPursuitBut = true;
     }
 
     private void Awake()

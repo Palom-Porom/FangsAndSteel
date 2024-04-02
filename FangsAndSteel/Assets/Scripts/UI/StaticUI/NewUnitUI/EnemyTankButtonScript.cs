@@ -9,7 +9,8 @@ public class EnemyTankButtonScript : MonoBehaviour
 
     public void EnemyTankButtonClick()
     {
-        Debug.Log("Противник танк");
+        //Debug.Log("Противник танк");
+        StaticUIRefs.Instance.newPursuiteUnitType |= UnitTypes.Tank;
         var x = EnemyTankButton.GetComponent<Image>();
         if (x.color == Color.green) { x.color = Color.red; }
         else { x.color = Color.green; }

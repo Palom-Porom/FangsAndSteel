@@ -26,8 +26,21 @@ public partial class StaticUISystem : SystemBase
         StaticUIRefs.Instance.stopMoveBut = false;
 
         
-        uiData.ValueRW.shootModeBut = StaticUIRefs.Instance.shootModeBut;
-        StaticUIRefs.Instance.shootModeBut = false;
+        uiData.ValueRW.shootOnMoveBut = StaticUIRefs.Instance.shootOnMoveBut;
+        StaticUIRefs.Instance.shootOnMoveBut = false;
+
+        uiData.ValueRW.shootOffBut = StaticUIRefs.Instance.shootOffBut;
+        StaticUIRefs.Instance.shootOffBut = false;
+
+        uiData.ValueRW.autoPursuitBut = StaticUIRefs.Instance.autoPursuitBut;
+        StaticUIRefs.Instance.autoPursuitBut = false;
+        
+        uiData.ValueRW.enemyListBut = StaticUIRefs.Instance.enemyListBut;
+        StaticUIRefs.Instance.enemyListBut = false;
+
+        uiData.ValueRW.newPursuiteUnitType = StaticUIRefs.Instance.newPursuiteUnitType;
+        StaticUIRefs.Instance.newPursuiteUnitType = 0;
+
 
         uiData.ValueRW.newTurnStartBut = StaticUIRefs.Instance.newTurnStartBut;
         StaticUIRefs.Instance.newTurnStartBut = false;
@@ -39,7 +52,13 @@ public struct StaticUIData : IComponentData
 {
     public bool endTurnBut;
     public bool stopMoveBut;
-    public bool shootModeBut;
+
+
+    public bool shootOnMoveBut;
+    public bool shootOffBut;
+    public bool autoPursuitBut;
+    public bool enemyListBut;
+    public UnitTypes newPursuiteUnitType;
 
     public bool newTurnStartBut;
 }

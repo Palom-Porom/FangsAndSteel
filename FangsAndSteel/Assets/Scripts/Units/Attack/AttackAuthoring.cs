@@ -57,7 +57,7 @@ public class AttackAuthoring : MonoBehaviour
                 shootingDisabled = false,
                 shootingOnMove = false,
                 
-                autoTriggerMoving = false,
+                isAutoTrigger = false,
                 autoTriggerRadiusSq = authoring.attackRadius,
                 autoTriggerMaxHpPercent = 100
             });
@@ -149,7 +149,7 @@ public struct BattleModeComponent : IComponentData, IEnableableComponent
     ///<value> Is auto-trigger enabled when unit is not moving </value>
     //public bool autoTriggerStatic; <-- suppose it is not so useful option for player 
     ///<value> Is auto-trigger enabled when unit is moving </value>
-    public bool autoTriggerMoving;
+    public bool isAutoTrigger;
     ///<value> Radius in which auto-trigger will work </value>
     public float autoTriggerRadiusSq;
     ///<value> Max percentage (0 to 1) of Hp which target can have for auto-trigger to work </value>
@@ -160,7 +160,7 @@ public struct BattleModeComponent : IComponentData, IEnableableComponent
 
 
 ///<summary> One of units ActionModes </summary>
-///<remarks> Represents the state of pusuing some particular target </remarks>
+///<remarks> Represents the state of pursuing some particular target </remarks>
 public struct PursuingModeComponent : IComponentData, IEnableableComponent
 {
     /// <summary> Target which is pursued </summary>
