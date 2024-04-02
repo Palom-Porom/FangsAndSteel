@@ -22,6 +22,7 @@ using Unity.Entities.UniversalDelegates;
 public partial struct MovementSystem : ISystem, ISystemStartStop
 {
     ComponentLookup<LocalTransform> transformLookup;
+    ComponentLookup<NotRotateAttackModelTag> notRotateLookup;
     
     ComponentLookup<AnimationCmdData> animCmdLookup;
     ComponentLookup<AnimationStateData> animStateLookup;
@@ -48,6 +49,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
         animCmdLookup = state.GetComponentLookup<AnimationCmdData>();
         animStateLookup = state.GetComponentLookup<AnimationStateData>();
+        notRotateLookup = state.GetComponentLookup<NotRotateAttackModelTag>(true);
 
         movementQuery = new EntityQueryBuilder(Allocator.Temp).
             WithAllRW<MovementComponent, LocalTransform>().
@@ -88,6 +90,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
         animCmdLookup.Update(ref state);
         animStateLookup.Update(ref state);
+        notRotateLookup.Update(ref state);
 
         transformTypeHandle.Update(ref state);
         movementTypeHandle.Update(ref state);
@@ -141,7 +144,8 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
         JobHandle attackRotationJobHandle = new AttackRotationJob 
         {
             deltaTime = SystemAPI.Time.DeltaTime,
-            transformLookup = transformLookup
+            transformLookup = transformLookup,
+            notRotateLookup = notRotateLookup
         }.Schedule(movementJobHandle); // Be careful changing these parallel jobs
 
         
@@ -534,6 +538,7 @@ public partial struct AttackRotationJob : IJobEntity
     public float deltaTime;
     [NativeDisableContainerSafetyRestriction]
     public ComponentLookup<LocalTransform> transformLookup;
+    [ReadOnly] public ComponentLookup<NotRotateAttackModelTag> notRotateLookup;
 
     public void Execute(ref AttackRotationComponent rotation, in DynamicBuffer<AttackModelsBuffer> attackModelsBuf, in AttackCharsComponent attackChars,
         in ReloadComponent reload, in LocalToWorld localToWorld, Entity entity)
@@ -568,6 +573,8 @@ public partial struct AttackRotationJob : IJobEntity
                     rotation.newRotTarget = quaternion.identity;
                     rotation.isRotatingToDefault = true;
                 }
+                else
+                    return;
             }
         }
         #endregion
@@ -580,12 +587,18 @@ public partial struct AttackRotationJob : IJobEntity
                 rotation.rotTimeElapsed += deltaTime;
                 quaternion resultRotation = math.nlerp(rotation.initialRotation, rotation.newRotTarget, rotation.rotTimeElapsed / rotation.rotTime);
                 foreach (var model in attackModelsBuf)
+                {
+                    if (notRotateLookup.HasComponent(model)) continue;
                     transformLookup.GetRefRW(model).ValueRW.Rotation = resultRotation;
+                }
             }
             else
             {
                 foreach (var model in attackModelsBuf)
+                {
+                    if (notRotateLookup.HasComponent(model)) continue;
                     transformLookup.GetRefRW(model).ValueRW.Rotation = rotation.newRotTarget;
+                }
                 if (rotation.isRotatingToDefault)
                 {
                     rotation.isRotatingToDefault = false;
@@ -600,7 +613,10 @@ public partial struct AttackRotationJob : IJobEntity
             rotation.curRotTarget = rotation.newRotTarget;
             quaternion resultRotation = math.nlerp(rotation.initialRotation, rotation.newRotTarget, deltaTime / rotation.rotTime);
             foreach (var model in attackModelsBuf)
+            {
+                if (notRotateLookup.HasComponent(model)) continue;
                 transformLookup.GetRefRW(model).ValueRW.Rotation = resultRotation;
+            }
         }
         #endregion
     }

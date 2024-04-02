@@ -234,7 +234,7 @@ MonoBehaviour:
   attackModels:
   - {fileID: 5892261436265124802}
   - {fileID: 2435601993070747537}
-  attackRotationTime: 0.22
+  attackRotationTime: 0.5
   timeToReturnRot: 1
 --- !u!114 &6532649445277054896
 MonoBehaviour:
@@ -422,6 +422,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5201341880530389858}
+    - targetCorrespondingSourceObject: {fileID: 2247940967027340266, guid: fff9b2f2e3971df439de3b7351dbbac2,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8671504547771996828}
   m_SourcePrefab: {fileID: 100100000, guid: fff9b2f2e3971df439de3b7351dbbac2, type: 3}
 --- !u!1 &2435601993070747537 stripped
 GameObject:
@@ -439,6 +443,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe1ca40331fb767489d4e1ad1353acff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8671504547771996828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2435601993070747537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfcc2cd806d290e4f842861671b2357c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &7732719515380777439 stripped
