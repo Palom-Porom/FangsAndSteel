@@ -218,6 +218,7 @@ public partial class SelectionSystem : SystemBase
         HashSet<float> diffVals_pursuiteMaxHp = new HashSet<float>();
         HashSet<float> diffVals_pursuiteEndRadius = new HashSet<float>();
         HashSet<float> diffVals_pursuiteMaxAttackDist = new HashSet<float>();
+        HashSet<float> diffVals_pursuiteTimeForEnd = new HashSet<float>();
 
         //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, PursuingModeComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
         //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, PursuingModeComponent, SelectTag>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
@@ -297,6 +298,10 @@ public partial class SelectionSystem : SystemBase
             }
 
             #endregion
+
+            NewUnitUIManager.Instance.PursuiteTimeForEndField.GetComponent<TimeForEndPursuitInput>().isCosmeticChangeOfValue = true;
+            NewUnitUIManager.Instance.PursuiteTimeForEndField.text = ((int)pursueModeSets.dropTime).ToString();
+            diffVals_pursuiteTimeForEnd.Add((int)pursueModeSets.dropTime);
         }
 
         //int i = 0;
@@ -395,6 +400,13 @@ public partial class SelectionSystem : SystemBase
             //Debug.Log("Entered");
             //NewUnitUIManager.Instance.PursuiteRadiusSlider.value = 0;
             NewUnitUIManager.Instance.PursuiteMaxAttackDistSliderText.text = "Разн.";
+        }
+
+        if (diffVals_pursuiteTimeForEnd.Count > 1)
+        {
+            //Debug.Log("Entered");
+            //NewUnitUIManager.Instance.PursuiteRadiusSlider.value = 0;
+            NewUnitUIManager.Instance.PursuiteTimeForEndField.text = "Разн.";
         }
 
         #endregion

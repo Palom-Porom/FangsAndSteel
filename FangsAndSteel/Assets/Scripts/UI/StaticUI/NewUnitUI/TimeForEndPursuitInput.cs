@@ -1,25 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class TimeForEndPursuitInput : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private int input;
+    private TMP_InputField inputField;
+    public bool isCosmeticChangeOfValue = false;
+
+    private void Awake()
     {
-        
+        inputField = GetComponent<TMP_InputField>();    
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    private string input;
     public void ReadTimeInput(string s)
     {
-        input = s;
-        Debug.Log(input);
+        //Debug.Log(inputField.text);
+        //Debug.Log(s);
+        if (int.TryParse(s, out input) && input < 100000 && input > 0)
+        {
+            //if (isCosmeticChangeOfValue) { isCosmeticChangeOfValue = false; return; }
+            //StaticUIRefs.Instance.newPursuitTimeForEnd = input;
+            //Debug.Log("1");
+        }
+        else
+        {
+            //Debug.Log("2");
+            inputField.text = "1";
+            input = 1;
+        }
+        //Debug.Log(input);
+        //if (isCosmeticChangeOfValue) { isCosmeticChangeOfValue = false; return; }
+        StaticUIRefs.Instance.newPursuitTimeForEnd = input;
+        //Debug.Log(StaticUIRefs.Instance.newPursuitTimeForEnd);
+
+        //Debug.Log(input);
     }
 }
 

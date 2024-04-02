@@ -93,6 +93,11 @@ public partial class BasicButtonSystem : SystemBase
             new ChangeAutoTriggerMinAttackDistJob { newValue = uiData.newPursuitMinAttackRadius }.Schedule();
         }
         #endregion
+        if (uiData.newPursuitTimeForEnd != -1)
+        {
+            //Debug.Log(uiData.newPursuitTimeForEnd);
+            new ChangeAutoTriggerTimeForEndJob { newValue = uiData.newPursuitTimeForEnd }.Schedule();
+        }
     }
 
     private void UpdateButColor(Image but)
@@ -242,6 +247,21 @@ public partial struct ChangeAutoTriggerMinAttackDistJob : IJobEntity
 }
 
 #endregion
+
+[WithAll(typeof(SelectTag))]
+[WithOptions(EntityQueryOptions.IgnoreComponentEnabledState)]
+public partial struct ChangeAutoTriggerTimeForEndJob : IJobEntity
+{
+    public float newValue;
+
+    public void Execute(ref PursuingModeComponent pursuingModeSettings, EnabledRefRO<SelectTag> selectTag)
+    {
+        //Debug.Log(selectTag.ValueRO);
+        if (!selectTag.ValueRO) return;
+
+        pursuingModeSettings.dropTime = newValue;
+    }
+}
 
 public struct ShootModeButChangeColorRqst : IComponentData
 {

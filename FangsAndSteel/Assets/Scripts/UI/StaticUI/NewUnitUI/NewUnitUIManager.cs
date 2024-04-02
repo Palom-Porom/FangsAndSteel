@@ -55,6 +55,9 @@ public class NewUnitUIManager : MonoBehaviour
 
     #endregion
 
+    public TMP_InputField PursuiteTimeForEndField { get { return pursuiteTimeForEndField; } }
+    [SerializeField] private TMP_InputField pursuiteTimeForEndField;
+
     void Awake()
     {
         Instance = this;

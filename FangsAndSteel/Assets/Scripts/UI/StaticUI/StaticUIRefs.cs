@@ -66,6 +66,7 @@ public class StaticUIRefs : MonoBehaviour
     [HideInInspector] public float newPursuitmaxHp;
     [HideInInspector] public float newPursuitEndRadius;
     [HideInInspector] public float newPursuitMinAttackRadius;
+    [HideInInspector] public float newPursuitTimeForEnd;
 
 
     [HideInInspector] public bool newTurnStartBut;

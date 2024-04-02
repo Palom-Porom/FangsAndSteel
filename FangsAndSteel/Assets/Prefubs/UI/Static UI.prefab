@@ -2860,6 +2860,7 @@ GameObject:
   - component: {fileID: 3945561322441164537}
   - component: {fileID: 2805709384202710989}
   - component: {fileID: 7603536168568175515}
+  - component: {fileID: 5683296312779329341}
   m_Layer: 5
   m_Name: TimeEndPursuitInput
   m_TagString: Untagged
@@ -2882,10 +2883,10 @@ RectTransform:
   - {fileID: 7966869426518520866}
   m_Father: {fileID: 2599763739146726444}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.934, y: 0.29900002}
-  m_AnchorMax: {x: 0.99575436, y: 0.4145916}
-  m_AnchoredPosition: {x: 0.3217163, y: 0.18999863}
-  m_SizeDelta: {x: -0.07670021, y: -0.5882001}
+  m_AnchorMin: {x: 0.82853055, y: 0.22766922}
+  m_AnchorMax: {x: 0.96364725, y: 0.4145916}
+  m_AnchoredPosition: {x: 0.000030517578, y: -0.6025009}
+  m_SizeDelta: {x: -1.6861, y: -1.2049999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3945561322441164537
 CanvasRenderer:
@@ -2987,7 +2988,7 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3954037837594954584}
+      - m_Target: {fileID: 5683296312779329341}
         m_TargetAssemblyTypeName: TimeForEndPursuitInput, Assembly-CSharp
         m_MethodName: ReadTimeInput
         m_Mode: 0
@@ -3035,6 +3036,19 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
+--- !u!114 &5683296312779329341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684661769981711244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a93a892d90e80e46a2587c9957342c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isCosmeticChangeOfValue: 0
 --- !u!1 &738304709998356593
 GameObject:
   m_ObjectHideFlags: 0
@@ -3488,6 +3502,7 @@ MonoBehaviour:
   newPursuitmaxHp: 0
   newPursuitEndRadius: 0
   newPursuitMinAttackRadius: 0
+  newPursuitTimeForEnd: 0
   newTurnStartBut: 0
 --- !u!114 &5427605767883339875
 MonoBehaviour:
@@ -3927,7 +3942,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -0.264}
   m_AnchorMin: {x: 0.32646, y: 0.75000006}
   m_AnchorMax: {x: 0.70154005, y: 0.9335277}
-  m_AnchoredPosition: {x: 0.19999695, y: 0.29999924}
+  m_AnchoredPosition: {x: 0.19999695, y: 0.30000305}
   m_SizeDelta: {x: -0.15380096, y: -0.17379999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3308865945443691690
@@ -4229,7 +4244,7 @@ GameObject:
   - component: {fileID: 3884478121737954406}
   - component: {fileID: 3095480588610071864}
   m_Layer: 5
-  m_Name: AttackDistSliderText
+  m_Name: AttackDistTextSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6835,10 +6850,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2599763739146726444}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.8143391, y: 0.22766224}
-  m_AnchorMax: {x: 0.934, y: 0.45853466}
-  m_AnchoredPosition: {x: 0.08200073, y: -0.0809021}
-  m_SizeDelta: {x: 0.36400032, y: -0.16180992}
+  m_AnchorMin: {x: 0.80629444, y: 0.45847237}
+  m_AnchorMax: {x: 0.9954656, y: 0.68236184}
+  m_AnchoredPosition: {x: 0.24035645, y: -0.5}
+  m_SizeDelta: {x: 3.6511, y: 0.8382}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3356338318909287521
 CanvasRenderer:
@@ -6896,11 +6911,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 13
+  m_fontSize: 18.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 13
+  m_fontSizeMin: 7
   m_fontSizeMax: 20
   m_fontStyle: 0
   m_HorizontalAlignment: 1
@@ -6932,7 +6947,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0.22511578}
+  m_margin: {x: 0, y: 0, z: 0.372364, w: 0.22511578}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -7429,7 +7444,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.16100001, y: 0.28}
   m_AnchorMax: {x: 0.2415208, y: 0.305}
-  m_AnchoredPosition: {x: 1, y: 1.7998962}
+  m_AnchoredPosition: {x: 1, y: 1.7998657}
   m_SizeDelta: {x: 4, y: 3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7429860464497071761
@@ -10523,7 +10538,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 11.55
+  m_fontSize: 22.65
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12852,8 +12867,9 @@ MonoBehaviour:
   pursuiteMaxHpSliderText: {fileID: 6377828347051096783}
   pursuiteEndRadiusSlider: {fileID: 1132716941685995612}
   pursuiteEndRadiusSliderText: {fileID: 2236278422259358640}
-  pursuiteMinAttackDistSlider: {fileID: 5723312065713890682}
-  pursuiteMinAttackDistSliderText: {fileID: 3095480588610071864}
+  pursuiteMaxAttackDistSlider: {fileID: 5723312065713890682}
+  pursuiteMaxAttackDistSliderText: {fileID: 3095480588610071864}
+  pursuiteTimeForEndField: {fileID: 7603536168568175515}
 --- !u!1 &4496243129089103536
 GameObject:
   m_ObjectHideFlags: 0
@@ -13224,7 +13240,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.5}
+  m_AnchoredPosition: {x: 0, y: -0.50000095}
   m_SizeDelta: {x: -20, y: -13}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4579056362277314651
@@ -19616,7 +19632,6 @@ GameObject:
   - component: {fileID: 2599763739146726444}
   - component: {fileID: 6423711957099344913}
   - component: {fileID: 1981230295292926075}
-  - component: {fileID: 3954037837594954584}
   m_Layer: 5
   m_Name: PursuitPanel
   m_TagString: Untagged
@@ -19701,18 +19716,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3954037837594954584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6825089819843955483}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a93a892d90e80e46a2587c9957342c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6848558972493730559
 GameObject:
   m_ObjectHideFlags: 0

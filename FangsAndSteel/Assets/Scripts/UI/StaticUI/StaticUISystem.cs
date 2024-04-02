@@ -41,6 +41,7 @@ public partial class StaticUISystem : SystemBase
         uiData.ValueRW.newPursuiteUnitType = StaticUIRefs.Instance.newPursuiteUnitType;
         StaticUIRefs.Instance.newPursuiteUnitType = 0;
 
+
         #region Sliders
         uiData.ValueRW.newPursuitStartRadius = StaticUIRefs.Instance.newPursuitStartRadius;
         StaticUIRefs.Instance.newPursuitStartRadius = -1;
@@ -55,6 +56,10 @@ public partial class StaticUISystem : SystemBase
         StaticUIRefs.Instance.newPursuitMinAttackRadius = -1;
         #endregion
 
+        uiData.ValueRW.newPursuitTimeForEnd = StaticUIRefs.Instance.newPursuitTimeForEnd;
+        //if (StaticUIRefs.Instance.newPursuitTimeForEnd != -1)
+        //    Debug.Log($"{StaticUIRefs.Instance.newPursuitTimeForEnd} ===> {uiData.ValueRO.newPursuitTimeForEnd}");
+        StaticUIRefs.Instance.newPursuitTimeForEnd = -1;
 
 
         uiData.ValueRW.newTurnStartBut = StaticUIRefs.Instance.newTurnStartBut;
@@ -78,6 +83,7 @@ public struct StaticUIData : IComponentData
     public float newPursuitmaxHp;
     public float newPursuitEndRadius;
     public float newPursuitMinAttackRadius;
+    public float newPursuitTimeForEnd;
 
     public bool newTurnStartBut;
 }
