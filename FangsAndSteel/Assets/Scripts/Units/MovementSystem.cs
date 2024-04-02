@@ -18,7 +18,7 @@ using Unity.Burst.Intrinsics;
 using Unity.Entities.UniversalDelegates;
 
 [UpdateInGroup(typeof(UnitsSystemGroup))]
-[BurstCompile]
+//[BurstCompile]
 public partial struct MovementSystem : ISystem, ISystemStartStop
 {
     ComponentLookup<LocalTransform> transformLookup;
@@ -37,7 +37,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
     ComponentTypeHandle<VehicleMovementComponent> vehicleTypeHandle;
 
-    [BurstCompile]
+    //[BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PhysicsWorldSingleton>();
@@ -81,7 +81,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
         
     }
 
-    [BurstCompile]
+    //[BurstCompile]
     public void OnUpdate(ref SystemState state) 
     {
         transformLookup.Update(ref state);
@@ -157,7 +157,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 /// <summary>
 /// Moves all entities with MovementComponent to their target over the terrain
 /// </summary>
-//[BurstCompile]
+////[BurstCompile]
 //public partial struct MovementJob : IJobEntity
 //{
 //    public float deltaTime;
@@ -230,7 +230,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
 
 
-[BurstCompile]
+//[BurstCompile]
 public partial struct MovementJob : IJobChunk
 {
     public float deltaTime;
@@ -535,10 +535,20 @@ public partial struct AttackRotationJob : IJobEntity
     [NativeDisableContainerSafetyRestriction]
     public ComponentLookup<LocalTransform> transformLookup;
 
-    public void Execute(ref AttackRotationComponent rotation, in DynamicBuffer<AttackModelsBuffer> attackModelsBuf, in AttackCharsComponent attackChars, in LocalToWorld localToWorld)
+    public void Execute(ref AttackRotationComponent rotation, in DynamicBuffer<AttackModelsBuffer> attackModelsBuf, in AttackCharsComponent attackChars,
+        in ReloadComponent reload, in LocalToWorld localToWorld, Entity entity)
     {
         #region Update target and handle automatic return to default rotation
-        if (attackChars.target != Entity.Null)
+        if (reload.isReloading())
+        {
+            if (!rotation.isRotatingToDefault)
+            {
+                //rotation.newRotTarget = quaternion.LookRotationSafe(localToWorld.Forward, localToWorld.Up);
+                rotation.newRotTarget = quaternion.identity;
+                rotation.isRotatingToDefault = true;
+            }
+        }
+        else if (attackChars.target != Entity.Null)
         {
             rotation.newRotTarget = quaternion.LookRotationSafe(transformLookup[attackChars.target].Position - localToWorld.Position, localToWorld.Up);
             rotation.isInDefaultState = false;
@@ -553,7 +563,11 @@ public partial struct AttackRotationJob : IJobEntity
             {
                 rotation.noRotTimeElapsed += deltaTime;
                 if (rotation.noRotTimeElapsed >= rotation.timeToReturnRot)
+                {
+                    //rotation.newRotTarget = quaternion.LookRotationSafe(localToWorld.Forward, localToWorld.Up);
+                    rotation.newRotTarget = quaternion.identity;
                     rotation.isRotatingToDefault = true;
+                }
             }
         }
         #endregion
@@ -564,14 +578,19 @@ public partial struct AttackRotationJob : IJobEntity
             if (rotation.rotTimeElapsed < rotation.rotTime)
             {
                 rotation.rotTimeElapsed += deltaTime;
-                quaternion resultRotation = math.nlerp(rotation.initialRotation, rotation.newRotTarget, deltaTime / rotation.rotTime);
+                quaternion resultRotation = math.nlerp(rotation.initialRotation, rotation.newRotTarget, rotation.rotTimeElapsed / rotation.rotTime);
                 foreach (var model in attackModelsBuf)
                     transformLookup.GetRefRW(model).ValueRW.Rotation = resultRotation;
             }
-            else if (rotation.isRotatingToDefault)
+            else
             {
-                rotation.isRotatingToDefault = false;
-                rotation.isInDefaultState = true;
+                foreach (var model in attackModelsBuf)
+                    transformLookup.GetRefRW(model).ValueRW.Rotation = rotation.newRotTarget;
+                if (rotation.isRotatingToDefault)
+                {
+                    rotation.isRotatingToDefault = false;
+                    rotation.isInDefaultState = true;
+                }
             }
         }
         else

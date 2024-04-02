@@ -1,0 +1,25 @@
+Model: FirstRobot Blue
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone
+   6fps, 512x256, 2097KB
+     0 Armature|Armature|Armature|Rest : 1,6667s 10f [0..9]
+     1 Armature|Armature|Armature|Movement : 1,6667s 10f [10..19]
+     2 Armature|Armature|Armature|Atack : 1,3333s 8f [20..27]
+     3 Armature|Armature|Armature|Recharge : 1,6667s 10f [28..37]
+     4 Armature|Armature|Armature|Death_1 : 1,6667s 10f [38..47]
+     5 Armature|Armature|Armature|Death_2 : 1,1667s 7f [48..54]
+   Frame Count> Expected: 55, Actual: 55
+   Point Count> Expected: 118487, Actual: 118487
+   Fill ratio: 90,625%.
+   6 clips, 6fps, 9,1667s, 55f
+Started: 4/2/2024 6:46:39 PM
+Output files were saved to: Assets/ExampleScene/Baked\FirstRobot Blue
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 7,6558 seconds.

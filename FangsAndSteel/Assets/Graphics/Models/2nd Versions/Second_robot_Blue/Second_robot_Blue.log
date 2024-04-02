@@ -1,0 +1,28 @@
+Model: Second_robot_Blue
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.009
+   4fps, 512x512, 4194KB
+     0 Armature.001|BM2_Rest : 0s 0f [0..-1]
+     1 Armature.001|BM2_Movement : 1,5s 6f [0..5]
+     2 Armature.001|BM2_Atack : 0s 0f [6..5]
+     3 Armature.001|BM2_Die : 2,5s 10f [6..15]
+     4 Armature.001|BM2_Lie_Down : 1,75s 7f [16..22]
+     5 Armature.001|BM2_Lie  : 0s 0f [23..22]
+     6 Armature.001|BM2_Lie_Die : 1,75s 7f [23..29]
+     7 Armature.001|BM2_Stand_Up : 2,5s 10f [30..39]
+     8 Armature.001|BM2_Recharge : 5s 20f [40..59]
+   Frame Count> Expected: 60, Actual: 60
+   Point Count> Expected: 195992, Actual: 195992
+   Fill ratio: 74,80469%.
+   9 clips, 4fps, 15s, 60f
+Started: 4/2/2024 6:38:29 PM
+Output files were saved to: Assets/ExampleScene/Baked\Second_robot_Blue
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 16,0391 seconds.

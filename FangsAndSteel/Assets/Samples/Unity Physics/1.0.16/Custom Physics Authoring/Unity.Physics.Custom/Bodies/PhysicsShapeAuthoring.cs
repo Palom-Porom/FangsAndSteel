@@ -820,7 +820,7 @@ namespace Unity.Physics.Authoring
             }
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         struct BakePointsJob : IJobParallelFor
         {
             [Collections.ReadOnly]

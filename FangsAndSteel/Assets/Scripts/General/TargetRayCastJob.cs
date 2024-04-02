@@ -11,7 +11,7 @@ using RaycastHit = Unity.Physics.RaycastHit;
 /// <summary>
 /// Raycasts with given RaycastInput and puts the result in the NativeReference<RaycastResult>
 /// </summary>
-[BurstCompile]
+//[BurstCompile]
 public partial struct TargetRayCastJob : IJob
 {
     [ReadOnly]
@@ -19,7 +19,7 @@ public partial struct TargetRayCastJob : IJob
     public RaycastInput raycastInput;
     public NativeReference<RaycastResult> raycastResult;
 
-    //[BurstCompile] - for jobs` execution method that is not needed, as this method is automatically bursted if Job is bursted
+    ////[BurstCompile] - for jobs` execution method that is not needed, as this method is automatically bursted if Job is bursted
     public void Execute()
     {
         bool hasHitTemp = collisionWorld.CastRay(raycastInput, out RaycastHit raycastHit);

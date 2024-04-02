@@ -14,7 +14,7 @@ using Unity.Burst;
 namespace AnimCooker
 {
     
-    [BurstCompile]
+    //[BurstCompile]
     public partial struct AnimationJob : IJobEntity
     {
         public float DeltaTime;
@@ -78,7 +78,7 @@ namespace AnimCooker
     }
 
     [RequireMatchingQueriesForUpdate]
-    [BurstCompile]
+    //[BurstCompile]
     public partial struct AnimationSystem : ISystem
     {
         void OnCreate(ref SystemState state)
@@ -86,7 +86,7 @@ namespace AnimCooker
             state.RequireForUpdate<AnimDbRefData>();
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         void OnUpdate(ref SystemState state)
         {
             AnimationJob job = new AnimationJob();

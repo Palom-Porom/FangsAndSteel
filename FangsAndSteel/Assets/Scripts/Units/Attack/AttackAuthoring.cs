@@ -100,7 +100,7 @@ public struct AttackCharsComponent : IComponentData
 
 
 ///<summary> Info about "bullets" and reload status of unit </summary>>
-[BurstCompile]
+//[BurstCompile]
 public struct ReloadComponent : IComponentData
 {
     /// <value> Max "bullets" amount in a Drum </value>
@@ -133,6 +133,7 @@ public struct ReloadComponent : IComponentData
 
     ///<value> If true then unit is ready to fire </value>
     public bool isReloaded() { return curBullets > 0 && bulletReloadElapsed >= bulletReloadLen; }
+    public bool isReloading() { return !isReloaded() && shootAnimElapsed >= shootAnimLen; }
 }
 
 

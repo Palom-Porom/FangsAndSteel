@@ -1,0 +1,28 @@
+Model: Second_robot_1
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.009
+   19fps, 1024x1024, 16777KB
+     0 MG2_Rest : 0,1579s 3f [0..2]
+     1 MG2_Move : 1,6316s 31f [3..33]
+     2 MG2_Atack : 0,1579s 3f [34..36]
+     3 MG2_Die : 2,6316s 50f [37..86]
+     4 MG2_Lie_Down : 1,7368s 33f [87..119]
+     5 MG2_Lie  : 0,1579s 3f [120..122]
+     6 MG2_Lie_Die : 1,7368s 33f [123..155]
+     7 MG2_Stand_Up : 2,6316s 50f [156..205]
+     8 MG2_Recharge : 5,1579s 98f [206..303]
+   Frame Count> Expected: 304, Actual: 304
+   Point Count> Expected: 991456, Actual: 991456
+   Fill ratio: 94,62891%.
+   9 clips, 19fps, 16s, 304f
+Started: 4/2/2024 9:01:39 PM
+Output files were saved to: Assets/ExampleScene/Baked\Second_robot_1
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 87,8181 seconds.

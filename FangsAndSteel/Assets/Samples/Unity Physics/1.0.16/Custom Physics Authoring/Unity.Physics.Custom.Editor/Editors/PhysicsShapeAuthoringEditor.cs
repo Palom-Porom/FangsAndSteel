@@ -185,7 +185,7 @@ namespace Unity.Physics.Editor
 
         class PreviewMeshData : IDisposable
         {
-            [BurstCompile]
+            //[BurstCompile]
             struct CreateTempHullJob : IJob
             {
                 public ConvexHullGenerationParameters GenerationParameters;
@@ -197,7 +197,7 @@ namespace Unity.Physics.Editor
                 public void Execute() => Output[0] = ConvexCollider.Create(Points, GenerationParameters, CollisionFilter.Default);
             }
 
-            [BurstCompile]
+            //[BurstCompile]
             struct CreateTempMeshJob : IJob
             {
                 [ReadOnly]

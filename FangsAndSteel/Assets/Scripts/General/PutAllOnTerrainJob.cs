@@ -12,7 +12,7 @@ using Unity.Mathematics;
 /// <summary>
 /// Putting all entities with movementComponent on terrain (by adopting position and rotation) without moving it
 /// </summary>
-[BurstCompile]
+//[BurstCompile]
 public partial struct PutAllOnTerrainJob : IJobEntity
 {
     [ReadOnly] public CollisionWorld collisionWorld;

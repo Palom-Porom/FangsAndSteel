@@ -12,7 +12,7 @@ using Unity.Burst.Intrinsics;
 
 [UpdateInGroup(typeof(ControlsSystemGroup), OrderFirst = true)]
 [UpdateAfter(typeof(ControlSystem))]
-[BurstCompile]
+//[BurstCompile]
 public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 {
     private InputData inputData;
@@ -29,7 +29,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
     BufferTypeHandle<MovementCommandsBuffer> moveComsBuffTypeHandle;
     BufferTypeHandle<ModelsBuffer> modelsBuffsTypeHandle;
 
-    [BurstCompile]
+    //[BurstCompile]
     public void OnCreate (ref SystemState state)
     {
         state.RequireForUpdate<GameTag>();
@@ -55,19 +55,19 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
         modelsBuffsTypeHandle = SystemAPI.GetBufferTypeHandle<ModelsBuffer>(true);
     }
 
-    [BurstCompile]
+    //[BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
         new PutAllOnTerrainJob { collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld }.Schedule();
-        moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Movement");
+        moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Move");
     }
 
-    [BurstCompile]
+    //[BurstCompile]
     public void OnStopRunning(ref SystemState state)
     {
     }
 
-    [BurstCompile]
+    //[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         inputData = SystemAPI.GetSingleton<InputData>();
@@ -129,7 +129,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 
 
 ///<summary> Changes targets for all selected units if raycast of new target was succesfull </summary>
-[BurstCompile]
+////[BurstCompile]
 public partial struct _ChangeTargetJob : IJobChunk
 {
     [ReadOnly]
@@ -197,6 +197,9 @@ public partial struct _ChangeTargetJob : IJobChunk
                         {
                             RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
                             animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
+                            Debug.Log(animStateLookup[modelBufElem.model].ModelIndex);
+                            Debug.Log(moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipName);
+                            Debug.Log(moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex);
                             animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
                         }
                     }

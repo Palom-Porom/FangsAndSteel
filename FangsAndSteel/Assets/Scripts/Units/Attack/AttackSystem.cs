@@ -11,7 +11,7 @@ using Unity.Mathematics;
 //All attacks are processed with a latency in 1 frame. May be there is a better solution?..
 [UpdateInGroup(typeof(UnitsSystemGroup))]
 [UpdateAfter(typeof(TargetingAttackSystem))]
-[BurstCompile]
+//[BurstCompile]
 public partial struct AttackSystem : ISystem, ISystemStartStop
 {
     ComponentLookup<HpComponent> hpLookup;
@@ -25,7 +25,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     BufferLookup<ModelsBuffer> modelBufLookup;
     NativeArray<AnimDbEntry> deathClips;
 
-    [BurstCompile]
+    //[BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<AttackRequestComponent>();
@@ -52,7 +52,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         
     }
 
-    [BurstCompile]
+    //[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         hpLookup.Update(ref state);
@@ -86,7 +86,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     }
 }
 
-//[BurstCompile]
+////[BurstCompile]
 public partial struct DealingDamageJob : IJobEntity
 {
     public ComponentLookup<HpComponent> hpLookup;

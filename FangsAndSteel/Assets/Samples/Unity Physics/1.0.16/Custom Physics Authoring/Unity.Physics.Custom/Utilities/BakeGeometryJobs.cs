@@ -17,7 +17,7 @@ namespace Unity.Physics.Authoring
         }
 
         #region Box
-        [BurstCompile]
+        //[BurstCompile]
         internal struct BakeBoxJob : IJob
         {
             public NativeArray<BoxGeometry> Box;
@@ -84,7 +84,7 @@ namespace Unity.Physics.Authoring
         #endregion
 
         #region Capsule
-        [BurstCompile]
+        //[BurstCompile]
         internal struct BakeCapsuleJob : IJob
         {
             public NativeArray<CapsuleGeometryAuthoring> Capsule;
@@ -140,7 +140,7 @@ namespace Unity.Physics.Authoring
         #endregion
 
         #region Cylinder
-        [BurstCompile]
+        //[BurstCompile]
         internal struct BakeCylinderJob : IJob
         {
             public NativeArray<CylinderGeometry> Cylinder;
@@ -218,7 +218,7 @@ namespace Unity.Physics.Authoring
 
 
         #region Sphere
-        [BurstCompile]
+        //[BurstCompile]
         struct BakeSphereJob : IJob
         {
             public NativeArray<SphereGeometry> Sphere;
@@ -272,7 +272,7 @@ namespace Unity.Physics.Authoring
 
         #region Plane
 
-        [BurstCompile]
+        //[BurstCompile]
         struct BakePlaneJob : IJob
         {
             public NativeArray<float3x4> Vertices;
@@ -338,7 +338,7 @@ namespace Unity.Physics.Authoring
         #region ShapeInputHash
 #if !(UNITY_ANDROID && !UNITY_64) // !Android32
         // Getting memory alignment errors from HashUtility.Hash128 on Android32
-        [BurstCompile]
+        //[BurstCompile]
 #endif
         internal struct GetShapeInputsHashJob : IJob
         {
@@ -366,7 +366,7 @@ namespace Unity.Physics.Authoring
 
 
         #region AABB
-        [BurstCompile]
+        //[BurstCompile]
         internal struct GetAabbJob : IJob
         {
             [ReadOnly] public NativeArray<float3> Points;
