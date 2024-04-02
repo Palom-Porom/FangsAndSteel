@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
 using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,7 +36,10 @@ public class PriorityDropdownScript : MonoBehaviour
             foreach (var dropdown in dropdownLST) {dropdown.options.Add(new TMP_Dropdown.OptionData() { text = priority });}
         }
 
-        foreach (var dropdown in dropdownLST) { dropdown.onValueChanged.AddListener(delegate { DropdownItemSelected(dropdown);}); }
+        foreach (var dropdown in dropdownLST) 
+        { 
+            dropdown.onValueChanged.AddListener(delegate { DropdownItemSelected(dropdown);}); 
+        }
 
         DropdownItemSelected(0, (int)priorityItems.Nearest);
         DropdownItemSelected(1, (int)priorityItems.ByMinHp);
@@ -61,6 +65,7 @@ public class PriorityDropdownScript : MonoBehaviour
                 DropdownItemSelected(x);
             }
         }
+        StaticUIRefs.Instance.isNeededPrioritiesUpdate = true;
     }
 
     public static void DropdownItemSelected(int dropdownIndex, int priorityIndex)
@@ -77,34 +82,33 @@ public class PriorityDropdownScript : MonoBehaviour
         }
     }
 
-    public PriorityInfo ReturnDropdownPriorityInfo()
+    public static PriorityInfo ReturnDropdownPriorityInfo()
     {
         var dropdownPriority = new PriorityInfo();
-        var unitPrioritiesLST = new List<(priorityUnitTypes,int)>();
+        var unitPrioritiesLST = new List<(UnitTypes,int)>();
         int distancePriority = -1;
         int minHpPriority = -1;
         foreach (var dropdown in dropdownLST)
         {
             if (dropdown.value == (int)priorityItems.Infantry)
             {
-                unitPrioritiesLST.Add((priorityUnitTypes.BaseInfantry, dropdownLST.IndexOf(dropdown)));
+                unitPrioritiesLST.Add((UnitTypes.BaseInfantry, dropdownLST.IndexOf(dropdown)));
             }
             else if (dropdown.value == (int)priorityItems.MachineGunner)
             {
-                unitPrioritiesLST.Add((priorityUnitTypes.MachineGunner, dropdownLST.IndexOf(dropdown)));
-
+                unitPrioritiesLST.Add((UnitTypes.MachineGunner, dropdownLST.IndexOf(dropdown)));
             }
             else if (dropdown.value == (int)priorityItems.AntiTankInf)
             {
-                unitPrioritiesLST.Add((priorityUnitTypes.AntiTankInf, dropdownLST.IndexOf(dropdown)));
+                unitPrioritiesLST.Add((UnitTypes.AntyTank, dropdownLST.IndexOf(dropdown)));
             }
             else if (dropdown.value == (int)priorityItems.Tank)
             {
-                unitPrioritiesLST.Add((priorityUnitTypes.Tank, dropdownLST.IndexOf(dropdown)));
+                unitPrioritiesLST.Add((UnitTypes.Tank, dropdownLST.IndexOf(dropdown)));
             }
             else if (dropdown.value == (int)priorityItems.Artillery)
             {
-                unitPrioritiesLST.Add((priorityUnitTypes.Artillery, dropdownLST.IndexOf(dropdown)));
+                unitPrioritiesLST.Add((UnitTypes.Artillery, dropdownLST.IndexOf(dropdown)));
             }
             else if (dropdown.value == (int)priorityItems.Nearest)
             {
@@ -115,7 +119,7 @@ public class PriorityDropdownScript : MonoBehaviour
                 minHpPriority = dropdownLST.IndexOf(dropdown);
             }
         }
-        dropdownPriority.unitsPriorities = unitPrioritiesLST;
+        dropdownPriority.unitsPriorities = unitPrioritiesLST.ToNativeArray(Allocator.TempJob);
         dropdownPriority.distancePriority = distancePriority;
         dropdownPriority.minHpPriority = minHpPriority;
         return dropdownPriority;
@@ -132,22 +136,22 @@ public class PriorityDropdownScript : MonoBehaviour
         Empty
     }
 
-    [Flags]
-    public enum priorityUnitTypes
-    {
-        None = 0,
-        BaseInfantry = 1,
-        MachineGunner = 2,
-        AntiTankInf = 4,
-        Tank = 8,
-        Artillery = 16,
-        Everything = 31
-    }
+    //[Flags]
+    //public enum priorityUnitTypes
+    //{
+    //    None = 0,
+    //    BaseInfantry = 1,
+    //    MachineGunner = 2,
+    //    AntiTankInf = 4,
+    //    Tank = 8,
+    //    Artillery = 16,
+    //    Everything = 31
+    //}
 
+}
     public struct PriorityInfo
     {
-        public List<(priorityUnitTypes, int)> unitsPriorities;
+        public NativeArray<(UnitTypes, int)> unitsPriorities;
         public int distancePriority;
         public int minHpPriority;
     }
-}

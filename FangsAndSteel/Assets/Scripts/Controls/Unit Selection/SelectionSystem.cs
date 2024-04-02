@@ -204,6 +204,8 @@ public partial class SelectionSystem : SystemBase
         //    (new HashSet<bool>(), NewUnitUIManager.Instance.ShootOnMoveButton),
         //    (new HashSet<bool>(), NewUnitUIManager.Instance.ShootOffButton)
         //};
+        #region Right Panel
+
         HashSet<bool> diffVals_shootOnMove = new HashSet<bool>();
         HashSet<bool> diffVals_shootOff = new HashSet<bool>();
         HashSet<bool> diffVals_autoTrigger = new HashSet<bool>();
@@ -220,21 +222,18 @@ public partial class SelectionSystem : SystemBase
         HashSet<float> diffVals_pursuiteMaxAttackDist = new HashSet<float>();
         HashSet<float> diffVals_pursuiteTimeForEnd = new HashSet<float>();
 
-        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, PursuingModeComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
-        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, PursuingModeComponent, SelectTag>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
-        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, SelectTag>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
-        ////Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, SelectTag>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this).ToEntityArray(Allocator.Temp).Length);
-        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, SelectTag>().Build(this).ToEntityArray(Allocator.Temp).Length);
-        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<BattleModeComponent, PursuingModeComponent, SelectTag>().Build(this).ToEntityArray(Allocator.Temp).Length);
-        //Debug.Log(new EntityQueryBuilder(Allocator.Temp).WithAll<PursuingModeComponent, SelectTag>().Build(this).ToEntityArray(Allocator.Temp).Length);
+        #endregion
 
-        
+        NativeArray<PriorityDropdownScript.priorityItems> prioritiesArr = new NativeArray<PriorityDropdownScript.priorityItems>(7, Allocator.Temp);
+        bool prioritiesArrWasFilled = false;
+        bool prioritiesAreSame = true;
 
-        foreach (var (battleModeSets, pursueModeSets, selectTag_EnabledRO) 
-            in SystemAPI.Query<BattleModeComponent, PursuingModeComponent, EnabledRefRO<SelectTag>>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
+        foreach (var (battleModeSets, pursueModeSets, attackPriorities, selectTag_EnabledRO) 
+            in SystemAPI.Query<BattleModeComponent, PursuingModeComponent, AttackPrioritiesAspect, EnabledRefRO<SelectTag>>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
         {
-            //Debug.Log($"Entered foreach; SelectEnabled = {selectTag_EnabledRO.ValueRO}");
             if (!selectTag_EnabledRO.ValueRO) continue;
+
+            #region RightPanel
 
             NewUnitUIManager.Instance.ShootOnMoveButton.color = battleModeSets.shootingOnMove ? Color.green : Color.red;
             diffVals_shootOnMove.Add(battleModeSets.shootingOnMove);
@@ -302,16 +301,81 @@ public partial class SelectionSystem : SystemBase
             NewUnitUIManager.Instance.PursuiteTimeForEndField.GetComponent<TimeForEndPursuitInput>().isCosmeticChangeOfValue = true;
             NewUnitUIManager.Instance.PursuiteTimeForEndField.text = ((int)pursueModeSets.dropTime).ToString();
             diffVals_pursuiteTimeForEnd.Add((int)pursueModeSets.dropTime);
-        }
 
-        //int i = 0;
-        //foreach (var (battleModeSets, pursueModeSets, selectTag_EnabledRO)
-        //    in SystemAPI.Query<BattleModeComponent, PursuingModeComponent, EnabledRefRO<SelectTag>>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
-        //{
-        //    i++;
-        //    Debug.Log(i);
-        //}
-        //Debug.Log(i);
+            #endregion
+
+            #region Priorities
+
+            if (prioritiesAreSame)
+            {
+                if (!prioritiesArrWasFilled)
+                {
+                    for (int i = 0; i < 7; i++)
+                        prioritiesArr[i] = PriorityDropdownScript.priorityItems.Empty;
+
+                    if (attackPriorities.DistanceModifier != 0) prioritiesArr[7 - (int)attackPriorities.DistanceModifier] = PriorityDropdownScript.priorityItems.Nearest;
+                    if (attackPriorities.MinHpModifier != 0) prioritiesArr[7 - (int)attackPriorities.MinHpModifier] = PriorityDropdownScript.priorityItems.ByMinHp;
+
+                    foreach (var prior in attackPriorities.unitsPriorities)
+                    {
+                        uint i = 0; uint tmp = prior.types;
+                        while (tmp > 1)
+                        {
+                            tmp = tmp >> 1;
+                            i++;
+                        }
+                        prioritiesArr[7 - (int)prior.modifier] = (PriorityDropdownScript.priorityItems)(i + 2);
+                    }
+                    prioritiesArrWasFilled = true;
+                }
+                else
+                {
+                    List<int> emptyIndices = new List<int> { 0, 1, 2, 3, 4, 5, 6};
+                    if (attackPriorities.DistanceModifier != 0)
+                        if (prioritiesArr[7 - (int)attackPriorities.DistanceModifier] != PriorityDropdownScript.priorityItems.Nearest)
+                        {
+                            prioritiesAreSame = false;
+                            continue;
+                        }
+                        else
+                            emptyIndices.Remove(7 - (int)attackPriorities.DistanceModifier);
+                    if (attackPriorities.MinHpModifier != 0)
+                        if (prioritiesArr[7 - (int)attackPriorities.MinHpModifier] != PriorityDropdownScript.priorityItems.ByMinHp)
+                        {
+                            prioritiesAreSame = false;
+                            continue;
+                        }
+                        else
+                            emptyIndices.Remove(7 - (int)attackPriorities.MinHpModifier);
+                    foreach (var prior in attackPriorities.unitsPriorities)
+                    {
+                        uint i = 0; uint tmp = prior.types;
+                        while (tmp > 1)
+                        {
+                            tmp = tmp >> 1;
+                            i++;
+                        }
+                        if (prioritiesArr[7 - (int)prior.modifier] != (PriorityDropdownScript.priorityItems)(i + 2))
+                        {
+                            prioritiesAreSame = false;
+                            continue;
+                        }
+                        else
+                            emptyIndices.Remove(7 - (int)prior.modifier);
+                    }
+                    foreach (int ind in emptyIndices)
+                    {
+                        if (prioritiesArr[ind] != PriorityDropdownScript.priorityItems.Empty)
+                        {
+                            prioritiesAreSame = false;
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            #endregion
+        }
 
         if (diffVals_shootOnMove.Count > 1)
         {
@@ -407,6 +471,21 @@ public partial class SelectionSystem : SystemBase
             //Debug.Log("Entered");
             //NewUnitUIManager.Instance.PursuiteRadiusSlider.value = 0;
             NewUnitUIManager.Instance.PursuiteTimeForEndField.text = "Разн.";
+        }
+
+        #endregion
+
+        #region Priorities
+
+        if (prioritiesAreSame)
+        {
+            for (int i = 0; i < 7; i++)
+                PriorityDropdownScript.DropdownItemSelected(i, (int)prioritiesArr[i]);
+            NewUnitUIManager.Instance.DifferenentPrioritiesWarningPanel.SetActive(false);
+        }
+        else
+        {
+            NewUnitUIManager.Instance.DifferenentPrioritiesWarningPanel.SetActive(true);
         }
 
         #endregion

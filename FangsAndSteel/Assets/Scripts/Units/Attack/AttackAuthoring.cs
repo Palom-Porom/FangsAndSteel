@@ -76,7 +76,7 @@ public class AttackAuthoring : MonoBehaviour
 
             AddComponent(entity, new SimpleAttackPrioritiesComponent
             {
-                distanceModifier = 1,
+                distanceModifier = 7,
                 minHpModifier = 0
             });
             AddBuffer<UnitsPrioritiesBuffer>(entity);
@@ -268,6 +268,8 @@ public readonly partial struct AttackPrioritiesAspect : IAspect
         unitsPriorities.ElementAt(idx1).types = unitsPriorities.ElementAt(idx2).types;
         unitsPriorities.ElementAt(idx2).types = temp;
     }
+
+    public void UnitsPriority_Clear() { unitsPriorities.Clear(); }
 
     ///TODO: zones priorities methods
 }

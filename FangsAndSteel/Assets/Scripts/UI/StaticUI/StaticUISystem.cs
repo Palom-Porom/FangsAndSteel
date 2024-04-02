@@ -62,6 +62,10 @@ public partial class StaticUISystem : SystemBase
         StaticUIRefs.Instance.newPursuitTimeForEnd = -1;
 
 
+        uiData.ValueRW.isNeededPrioritiesUpdate = StaticUIRefs.Instance.isNeededPrioritiesUpdate;
+        StaticUIRefs.Instance.isNeededPrioritiesUpdate = false;
+
+
         uiData.ValueRW.newTurnStartBut = StaticUIRefs.Instance.newTurnStartBut;
         StaticUIRefs.Instance.newTurnStartBut = false;
 
@@ -84,6 +88,8 @@ public struct StaticUIData : IComponentData
     public float newPursuitEndRadius;
     public float newPursuitMinAttackRadius;
     public float newPursuitTimeForEnd;
+
+    public bool isNeededPrioritiesUpdate;
 
     public bool newTurnStartBut;
 }

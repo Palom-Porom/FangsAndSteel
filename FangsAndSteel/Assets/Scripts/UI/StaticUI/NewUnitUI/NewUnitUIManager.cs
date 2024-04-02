@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -57,6 +58,11 @@ public class NewUnitUIManager : MonoBehaviour
 
     public TMP_InputField PursuiteTimeForEndField { get { return pursuiteTimeForEndField; } }
     [SerializeField] private TMP_InputField pursuiteTimeForEndField;
+
+
+
+    public GameObject DifferenentPrioritiesWarningPanel { get { return differenentPrioritiesWarningPanel; } }
+    [SerializeField] private GameObject differenentPrioritiesWarningPanel;
 
     void Awake()
     {

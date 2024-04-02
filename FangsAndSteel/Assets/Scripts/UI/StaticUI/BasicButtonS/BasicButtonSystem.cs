@@ -98,6 +98,13 @@ public partial class BasicButtonSystem : SystemBase
             //Debug.Log(uiData.newPursuitTimeForEnd);
             new ChangeAutoTriggerTimeForEndJob { newValue = uiData.newPursuitTimeForEnd }.Schedule();
         }
+
+
+        if (uiData.isNeededPrioritiesUpdate)
+        {
+            var newPriorities = PriorityDropdownScript.ReturnDropdownPriorityInfo();
+            new UpdatePrioritiesJob { newPriorities = newPriorities }.Schedule();
+        }
     }
 
     private void UpdateButColor(Image but)
@@ -262,6 +269,30 @@ public partial struct ChangeAutoTriggerTimeForEndJob : IJobEntity
         pursuingModeSettings.dropTime = newValue;
     }
 }
+
+
+
+[WithAll(typeof(SelectTag))]
+[WithOptions(EntityQueryOptions.IgnoreComponentEnabledState)]
+public partial struct UpdatePrioritiesJob : IJobEntity
+{
+    public PriorityInfo newPriorities;
+
+    public void Execute(AttackPrioritiesAspect attackPriorities, EnabledRefRO<SelectTag> selectTag)
+    {
+        if (!selectTag.ValueRO) return;
+
+        attackPriorities.DistanceModifier = (newPriorities.distancePriority == -1) ? 0 : 7 - newPriorities.distancePriority;
+        attackPriorities.MinHpModifier = (newPriorities.minHpPriority == -1) ? 0 : 7 - newPriorities.minHpPriority;
+
+        attackPriorities.UnitsPriority_Clear();
+        foreach(var prior in newPriorities.unitsPriorities)
+        {
+            attackPriorities.UnitsPriority_Add((uint)prior.Item1, (7 - prior.Item2));
+        }
+    }
+}
+
 
 public struct ShootModeButChangeColorRqst : IComponentData
 {
