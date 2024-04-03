@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ShowEnemyZone : MonoBehaviour
 {
+    public static ShowEnemyZone TutorialUiInstance { get; private set; }
+
     private Transform cameraTransform;
     [SerializeField] private Vector3 CameraZonePosition;
 
@@ -18,6 +21,12 @@ public class ShowEnemyZone : MonoBehaviour
     public GameObject PointerRing;
     public Button ShowZoneButton;
     public GameObject ShowZoneHint;
+    public GameObject WinPanel;
+
+    private void Awake()
+    {
+        TutorialUiInstance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
