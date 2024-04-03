@@ -14,6 +14,11 @@ public class PlayButtonScript : MonoBehaviour
         SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
     }
 
+    public void PlayTutorial()
+    {
+        SceneManager.LoadScene("Tutorial", LoadSceneMode.Single);
+    }
+
     private void Awake()
     {
         button = GetComponent<Button>();

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
@@ -10,7 +11,17 @@ public partial class StaticUISystem : SystemBase
 
     protected override void OnCreate()
     {
-        EntityManager.AddComponent<StaticUIData>(SystemHandle);
+        RequireForUpdate(new EntityQueryBuilder(Allocator.Temp).WithAny<GameTag, TutorialTag>().Build(this));
+    }
+
+    protected override void OnStartRunning()
+    {
+        if (!EntityManager.HasComponent<StaticUIData>(SystemHandle))
+            EntityManager.AddComponent<StaticUIData>(SystemHandle);
+    }
+    protected override void OnStopRunning()
+    {
+        EntityManager.RemoveComponent<StaticUIData>(SystemHandle);
     }
 
     protected override void OnUpdate()

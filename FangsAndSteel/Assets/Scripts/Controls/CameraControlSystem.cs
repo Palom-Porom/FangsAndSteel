@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using static UnityEngine.Rendering.DebugUI;
 
 [UpdateInGroup(typeof(ControlsSystemGroup))]
@@ -80,7 +81,7 @@ public partial class CameraControlSystem : SystemBase
             cameraPivotTransform.rotation.eulerAngles.y + rotateInputs.x * ROTATION_SPEED * SystemAPI.Time.DeltaTime,
             0f);
 
-        if (inputData.cameraZoomInputs != 0)
+        if (inputData.cameraZoomInputs != 0 && !EventSystem.current.IsPointerOverGameObject())
             SetCameraOffset(cameraTransform.position + cameraTransform.forward * ZOOM_STEP * inputData.cameraZoomInputs);
     }
 
