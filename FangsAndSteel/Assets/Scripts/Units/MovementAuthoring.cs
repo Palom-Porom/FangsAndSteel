@@ -142,7 +142,7 @@ public struct AttackRotationComponent : IComponentData
 }
 
 
-//[BurstCompile]
+[BurstCompile]
 public struct VehicleMovementComponent: IComponentData
 {
     public float minMovementMultiplier;

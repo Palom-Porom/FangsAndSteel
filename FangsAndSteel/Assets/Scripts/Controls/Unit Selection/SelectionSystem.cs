@@ -562,7 +562,7 @@ public partial class SelectionSystem : SystemBase
 /// <summary>
 /// Disable all SelectTag-s (as they are IEnableable-s)
 /// </summary>
-////[BurstCompile]
+[BurstCompile]
 public partial struct DeselectAllUnitsJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ecb;
@@ -583,7 +583,7 @@ public partial struct DeselectAllUnitsJob : IJobEntity
 /// <summary>
 /// Raycasts with the given RaycastInput and enables a SelectionTag if Selectable is hit
 /// </summary>
-////[BurstCompile]
+[BurstCompile]
 public partial struct SingleSelectJob : IJob
 {
 
@@ -633,7 +633,7 @@ public partial struct SingleSelectJob : IJob
 /// Selects all units, which are inside of the rect (which is in the screen coordinates)
 /// All other units are deselected
 /// </summary>
-////[BurstCompile]
+[BurstCompile]
 public partial struct MultipleSelectJob : IJobEntity
 {
     public WorldToScreen worldToScreen;

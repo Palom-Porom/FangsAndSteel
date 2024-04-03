@@ -5,14 +5,14 @@
 // There are several convenience functions within the singleton.
 //
 // Example of use:
-//    //[BurstCompile]
+//    [BurstCompile]
 //    public partial struct MySystem : ISystem
 //    {
 //       void OnCreate(ref SystemState state)
 //       {
 //          state.RequireForUpdate<AnimDbRefData>();
 //       }
-//       //[BurstCompile]
+//       [BurstCompile]
 //       void OnUpdate(ref SystemState state)
 //       {
 //          AnimDbRefData db = SystemAPI.GetSingleton<AnimDbRefData>();

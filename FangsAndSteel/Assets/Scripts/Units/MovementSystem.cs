@@ -18,7 +18,7 @@ using Unity.Burst.Intrinsics;
 using Unity.Entities.UniversalDelegates;
 
 [UpdateInGroup(typeof(UnitsSystemGroup))]
-//[BurstCompile]
+[BurstCompile]
 public partial struct MovementSystem : ISystem, ISystemStartStop
 {
     ComponentLookup<LocalTransform> transformLookup;
@@ -40,7 +40,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
     ComponentTypeHandle<VehicleMovementComponent> vehicleTypeHandle;
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PhysicsWorldSingleton>();
@@ -87,7 +87,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
         
     }
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnUpdate(ref SystemState state) 
     {
         transformLookup.Update(ref state);
@@ -180,7 +180,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 /// <summary>
 /// Moves all entities with MovementComponent to their target over the terrain
 /// </summary>
-////[BurstCompile]
+//[BurstCompile]
 //public partial struct MovementJob : IJobEntity
 //{
 //    public float deltaTime;
@@ -253,7 +253,7 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
 
 
-//[BurstCompile]
+[BurstCompile]
 public partial struct MovementJob : IJobChunk
 {
     public float deltaTime;

@@ -44,12 +44,12 @@ namespace AnimCooker
 
     // DISTANCE MODE
     //// This only runs whenever the FOV is changing.
-    ////[BurstCompile]
+    //[BurstCompile]
     //public partial struct UpdateDistancesJob : IJobEntity
     //{
     //    public CamData Cam;
 
-    //    //[BurstCompile]
+    //    [BurstCompile]
     //    public void Execute()
     //    {
     // todo - update distances for all entities

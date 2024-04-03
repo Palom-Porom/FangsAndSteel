@@ -10,7 +10,7 @@ using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 
 [UpdateAfter(typeof(UnitsSystemGroup))]
-//[BurstCompile]
+[BurstCompile]
 public partial struct VisionCurrentTeamSystem : ISystem 
 {
     BufferLookup<Child> children;
@@ -18,7 +18,7 @@ public partial struct VisionCurrentTeamSystem : ISystem
 
     EntityCommandBuffer ecb;
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         // Если нет ни единого экземпляра компонента, который мы указали в <>, то система не будет обновляться вплоть до момента, пока не появится хотя бы один экземпляр
@@ -30,7 +30,7 @@ public partial struct VisionCurrentTeamSystem : ISystem
         disableRendLookup = SystemAPI.GetComponentLookup<DisableRendering>();
     }
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         children.Update(ref state);
@@ -51,7 +51,7 @@ public partial struct VisionCurrentTeamSystem : ISystem
 }
 
 
-//[BurstCompile]
+[BurstCompile]
 public partial struct VisionCurrentTeamJob : IJobEntity
 {
     // in - чтение компонента, ref - чтение и запись (Возможность редактирования) компонента

@@ -100,7 +100,7 @@ public struct AttackCharsComponent : IComponentData
 
 
 ///<summary> Info about "bullets" and reload status of unit </summary>>
-//[BurstCompile]
+[BurstCompile]
 public struct ReloadComponent : IComponentData
 {
     /// <value> Max "bullets" amount in a Drum </value>

@@ -55,7 +55,7 @@ public partial class TransformUnitsUISystem : SystemBase
 
 }
 
-//[BurstCompile]
+[BurstCompile]
 public partial struct TransformUnitsUIJob : IJobEntity
 {
     public float3 camPosition;
@@ -75,7 +75,7 @@ public partial struct TransformUnitsUIJob : IJobEntity
 
 }
 
-//[BurstCompile]
+[BurstCompile]
 public partial struct UpdateBarsJob : IJobEntity
 {
     public ComponentLookup<FillFloatOverride> fillBarLookup;
@@ -88,7 +88,7 @@ public partial struct UpdateBarsJob : IJobEntity
 }
 
 
-//[BurstCompile]
+[BurstCompile]
 public partial struct InitializeBarsJob : IJobEntity
 {
     public ComponentLookup<FillFloatOverride> fillBarLookup;

@@ -15,7 +15,7 @@ using UnityEngine;
 
 
 [UpdateAfter(typeof(FillVisionMapTextureSystem))]
-//[BurstCompile]
+[BurstCompile]
 public partial struct VisionMapSystem : ISystem, ISystemStartStop
 {
     #region Debug Vars
@@ -29,7 +29,7 @@ public partial struct VisionMapSystem : ISystem, ISystemStartStop
 
     EntityCommandBuffer.ParallelWriter ecb;
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<VisionMapBuffer>();
@@ -61,7 +61,7 @@ public partial struct VisionMapSystem : ISystem, ISystemStartStop
         
     }
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         if (Time.frameCount % 5 == 0)
@@ -115,7 +115,7 @@ public partial struct VisionMapSystem : ISystem, ISystemStartStop
 /// <summary>
 /// Fills the VisionMap with actual vision data
 /// </summary>
-//[BurstCompile]
+[BurstCompile]
 public partial struct FillVisionMapJob : IJobEntity
 {
     //  [NativeDisableParallelForRestriction] отвечает за разрешение записи в одну и ту же €чейку доступа
@@ -171,7 +171,7 @@ public partial struct FillVisionMapJob : IJobEntity
 /// <summary>
 /// Visualize the current visionMap state (don't destroy the debugCubes)
 /// </summary>
-////[BurstCompile]
+[BurstCompile]
 public partial struct DebugVissionMapJob : IJobParallelFor
 {
     [ReadOnly] public DynamicBuffer<VisionMapBuffer> visionMap;

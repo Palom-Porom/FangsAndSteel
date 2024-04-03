@@ -11,13 +11,13 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
-using UnityEngine.Apple.ReplayKit;
+//using UnityEngine.Apple.ReplayKit;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 using static UnityEngine.EventSystems.EventTrigger;
 
 [UpdateInGroup(typeof(UnitsSystemGroup))]
-//[BurstCompile]
+[BurstCompile]
 public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 {
     ComponentLookup<HpComponent> hpLookup;
@@ -69,7 +69,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
     NativeArray<AnimDbEntry> rest_deployedClips;
     #endregion
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<AttackCharsComponent>();
@@ -157,7 +157,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         
     }
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         #region Update data
@@ -297,7 +297,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 
 
 ///<summary> Update all units' reloadTime values and reload bars </summary>
-//[BurstCompile]
+[BurstCompile]
 public partial struct _ReloadJob : IJobChunk
 {
     public float deltaTime;
@@ -389,7 +389,7 @@ public partial struct _ReloadJob : IJobChunk
 
 
 ///<summary> Update deploying/undeploying values of units </summary>
-//[BurstCompile]
+[BurstCompile]
 public partial struct UpdateDeployJob : IJobEntity
 {
     public float deltaTime;
@@ -446,7 +446,7 @@ public partial struct UpdateDeployJob : IJobEntity
 
 
 ///<summary> Searching for the most valuable target at the moment for ALL units </summary>
-////[BurstCompile]
+[BurstCompile]
 public partial struct AttackTargetSearchJob : IJobEntity
 {
     /// <summary> In other words all units that can be attacked </summary>
@@ -519,7 +519,7 @@ public partial struct AttackTargetSearchJob : IJobEntity
 
 /// <summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
 /// <remarks> That Job is for NON Deployable units! </remarks>
-//[BurstCompile]
+[BurstCompile]
 public partial struct _CreateUsualAttackRequestsJob : IJobChunk
 {
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
@@ -667,7 +667,7 @@ public partial struct _CreateUsualAttackRequestsJob : IJobChunk
 
 ///<summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
 /// <remarks> That Job is for Deployable units! </remarks>
-//[BurstCompile]
+[BurstCompile]
 public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 {
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
@@ -825,7 +825,7 @@ public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 
 
 ///<summary> Updates some pursuing info for all units with such mode enabled </summary>
-//[BurstCompile]
+[BurstCompile]
 public partial struct PursuingJob : IJobChunk
 {
     public float deltaTime;

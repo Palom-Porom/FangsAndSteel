@@ -12,7 +12,7 @@ using UnityEngine.Rendering;
 namespace AnimCooker
 {
     [RequireMatchingQueriesForUpdate]
-    //[BurstCompile]
+    [BurstCompile]
     public partial struct SimpleLodSystem : ISystem
     {
         UpdateTimer m_timer;
@@ -24,7 +24,7 @@ namespace AnimCooker
             state.RequireForUpdate<SimpleLodOptsData>();
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         void OnUpdate(ref SystemState state)
         {
             if (m_timer.GetInterval() >= 888) { m_timer.SetInterval(SystemAPI.GetSingleton<SimpleLodOptsData>().TimerInterval); }
@@ -36,12 +36,12 @@ namespace AnimCooker
     }
 
 
-    //[BurstCompile]
+    [BurstCompile]
     public partial struct SimpleLodJob : IJobEntity
     {
         public CamData Cam;
 
-        //[BurstCompile]
+        [BurstCompile]
         public void Execute(ref MaterialMeshInfo mmi, in SimpleLodData lod, in LocalToWorld ltw, in SimpleLodInfoData lodInf)
         {
             float dist = lodInf.WorldSpaceSize / (2f * lodInf.ScreenRelativeTransitionHeight0 * math.tan(Cam.FovRad * 0.5f));
@@ -72,7 +72,7 @@ namespace AnimCooker
 
 
 // DISTANCE MODE
-////[BurstCompile]
+//[BurstCompile]
 //public void Execute(ref MaterialMeshInfo mmi, in SimpleLodData lod, in LocalToWorld ltw, in LodDistanceData lodDist)
 //{
 //    float actualDistSq = math.distancesq(Cam.Pos, ltw.Position);

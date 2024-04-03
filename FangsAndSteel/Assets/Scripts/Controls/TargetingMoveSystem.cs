@@ -12,7 +12,7 @@ using Unity.Burst.Intrinsics;
 
 [UpdateInGroup(typeof(ControlsSystemGroup), OrderFirst = true)]
 [UpdateAfter(typeof(ControlSystem))]
-//[BurstCompile]
+[BurstCompile]
 public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 {
     private InputData inputData;
@@ -30,7 +30,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
     BufferTypeHandle<MovementCommandsBuffer> moveComsBuffTypeHandle;
     BufferTypeHandle<ModelsBuffer> modelsBuffsTypeHandle;
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnCreate (ref SystemState state)
     {
         state.RequireForUpdate(new EntityQueryBuilder(Allocator.Temp).WithAny<GameTag, TutorialTag>().Build(state.EntityManager));
@@ -59,19 +59,19 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
         modelsBuffsTypeHandle = SystemAPI.GetBufferTypeHandle<ModelsBuffer>(true);
     }
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnStartRunning(ref SystemState state)
     {
         new PutAllOnTerrainJob { collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld }.Schedule();
         moveClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Move");
     }
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnStopRunning(ref SystemState state)
     {
     }
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         inputData = SystemAPI.GetSingleton<InputData>();
@@ -152,7 +152,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
 
 
 ///<summary> Changes targets for all selected units if raycast of new target was succesfull </summary>
-////[BurstCompile]
+[BurstCompile]
 public partial struct _ChangeTargetJob : IJobChunk
 {
     [ReadOnly]
