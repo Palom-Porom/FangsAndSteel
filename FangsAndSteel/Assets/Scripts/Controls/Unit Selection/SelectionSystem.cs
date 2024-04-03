@@ -45,6 +45,8 @@ public partial class SelectionSystem : SystemBase
     /// </summary>
     private EntityQuery allSelectable;
 
+    private EntityQuery flagsQuery;
+
     private Entity unitStatsRqstEntity;
 
     protected override void OnCreate()
@@ -62,8 +64,10 @@ public partial class SelectionSystem : SystemBase
 
         ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
-        allSelected = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag>().Build(this);
-        allSelectable = new EntityQueryBuilder(Allocator.TempJob).WithAll<SelectTag, LocalTransform, TeamComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
+        allSelected = new EntityQueryBuilder(Allocator.Persistent).WithAll<SelectTag>().Build(this);
+        allSelectable = new EntityQueryBuilder(Allocator.Persistent).WithAll<SelectTag, LocalTransform, TeamComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
+
+        flagsQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<FlagTag>().Build(this);
 
         if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
             unitStatsRqstEntity = Entity.Null;
@@ -116,10 +120,16 @@ public partial class SelectionSystem : SystemBase
             selectLookup.Update(this);
             //attackSetsLookup.Update(this);
             teamLookup.Update(this);
+            PrefubsComponent prefubs = SystemAPI.GetSingleton<PrefubsComponent>();
+
             ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+            EntityCommandBuffer.ParallelWriter ecb_parallel;
 
             if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
                 unitStatsRqstEntity = Entity.Null;
+
+            //Destroy all flags, because will update them
+            ecb.DestroyEntity(flagsQuery, EntityQueryCaptureMode.AtRecord);
 
             int curTeam = SystemAPI.GetSingleton<CurrentTeamComponent>().value;
 
@@ -140,8 +150,10 @@ public partial class SelectionSystem : SystemBase
                     ecb.RemoveComponent<UnitStatsRequestTag>(unitStatsRqstEntity);
 
                 //Change ShootMode color to the neutral
-                Entity colorRqstEntity = ecb.CreateEntity();
+                //Entity colorRqstEntity = ecb.CreateEntity();
                 //ecb.AddComponent(colorRqstEntity, new ShootModeButChangeColorRqst { color = Color.white });
+
+                ecb_parallel = ecb.AsParallelWriter();
 
                 new MultipleSelectJob
                 {
@@ -149,16 +161,18 @@ public partial class SelectionSystem : SystemBase
                     rect = GUI_Utilities.GetScreenRect(mouseStartPos, curMousePosition),
 
                     selectTagLookup = selectLookup,
-                    ecb = ecb.AsParallelWriter(),
+                    ecb = ecb_parallel,
                     curTeam = curTeam
                 }.Schedule(allSelectable);
             }
 
             else
             {
+                ecb_parallel = ecb.AsParallelWriter();
+
                 new DeselectAllUnitsJob 
                 { 
-                    ecb = ecb.AsParallelWriter(),
+                    ecb = ecb_parallel,
                     selectLookup = selectLookup,
                     unitStatsRqstEntity = unitStatsRqstEntity
                 }.Schedule(allSelected);
@@ -188,6 +202,21 @@ public partial class SelectionSystem : SystemBase
                     curTeam = curTeam
                 }.Schedule(Dependency);
             }
+            
+            Dependency = new ShowAllWayPoints()
+            {
+                ecb = ecb_parallel,
+                flag1_prefub = prefubs.flag1,
+                flag2_prefub = prefubs.flag2,
+                flag3_prefub = prefubs.flag3,
+                flag4_prefub = prefubs.flag4,
+                flag5_prefub = prefubs.flag5,
+                flag6_prefub = prefubs.flag6,
+                flag7_prefub = prefubs.flag7,
+                flag8_prefub = prefubs.flag8,
+                flag9_prefub = prefubs.flag9,
+            }.Schedule(Dependency);
+            
         }
     }
 
@@ -625,6 +654,64 @@ public partial struct MultipleSelectJob : IJobEntity
         {
             selectTagLookup.SetComponentEnabled(entity, false);
             ecb.AddComponent<DisableRendering>(chunkIndexInQuery, selectTagLookup[entity].selectionRing);
+        }
+    }
+}
+
+
+
+[WithAll(typeof(SelectTag))]
+public partial struct ShowAllWayPoints : IJobEntity
+{
+    public EntityCommandBuffer.ParallelWriter ecb;
+
+    public Entity flag1_prefub;
+    public Entity flag2_prefub;
+    public Entity flag3_prefub;
+    public Entity flag4_prefub;
+    public Entity flag5_prefub;
+    public Entity flag6_prefub;
+    public Entity flag7_prefub;
+    public Entity flag8_prefub;
+    public Entity flag9_prefub;
+
+    public void Execute(DynamicBuffer<MovementCommandsBuffer> movementCommands, MovementComponent movement, [ChunkIndexInQuery] int chunkIndexInQuery)
+    {
+        if (!movement.hasMoveTarget) return;
+
+        //Spawn flag1
+        {
+            Entity tmp = ecb.Instantiate(chunkIndexInQuery, flag1_prefub);
+            ecb.SetComponent(chunkIndexInQuery, tmp, new LocalTransform
+            {
+                Position = movement.target,
+                Rotation = quaternion.identity,
+                Scale = 1
+            });
+            ecb.AddComponent<FlagTag>(chunkIndexInQuery, tmp);
+        }
+        //Spawn 2-8
+        {
+            NativeArray<Entity> flags = new NativeArray<Entity>(8, Allocator.Temp);
+            flags[0] = flag2_prefub;
+            flags[1] = flag3_prefub;
+            flags[2] = flag4_prefub;
+            flags[3] = flag5_prefub;
+            flags[4] = flag6_prefub;
+            flags[5] = flag7_prefub;
+            flags[6] = flag8_prefub;
+            flags[7] = flag9_prefub;
+            for (int i = 0; i < movementCommands.Length; i++)
+            {
+                Entity tmp = ecb.Instantiate(chunkIndexInQuery, flags[i]);
+                ecb.SetComponent(chunkIndexInQuery, tmp, new LocalTransform
+                {
+                    Position = movementCommands[i].target,
+                    Rotation = quaternion.identity,
+                    Scale = 1
+                });
+                ecb.AddComponent<FlagTag>(chunkIndexInQuery, tmp);
+            }
         }
     }
 }

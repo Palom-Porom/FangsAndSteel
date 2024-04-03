@@ -22,6 +22,7 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
     NativeArray<AnimDbEntry> moveClips;
 
     EntityQuery changeTargetJobQuery;
+    private EntityQuery flagsQuery;
 
     ComponentTypeHandle<MovementComponent> movementTypeHandle;
     ComponentTypeHandle<BattleModeComponent> battleModeTypeHandleRO;
@@ -47,6 +48,8 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
             WithAny<BattleModeComponent, PursuingModeComponent>().
             WithAll<SelectTag>().
             Build(ref state);
+
+        flagsQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<FlagTag>().Build(state.EntityManager);
 
         movementTypeHandle = SystemAPI.GetComponentTypeHandle<MovementComponent>();
         battleModeTypeHandleRO = SystemAPI.GetComponentTypeHandle<BattleModeComponent>(true);
@@ -123,6 +126,25 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
         }.Schedule(changeTargetJobQuery, targetRayCastJobHandle);
 
         raycastResult.Dispose(state.Dependency);
+
+        EntityCommandBuffer ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
+        PrefubsComponent prefubs = SystemAPI.GetSingleton<PrefubsComponent>();
+
+        ecb.DestroyEntity(flagsQuery, EntityQueryCaptureMode.AtRecord);
+
+        state.Dependency = new ShowAllWayPoints()
+        {
+            ecb = ecb.AsParallelWriter(),
+            flag1_prefub = prefubs.flag1,
+            flag2_prefub = prefubs.flag2,
+            flag3_prefub = prefubs.flag3,
+            flag4_prefub = prefubs.flag4,
+            flag5_prefub = prefubs.flag5,
+            flag6_prefub = prefubs.flag6,
+            flag7_prefub = prefubs.flag7,
+            flag8_prefub = prefubs.flag8,
+            flag9_prefub = prefubs.flag9,
+        }.Schedule(state.Dependency);
     }
 }
 

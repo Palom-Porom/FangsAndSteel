@@ -43,6 +43,61 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 13.339999
       objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_Capsule.Axis
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_SphereRadius
+      value: 5.685357
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_Cylinder.Axis
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_Capsule.Height
+      value: 11.370714
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_Capsule.Radius
+      value: 4.121575
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_Cylinder.Height
+      value: 11.370714
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_Cylinder.Radius
+      value: 4.121575
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_PrimitiveSize.x
+      value: 8.24315
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_PrimitiveSize.y
+      value: 5.72
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_PrimitiveSize.z
+      value: 11.370714
+      objectReference: {fileID: 0}
+    - target: {fileID: 4613903502469656764, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: m_PrimitiveCenter.y
+      value: 3.03
+      objectReference: {fileID: 0}
     - target: {fileID: 5180281274685029094, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -137,6 +192,11 @@ PrefabInstance:
         type: 3}
       propertyPath: speed
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7487308957241620955, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: target.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7487308957241620955, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4927485468863610683}
   - component: {fileID: 4116815118997861717}
   - component: {fileID: 5628419983897131561}
+  - component: {fileID: 1251305543534482702}
   m_Layer: 0
   m_Name: General
   m_TagString: Untagged
@@ -94,3 +95,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35b557eb2198ddd40b463256bfddbb4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1251305543534482702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071577303827733915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dc57406a072b1c46a5160066aa6eafe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flag1: {fileID: 4860990196745721806, guid: b2d2c32965f03ef42af6b844e5a78183, type: 3}
+  flag2: {fileID: 6711148088694362330, guid: cacdf8066fdc4414da7add4e7cd60c10, type: 3}
+  flag3: {fileID: 3682322130816677774, guid: a875c151f724a144397fd0cd7896adb7, type: 3}
+  flag4: {fileID: 4387926219314278438, guid: 22fe7722d4747394ba60f8eaabb64c48, type: 3}
+  flag5: {fileID: 9160515051804025108, guid: 069f90b8a8104d743ba6b26dc7a3e692, type: 3}
+  flag6: {fileID: 1958006726460449215, guid: e0c124e8dc5a6ec4aa107a1b8c57845c, type: 3}
+  flag7: {fileID: 8202652821416558563, guid: 04a1c293bd9cdf14da3cc3ddd7584dc6, type: 3}
+  flag8: {fileID: 5500170004566309481, guid: 46c7eb3c39a4f8640b9ce0008298aea8, type: 3}
+  flag9: {fileID: 4101951809526044627, guid: 900893c8c020664429bad028a9dba6fd, type: 3}

@@ -39,3 +39,31 @@ public partial struct PutAllOnTerrainJob : IJobEntity
         }
     }
 }
+
+[WithAll(typeof(FlagTag))]
+public partial struct PutFlagsOnTerrainJob : IJobEntity
+{
+    [ReadOnly] public CollisionWorld collisionWorld;
+
+    public void Execute(ref LocalTransform transform)
+    {
+        CollisionFilter filter = new CollisionFilter
+        {
+            BelongsTo = (uint)layers.Everything,
+            CollidesWith = (uint)layers.Terrain,
+            GroupIndex = 0
+        };
+        var pointDistanceInput = new PointDistanceInput { Filter = filter, Position = transform.Position, MaxDistance = 10f };
+        if (collisionWorld.CalculateDistance(pointDistanceInput, out DistanceHit closestHit))
+        {
+            if (closestHit.SurfaceNormal.y < 0f)
+                closestHit.SurfaceNormal = -closestHit.SurfaceNormal;
+            transform.Rotation = quaternion.LookRotationSafe(transform.Forward(), closestHit.SurfaceNormal);
+            transform.Position = closestHit.Position;
+        }
+        else
+        {
+            Debug.Log("ERROR: Terrain was not found near unit");
+        }
+    }
+}
