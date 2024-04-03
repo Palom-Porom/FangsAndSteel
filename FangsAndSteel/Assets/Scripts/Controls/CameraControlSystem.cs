@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -28,7 +29,8 @@ public partial class CameraControlSystem : SystemBase
 
     protected override void OnCreate()
     {
-        RequireForUpdate<GameTag>();
+        RequireForUpdate(new EntityQueryBuilder(Allocator.Temp).WithAny<GameTag, TutorialTag>().Build(this));
+        //RequireForUpdate<GameTag>();
         RequireForUpdate<InputData>();
     }
 

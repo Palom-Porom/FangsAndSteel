@@ -33,7 +33,8 @@ public partial struct TargetingMoveSystem : ISystem, ISystemStartStop
     //[BurstCompile]
     public void OnCreate (ref SystemState state)
     {
-        state.RequireForUpdate<GameTag>();
+        state.RequireForUpdate(new EntityQueryBuilder(Allocator.Temp).WithAny<GameTag, TutorialTag>().Build(state.EntityManager));
+        //state.RequireForUpdate<GameTag>();
         state.RequireForUpdate<PhysicsWorldSingleton>();
         state.RequireForUpdate<InputData>();
         state.RequireForUpdate<MovementComponent>();

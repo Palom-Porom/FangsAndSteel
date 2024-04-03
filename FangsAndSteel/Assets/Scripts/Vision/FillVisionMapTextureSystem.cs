@@ -15,7 +15,8 @@ public partial class FillVisionMapTextureSystem : SystemBase
     protected override void OnCreate()
     {
         RequireForUpdate<VisionMapBuffer>();
-        RequireForUpdate<GameTag>();
+        RequireForUpdate(new EntityQueryBuilder(Allocator.Temp).WithAny<GameTag, TutorialTag>().Build(this));
+        //RequireForUpdate<GameTag>();
     }
 
     protected override void OnStartRunning()

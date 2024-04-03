@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SceneAuthoring : MonoBehaviour
 {
-    public enum Scenes { Game, MainMenu };
+    public enum Scenes { Game, MainMenu, Tutorial };
 
     public Scenes scene;
 
@@ -22,6 +22,9 @@ public class SceneAuthoring : MonoBehaviour
                 case Scenes.MainMenu:
                     AddComponent<MainMenuTag>(entity);
                     break;
+                case Scenes.Tutorial:
+                    AddComponent<TutorialTag>(entity);
+                    break;
                 default:
                     throw new System.Exception("Wrongly Setted Scene enum");
             }
@@ -32,3 +35,4 @@ public class SceneAuthoring : MonoBehaviour
 
 public struct GameTag : IComponentData { }
 public struct MainMenuTag : IComponentData { }
+public struct TutorialTag : IComponentData { }

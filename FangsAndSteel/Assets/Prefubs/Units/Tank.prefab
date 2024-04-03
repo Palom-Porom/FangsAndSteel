@@ -208,6 +208,11 @@ PrefabInstance:
       propertyPath: isVehicle
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7487308957241620955, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: degreesPerSec
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 8818506933466611722, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: VisionRadius

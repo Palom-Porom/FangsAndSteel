@@ -30,6 +30,8 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
 
     EntityQuery movementQuery;
 
+    EntityQuery flagsQuery;
+
     ComponentTypeHandle<LocalTransform> transformTypeHandle;
     ComponentTypeHandle<MovementComponent> movementTypeHandle;
     ComponentTypeHandle<RotationComponent> rotationTypeHandle;
@@ -56,6 +58,8 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
             WithAllRW<RotationComponent, MovementCommandsBuffer>().
             WithAny<ModelsBuffer, VehicleMovementComponent>().
             Build(ref state);
+
+        flagsQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<FlagTag>().Build(state.EntityManager);
 
         transformTypeHandle = SystemAPI.GetComponentTypeHandle<LocalTransform>();
         movementTypeHandle = SystemAPI.GetComponentTypeHandle<MovementComponent>();
@@ -99,6 +103,9 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
         modelsBuffTypeHandle.Update(ref state);
         vehicleTypeHandle.Update(ref state);
 
+        EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
+        PrefubsComponent prefubs = SystemAPI.GetSingleton<PrefubsComponent>();
+
 
         #region MovementJob
         //JobHandle movementJobHandle = new MovementJob
@@ -132,6 +139,18 @@ public partial struct MovementSystem : ISystem, ISystemStartStop
             modelsBuffTypeHandle = modelsBuffTypeHandle,
 
             vehicleTypeHandle = vehicleTypeHandle,
+
+            ecb = ecb,
+            flagsArr = flagsQuery.ToEntityArray(Allocator.TempJob),
+            flag1_prefub = prefubs.flag1,
+            flag2_prefub = prefubs.flag2,
+            flag3_prefub = prefubs.flag3,
+            flag4_prefub = prefubs.flag4,
+            flag5_prefub = prefubs.flag5,
+            flag6_prefub = prefubs.flag6,
+            flag7_prefub = prefubs.flag7,
+            flag8_prefub = prefubs.flag8,
+            flag9_prefub = prefubs.flag9
         }.Schedule(movementQuery, vehicleRotationJobHandle);
         #endregion
 
@@ -252,6 +271,18 @@ public partial struct MovementJob : IJobChunk
     
     public ComponentTypeHandle<VehicleMovementComponent> vehicleTypeHandle;
 
+    public EntityCommandBuffer.ParallelWriter ecb;
+    public Entity flag1_prefub;
+    public Entity flag2_prefub;
+    public Entity flag3_prefub;
+    public Entity flag4_prefub;
+    public Entity flag5_prefub;
+    public Entity flag6_prefub;
+    public Entity flag7_prefub;
+    public Entity flag8_prefub;
+    public Entity flag9_prefub;
+    public NativeArray<Entity> flagsArr;
+
     public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
     {
         NativeArray<LocalTransform> transforms = chunk.GetNativeArray(ref transformTypeHandle);
@@ -288,11 +319,38 @@ public partial struct MovementJob : IJobChunk
 
                 if (math.distancesq(movements[i].target, transforms[i].Position) < math.max(deltaTime * movements[i].speed, 0.1f)) // has got to the current target?
                 {
+                    ecb.DestroyEntity(unfilteredChunkIndex, flagsArr);
+
                     UnsafeUtility.ArrayElementAsRef<LocalTransform>(transformsPtr, i).Position = movements[i].target;
                     if (movementCommandsBuffs[i].Length != 0) //Has next target to move?
                     {
                         UnsafeUtility.ArrayElementAsRef<MovementComponent>(movemetsPtr, i).target = movementCommandsBuffs[i][0].target;
                         movementCommandsBuffs[i].RemoveAt(0);
+                        #region FlagsUpdate
+                        {
+                            NativeArray<Entity> flags = new NativeArray<Entity>(9, Allocator.Temp);
+                            flags[0] = flag1_prefub;
+                            flags[1] = flag2_prefub;
+                            flags[2] = flag3_prefub;
+                            flags[3] = flag4_prefub;
+                            flags[4] = flag5_prefub;
+                            flags[5] = flag6_prefub;
+                            flags[6] = flag7_prefub;
+                            flags[7] = flag8_prefub;
+                            flags[8] = flag9_prefub;
+                            for (int j = 0; j < movementCommandsBuffs[i].Length; j++)
+                            {
+                                Entity tmp = ecb.Instantiate(unfilteredChunkIndex, flags[j]);
+                                ecb.SetComponent(unfilteredChunkIndex, tmp, new LocalTransform
+                                {
+                                    Position = movementCommandsBuffs[i][j].target,
+                                    Rotation = quaternion.identity,
+                                    Scale = 1
+                                });
+                                ecb.AddComponent<FlagTag>(unfilteredChunkIndex, tmp);
+                            }
+                        }
+                        #endregion
                     }
                     else
                     {
@@ -368,7 +426,8 @@ public partial struct MovementJob : IJobChunk
                 }
             }
         }
-     }
+        //flagsArr.Dispose();
+    }
 }
 
 
