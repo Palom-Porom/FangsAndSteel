@@ -397,10 +397,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42532add3dec7cb4ba39072547956510, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraZonePosition: {x: -0.3969083, y: 242.7785, z: -283.7067}
+  CameraZonePosition: {x: -14.19524, y: 73.82059, z: -71.08124}
   maxCamSpeedToZone: 150
-  targetRotation: {x: 0.38268346, y: 0, z: 0, w: 0.9238795}
-  PointerRing: {fileID: 0}
+  targetRotation: {x: -0.29304677, y: 0.1541083, z: -0.079569384, w: -0.94023556}
+  PointerRing1: {fileID: 0}
+  PointerRing2: {fileID: 0}
+  PointerRing3: {fileID: 0}
   ShowZoneButton: {fileID: 8794794643833138804}
   ShowZoneHint: {fileID: 7459008165281517927}
   WinPanel: {fileID: 5138820956149890965}

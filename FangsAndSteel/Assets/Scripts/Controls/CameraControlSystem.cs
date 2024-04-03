@@ -20,7 +20,7 @@ public partial class CameraControlSystem : SystemBase
     private const float MAX_ANGLE_X = 60f;
     private const float ZOOM_STEP = 10f;
     private const float MIN_DISTANCE_TO_PIVOT = 10-1f;
-    private const float MIN_HEIGHT= 25f;
+    private const float MIN_HEIGHT= 45f;
 
     private const float X_RIGHT_BORDER = 500f;
     private const float X_LEFT_BORDER = -500f;

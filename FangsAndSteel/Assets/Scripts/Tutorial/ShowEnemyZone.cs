@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -18,7 +19,9 @@ public class ShowEnemyZone : MonoBehaviour
 
     public Quaternion targetRotation;
 
-    public GameObject PointerRing;
+    public GameObject PointerRing1;
+    public GameObject PointerRing2;
+    public GameObject PointerRing3;
     public Button ShowZoneButton;
     public GameObject ShowZoneHint;
     public GameObject WinPanel;
@@ -32,7 +35,7 @@ public class ShowEnemyZone : MonoBehaviour
     void Start()
     {
         cameraTransform = Camera.main.transform;
-        StartCoroutine(ShowZone());
+        StartCoroutine(ShowZone(2f));
     }
 
     // Update is called once per frame
@@ -41,15 +44,22 @@ public class ShowEnemyZone : MonoBehaviour
         
     }
 
+    public IEnumerator ShowZone(float latency)
+    {
+        yield return new WaitForSeconds(latency);
+        yield return StartCoroutine(ShowZone());
+    }
+
     public void ShowZoneFunc()
     {
         StartCoroutine(ShowZone());
-        
     }
 
     public IEnumerator ShowZone()
     {
-        PointerRing.SetActive(true);
+        PointerRing1.SetActive(true);
+        PointerRing2.SetActive(true);
+        PointerRing3.SetActive(true);
         ShowZoneHint.SetActive(true);
         ShowZoneButton.interactable = false;
 
@@ -59,7 +69,9 @@ public class ShowEnemyZone : MonoBehaviour
         yield return new WaitForSeconds(2.5f);
         yield return StartCoroutine(MoveCameraToPoint(initialLocation, initialRotation));
 
-        PointerRing.SetActive(false);
+        PointerRing1.SetActive(false);
+        PointerRing2.SetActive(false);
+        PointerRing3.SetActive(false);
         ShowZoneHint.SetActive(false);
         ShowZoneButton.interactable = true;
 
@@ -79,7 +91,7 @@ public class ShowEnemyZone : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         initialDist = curDist;
-        while (curDist > MIN_CAM_SPEED_TO_ZONE * MIN_CAM_SPEED_TO_ZONE)
+        while (curDist > 5f)
         {
             curCamSpeedToZone = Mathf.Lerp(maxCamSpeedToZone, MIN_CAM_SPEED_TO_ZONE, (initialDist - curDist) / initialDist);
             Vector3 dir = (destination - cameraTransform.position).normalized;
