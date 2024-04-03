@@ -21,6 +21,11 @@ public partial class CameraControlSystem : SystemBase
     private const float MIN_DISTANCE_TO_PIVOT = 10-1f;
     private const float MIN_HEIGHT= 25f;
 
+    private const float X_RIGHT_BORDER = 500f;
+    private const float X_LEFT_BORDER = -500f;
+    private const float Z_FWD_BORDER = 500f;
+    private const float Z_BCK_BORDER = -500f;
+
     protected override void OnCreate()
     {
         RequireForUpdate<GameTag>();
@@ -37,10 +42,34 @@ public partial class CameraControlSystem : SystemBase
     {
         inputData = SystemAPI.GetSingleton<InputData>();
 
-        cameraPivotTransform.position += cameraPivotTransform.forward * inputData.cameraMoveInputs.y * MOVE_SPEED * SystemAPI.Time.DeltaTime;
-        cameraPivotTransform.position += cameraPivotTransform.right * inputData.cameraMoveInputs.x * MOVE_SPEED * SystemAPI.Time.DeltaTime;
+        var fwd = cameraPivotTransform.forward;
+        fwd.y = 0;
+        fwd.Normalize();
+
+        var rgt = cameraPivotTransform.right;
+        rgt.y = 0;
+        rgt.Normalize();
+
+        if (!inputData.cameraBordersDisabled)
+        {
+            //cameraPivotTransform.position += cameraPivotTransform.forward * inputData.cameraMoveInputs.y * MOVE_SPEED * SystemAPI.Time.DeltaTime;
+            cameraPivotTransform.position += fwd * inputData.cameraMoveInputs.y * MOVE_SPEED * SystemAPI.Time.DeltaTime;
+            //cameraPivotTransform.position += cameraPivotTransform.right * inputData.cameraMoveInputs.x * MOVE_SPEED * SystemAPI.Time.DeltaTime;
+            cameraPivotTransform.position += rgt * inputData.cameraMoveInputs.x * MOVE_SPEED * SystemAPI.Time.DeltaTime;
+        }
+        else
+        {
+            cameraPivotTransform.position += cameraPivotTransform.forward * inputData.cameraMoveInputs.y * MOVE_SPEED * SystemAPI.Time.DeltaTime;
+            cameraPivotTransform.position += cameraPivotTransform.right * inputData.cameraMoveInputs.x * MOVE_SPEED * SystemAPI.Time.DeltaTime;
+        }
         if (!inputData.cameraBordersDisabled && cameraPivotTransform.position.y < MIN_HEIGHT)
             cameraPivotTransform.position = new float3(cameraPivotTransform.position.x, MIN_HEIGHT, cameraPivotTransform.position.z);
+
+        cameraPivotTransform.position = new Vector3 (
+            math.clamp(cameraPivotTransform.position.x, X_LEFT_BORDER, X_RIGHT_BORDER),
+            cameraPivotTransform.position.y,
+            math.clamp(cameraPivotTransform.position.z, Z_BCK_BORDER, Z_FWD_BORDER)
+            );
 
         float2 rotateInputs = inputData.cameraRotateInputs;
         if (rotateInputs.x != 0.0 || rotateInputs.y != 0.0)
