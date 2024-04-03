@@ -21,7 +21,7 @@ PrefabInstance:
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: attackRadius
-      value: 25
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
@@ -141,7 +141,7 @@ PrefabInstance:
     - target: {fileID: 8818506933466611722, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: VisionRadius
-      value: 15
+      value: 25
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

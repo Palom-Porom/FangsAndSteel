@@ -115,8 +115,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68c54cbdf7301744b8e8dfebd090cdc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  escMenuUI: {fileID: 0}
   gameActiveUI: {fileID: 0}
+  escUI: {fileID: 0}
+  settingsWindow: {fileID: 0}
 --- !u!1001 &6829077433250444479
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -125,6 +126,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2742545956967673363}
     m_Modifications:
+    - target: {fileID: 1757246663050858678, guid: 95d504218c5fd21439a2458d8e9bbc60,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1880584674671788835, guid: 95d504218c5fd21439a2458d8e9bbc60,
         type: 3}
       propertyPath: m_Pivot.x

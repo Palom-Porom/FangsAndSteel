@@ -216,7 +216,7 @@ PrefabInstance:
     - target: {fileID: 8818506933466611722, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: VisionRadius
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
