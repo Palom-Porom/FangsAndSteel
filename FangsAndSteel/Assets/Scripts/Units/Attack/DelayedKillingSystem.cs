@@ -58,7 +58,8 @@ public partial struct DestroyingDeadJob : IJobEntity
     {
         if (dieComponent.timeToDie <= 0)
         {
-            UtilityFuncs.DestroyParentAndAllChildren(ecb, childrenLookup, entity, chunkIndexInQuery);
+            //UtilityFuncs.DestroyParentAndAllChildren(ecb, childrenLookup, entity, chunkIndexInQuery);
+            ecb.DestroyEntity(chunkIndexInQuery, entity);
         }
         else
         {

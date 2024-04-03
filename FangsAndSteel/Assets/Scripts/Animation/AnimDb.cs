@@ -9,7 +9,7 @@ public static class AnimDb
 	dict["FirstRobot", "Attack"] = new AnimDbEntry { BeginFrame = 42, EndFrame = 59, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Attack", ModelIndex = 0, ClipIndex = 2 };
 	dict["FirstRobot", "Recharge"] = new AnimDbEntry { BeginFrame = 60, EndFrame = 80, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Recharge", ModelIndex = 0, ClipIndex = 3 };
 	dict["FirstRobot", "Death_1"] = new AnimDbEntry { BeginFrame = 81, EndFrame = 101, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Death_1", ModelIndex = 0, ClipIndex = 4 };
-	dict["FirstRobot", "Death_2"] = new AnimDbEntry { BeginFrame = 102, EndFrame = 115, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Death_2", ModelIndex = 0, ClipIndex = 5 };
+	dict["FirstRobot", "Death"] = new AnimDbEntry { BeginFrame = 102, EndFrame = 115, Interval = 0.07692308f, ModelName = "FirstRobot", ClipName = "Death", ModelIndex = 0, ClipIndex = 5 };
 
 	//dict["Second_robot", "Rest"] = new AnimDbEntry { BeginFrame = 0, EndFrame = 15, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Rest", ModelIndex = 6, ClipIndex = 0 };
 	//dict["Second_robot", "Move"] = new AnimDbEntry { BeginFrame = 16, EndFrame = 37, Interval = 0.1f, ModelName = "Second_robot", ClipName = "Move", ModelIndex = 6, ClipIndex = 1 };
@@ -58,11 +58,11 @@ public static class AnimDb
     dict["Artillery_Turret", "Undeploy"] = new AnimDbEntry { BeginFrame = 191, EndFrame = 211, Interval = 0.1428571f, ModelName = "Artillery_Turret", ClipName = "Undeploy", ModelIndex = 6, ClipIndex = 6 };
     dict["Artillery_Turret", "Rest_Deployed"] = new AnimDbEntry { BeginFrame = 212, EndFrame = 216, Interval = 0.1428571f, ModelName = "Artillery_Turret", ClipName = "Deployed_Rest", ModelIndex = 6, ClipIndex = 7 };
     dict["Artillery_Turret", "Death_Deployed"] = new AnimDbEntry { BeginFrame = 217, EndFrame = 222, Interval = 0.1428571f, ModelName = "Artillery_Turret", ClipName = "Deployed_Death", ModelIndex = 6, ClipIndex = 8 };
-    dict["Robot_AntyTank_1", "Rest"] = new AnimDbEntry { BeginFrame = 0, EndFrame = 0, Interval = 0.1666667f, ModelName = "Robot_AntyTank_1", ClipName = "Rest", ModelIndex = 7, ClipIndex = 0 };
-    dict["Robot_AntyTank_1", "Move"] = new AnimDbEntry { BeginFrame = 1, EndFrame = 10, Interval = 0.1666667f, ModelName = "Robot_AntyTank_1", ClipName = "Move", ModelIndex = 7, ClipIndex = 1 };
-    dict["Robot_AntyTank_1", "Death"] = new AnimDbEntry { BeginFrame = 11, EndFrame = 23, Interval = 0.1666667f, ModelName = "Robot_AntyTank_1", ClipName = "Death", ModelIndex = 7, ClipIndex = 2 };
-    dict["Robot_AntyTank_1", "Recharge"] = new AnimDbEntry { BeginFrame = 24, EndFrame = 48, Interval = 0.1666667f, ModelName = "Robot_AntyTank_1", ClipName = "Recharge", ModelIndex = 7, ClipIndex = 3 };
-    dict["Robot_AntyTank_1", "Attack"] = new AnimDbEntry { BeginFrame = 49, EndFrame = 78, Interval = 0.1666667f, ModelName = "Robot_AntyTank_1", ClipName = "Attack", ModelIndex = 7, ClipIndex = 4 };
+    dict["Robot_AntyTank_3", "Rest"] = new AnimDbEntry { BeginFrame = 0, EndFrame = 4, Interval = 0.04166667f, ModelName = "Robot_AntyTank_3", ClipName = "Rest", ModelIndex = 7, ClipIndex = 0 };
+    dict["Robot_AntyTank_3", "Move"] = new AnimDbEntry { BeginFrame = 5, EndFrame = 44, Interval = 0.04166667f, ModelName = "Robot_AntyTank_3", ClipName = "Move", ModelIndex = 7, ClipIndex = 1 };
+    dict["Robot_AntyTank_3", "Death"] = new AnimDbEntry { BeginFrame = 45, EndFrame = 99, Interval = 0.04166667f, ModelName = "Robot_AntyTank_3", ClipName = "Death", ModelIndex = 7, ClipIndex = 2 };
+    dict["Robot_AntyTank_3", "Recharge"] = new AnimDbEntry { BeginFrame = 100, EndFrame = 199, Interval = 0.04166667f, ModelName = "Robot_AntyTank_3", ClipName = "Recharge", ModelIndex = 7, ClipIndex = 3 };
+    dict["Robot_AntyTank_3", "Attack"] = new AnimDbEntry { BeginFrame = 200, EndFrame = 319, Interval = 0.04166667f, ModelName = "Robot_AntyTank_3", ClipName = "Attack", ModelIndex = 7, ClipIndex = 4 };
     dict["Robot_AntyTank_Blue", "Rest"] = new AnimDbEntry { BeginFrame = 0, EndFrame = -1, Interval = 0.3333333f, ModelName = "Robot_AntyTank_Blue", ClipName = "Rest", ModelIndex = 8, ClipIndex = 0 };
     dict["Robot_AntyTank_Blue", "Move"] = new AnimDbEntry { BeginFrame = 0, EndFrame = 4, Interval = 0.3333333f, ModelName = "Robot_AntyTank_Blue", ClipName = "Move", ModelIndex = 8, ClipIndex = 1 };
     dict["Robot_AntyTank_Blue", "Death"] = new AnimDbEntry { BeginFrame = 5, EndFrame = 10, Interval = 0.3333333f, ModelName = "Robot_AntyTank_Blue", ClipName = "Death", ModelIndex = 8, ClipIndex = 2 };
@@ -94,7 +94,7 @@ public static class AnimDb
     dict["FirstRobot Blue", "Death_1"] = new AnimDbEntry { BeginFrame = 38, EndFrame = 47, Interval = 0.1666667f, ModelName = "FirstRobot Blue", ClipName = "Death_1", ModelIndex = 11, ClipIndex = 4 };
     dict["FirstRobot Blue", "Death_2"] = new AnimDbEntry { BeginFrame = 48, EndFrame = 54, Interval = 0.1666667f, ModelName = "FirstRobot Blue", ClipName = "Death_2", ModelIndex = 11, ClipIndex = 5 };
     }
-public enum Model { FirstRobot, /*Second_robot*/ Tank_Hands, Tank_Hull, Tank_Turret, Tank_Hands_Fixed, Artillery_Hull, Artillery_Turret, Robot_AntyTank_1, Robot_AntyTank_Blue, Second_robot_1, Second_robot_Blue, FirstRobotBlue }
+public enum Model { FirstRobot, /*Second_robot*/ Tank_Hands, Tank_Hull, Tank_Turret, Tank_Hands_Fixed, Artillery_Hull, Artillery_Turret, Robot_AntyTank_3, Robot_AntyTank_Blue, Second_robot_1, Second_robot_Blue, FirstRobotBlue }
 public enum FirstRobot { Rest, Move, Attack, Recharge, Death_1, Death_2}
     //public enum Second_robot { Rest, Move, Attack, Death, Rest_Deployed, Deploy, Death_Deployed, Undeploy }
     public enum Tank_Hands { Armature_Tank_HandsHands_Rest, Armature_Tank_HandsHands_Move, Armature_Tank_HandsHands_Death, Armature_Tank_HandsHands_Attack, Armature_Tank_HandsHands_Recharge }
@@ -103,7 +103,7 @@ public enum FirstRobot { Rest, Move, Attack, Recharge, Death_1, Death_2}
     public enum Tank_Hands_Fixed { Armature_Tank_HandsHands_Rest, Armature_Tank_HandsHands_Move, Armature_Tank_HandsHands_Death, Armature_Tank_HandsHands_Attack, Armature_Tank_HandsHands_Recharge }
     public enum Artillery_Hull { Armature_Arta_HullHull_Rest, Armature_Arta_HullHull_Move, Armature_Arta_HullHull_Death, Armature_Arta_HullHull_Attack, Armature_Arta_HullHull_Recharge, Armature_Arta_HullHull_Deploy, Armature_Arta_HullHull_Undeploy, Armature_Arta_HullHull_Deployed_Rest, Armature_Arta_HullHull_Deployed_Death }
     public enum Artillery_Turret { Armature_Arta_TurretTurret_Rest, Armature_Arta_TurretTurret_Move, Armature_Arta_TurretTurret_Death, Armature_Arta_TurretTurret_Attack, Armature_Arta_TurretTurret_Recharge, Armature_Arta_TurretTurret_Deploy, Armature_Arta_TurretTurret_Undeploy, Armature_Arta_TurretTurret_Deployed_Rest, Armature_Arta_TurretTurret_Deployed_Death }
-    public enum Robot_AntyTank_1 { ArmatureRest, Armaturemovement, ArmatureDeath, ArmatureRecharge, ArmatureAttack }
+    public enum Robot_AntyTank_3 { ArmatureRest, Armaturemovement, ArmatureDeath, ArmatureRecharge, ArmatureAttack }
     public enum Robot_AntyTank_Blue { ArmatureRest, Armaturemovement, ArmatureDeath, ArmatureRecharge, ArmatureAttack }
     public enum Second_robot_1 { MG2_Rest, MG2_Move, MG2_Atack, MG2_Death, MG2_Deploy, MG2_Rest_Deployed, MG2_Death_Deployed, MG2_Stand_Up, MG2_Recharge }
     public enum Second_robot_Blue { Armature001BM2_Rest, Armature001BM2_Move, Armature001BM2_Atack, Armature001BM2_Death, Armature001BM2_Deploy, Armature001BM2_Rest_Deployed, Armature001BM2_Death_Deployed, Armature001BM2_Stand_Up, Armature001BM2_Recharge }

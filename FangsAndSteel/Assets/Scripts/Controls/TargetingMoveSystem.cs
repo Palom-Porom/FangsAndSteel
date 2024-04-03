@@ -197,9 +197,9 @@ public partial struct _ChangeTargetJob : IJobChunk
                         {
                             RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
                             animCmd.ValueRW.ClipIndex = moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                            Debug.Log(animStateLookup[modelBufElem.model].ModelIndex);
-                            Debug.Log(moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipName);
-                            Debug.Log(moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex);
+                            //Debug.Log(animStateLookup[modelBufElem.model].ModelIndex);
+                            //Debug.Log(moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipName);
+                            //Debug.Log(moveClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex);
                             animCmd.ValueRW.Cmd = AnimationCmd.SetPlayForever;
                         }
                     }

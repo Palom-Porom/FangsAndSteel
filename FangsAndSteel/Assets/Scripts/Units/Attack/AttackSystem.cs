@@ -17,6 +17,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     ComponentLookup<HpComponent> hpLookup;
     ComponentLookup<FillFloatOverride> fillBarLookup;
     ComponentLookup<UnitIconsComponent> unitsIconsLookup;
+    ComponentLookup<SelectTag> selectLookup;
     BufferLookup<Child> childrenLookup;
 
     ComponentLookup<LocalTransform> localTransformLookup;
@@ -34,6 +35,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         hpLookup = state.GetComponentLookup<HpComponent>();
         fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
         unitsIconsLookup = state.GetComponentLookup<UnitIconsComponent>(true);
+        selectLookup = state.GetComponentLookup<SelectTag>(true);
         childrenLookup = state.GetBufferLookup<Child>(true);
 
         localTransformLookup = state.GetComponentLookup<LocalTransform>();
@@ -44,7 +46,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
 
     public void OnStartRunning(ref SystemState state)
     {
-        deathClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Death_2");        
+        deathClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Death");        
     }
 
     public void OnStopRunning(ref SystemState state)
@@ -58,6 +60,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         hpLookup.Update(ref state);
         fillBarLookup.Update(ref state);
         unitsIconsLookup.Update(ref state);
+        selectLookup.Update(ref state);
         childrenLookup.Update(ref state);
         localTransformLookup.Update(ref state);
         animCmdLookup.Update(ref state);
@@ -69,6 +72,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
             hpLookup = hpLookup, 
             fillBarLookup = fillBarLookup, 
             unitsIconsLookup = unitsIconsLookup, 
+            selectLookup = selectLookup,
             childrenLookup = childrenLookup,
             ecb = ecb,
 
@@ -92,6 +96,7 @@ public partial struct DealingDamageJob : IJobEntity
     public ComponentLookup<HpComponent> hpLookup;
     public ComponentLookup<FillFloatOverride> fillBarLookup;
     [ReadOnly] public ComponentLookup<UnitIconsComponent> unitsIconsLookup;
+    [ReadOnly] public ComponentLookup<SelectTag> selectLookup;
     [ReadOnly] public BufferLookup<Child> childrenLookup;
     public EntityCommandBuffer.ParallelWriter ecb;
 
@@ -123,10 +128,11 @@ public partial struct DealingDamageJob : IJobEntity
             ecb.RemoveComponent<VisionCharsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<TeamComponent>(chunkIndexInQuery, attackRequest.target);
             ///TODO: Redo the line below as it shouldn't use children unstable nature
-            ecb.DestroyEntity(chunkIndexInQuery, childrenLookup[attackRequest.target][1].Value); //Destroying Selection Ring (it must be a child with index 1!) 
+            ecb.AddComponent<Disabled>(chunkIndexInQuery, selectLookup[attackRequest.target].selectionRing); //Disabling selectionRing
             ecb.RemoveComponent<SelectTag>(chunkIndexInQuery, attackRequest.target);
-            //Destroying all Unit Icons
-            UtilityFuncs.DestroyParentAndAllChildren(ecb, childrenLookup, unitsIconsLookup[attackRequest.target].infoQuadsEntity, chunkIndexInQuery);
+            //Disabling all Unit Icons
+            //ecb.AddComponent<Disabled>(chunkIndexInQuery, unitsIconsLookup[attackRequest.target].infoQuadsEntity);
+            //UtilityFuncs.DestroyParentAndAllChildren(ecb, childrenLookup, unitsIconsLookup[attackRequest.target].infoQuadsEntity, chunkIndexInQuery);
             ecb.RemoveComponent<UnitIconsComponent>(chunkIndexInQuery, attackRequest.target);
             ecb.RemoveComponent<UnitStatsRequestTag>(chunkIndexInQuery, attackRequest.target);
 

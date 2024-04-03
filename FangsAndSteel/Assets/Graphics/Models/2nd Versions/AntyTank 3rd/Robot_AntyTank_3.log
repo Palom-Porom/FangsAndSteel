@@ -1,0 +1,24 @@
+Model: Robot_AntyTank_3
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.098
+   24fps, 2048x2048, 67108KB
+     0 Rest : 0,2083s 5f [0..4]
+     1 Move : 1,6667s 40f [5..44]
+     2 Death : 2,2917s 55f [45..99]
+     3 Recharge : 4,1667s 100f [100..199]
+     4 Attack : 5s 120f [200..319]
+   Frame Count> Expected: 320, Actual: 320
+   Point Count> Expected: 3934848, Actual: 3934848
+   Fill ratio: 93,84766%.
+   5 clips, 24fps, 13,3333s, 320f
+Started: 4/3/2024 12:58:47 AM
+Output files were saved to: Assets/ExampleScene/Baked\Robot_AntyTank_3
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 1141,0793 seconds.
