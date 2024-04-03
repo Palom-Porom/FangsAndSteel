@@ -319,7 +319,7 @@ public partial struct MovementJob : IJobChunk
 
                 if (math.distancesq(movements[i].target, transforms[i].Position) < math.max(deltaTime * movements[i].speed, 0.1f)) // has got to the current target?
                 {
-                    ecb.DestroyEntity(unfilteredChunkIndex, flagsArr);
+                    //ecb.DestroyEntity(unfilteredChunkIndex, flagsArr);
 
                     UnsafeUtility.ArrayElementAsRef<LocalTransform>(transformsPtr, i).Position = movements[i].target;
                     if (movementCommandsBuffs[i].Length != 0) //Has next target to move?
@@ -328,27 +328,27 @@ public partial struct MovementJob : IJobChunk
                         movementCommandsBuffs[i].RemoveAt(0);
                         #region FlagsUpdate
                         {
-                            NativeArray<Entity> flags = new NativeArray<Entity>(9, Allocator.Temp);
-                            flags[0] = flag1_prefub;
-                            flags[1] = flag2_prefub;
-                            flags[2] = flag3_prefub;
-                            flags[3] = flag4_prefub;
-                            flags[4] = flag5_prefub;
-                            flags[5] = flag6_prefub;
-                            flags[6] = flag7_prefub;
-                            flags[7] = flag8_prefub;
-                            flags[8] = flag9_prefub;
-                            for (int j = 0; j < movementCommandsBuffs[i].Length; j++)
-                            {
-                                Entity tmp = ecb.Instantiate(unfilteredChunkIndex, flags[j]);
-                                ecb.SetComponent(unfilteredChunkIndex, tmp, new LocalTransform
-                                {
-                                    Position = movementCommandsBuffs[i][j].target,
-                                    Rotation = quaternion.identity,
-                                    Scale = 1
-                                });
-                                ecb.AddComponent<FlagTag>(unfilteredChunkIndex, tmp);
-                            }
+                            //NativeArray<Entity> flags = new NativeArray<Entity>(9, Allocator.Temp);
+                            //flags[0] = flag1_prefub;
+                            //flags[1] = flag2_prefub;
+                            //flags[2] = flag3_prefub;
+                            //flags[3] = flag4_prefub;
+                            //flags[4] = flag5_prefub;
+                            //flags[5] = flag6_prefub;
+                            //flags[6] = flag7_prefub;
+                            //flags[7] = flag8_prefub;
+                            //flags[8] = flag9_prefub;
+                            //for (int j = 0; j < movementCommandsBuffs[i].Length; j++)
+                            //{
+                            //    Entity tmp = ecb.Instantiate(unfilteredChunkIndex, flags[j]);
+                            //    ecb.SetComponent(unfilteredChunkIndex, tmp, new LocalTransform
+                            //    {
+                            //        Position = movementCommandsBuffs[i][j].target,
+                            //        Rotation = quaternion.identity,
+                            //        Scale = 1
+                            //    });
+                            //    ecb.AddComponent<FlagTag>(unfilteredChunkIndex, tmp);
+                            //}
                         }
                         #endregion
                     }
