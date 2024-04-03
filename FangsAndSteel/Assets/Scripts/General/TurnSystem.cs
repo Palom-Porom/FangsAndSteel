@@ -36,6 +36,8 @@ public partial class TurnSystem : SystemBase
     EntityQuery replayCopiesQuery;
     EntityQuery actualEntitiesQuery;
 
+    private EntityQuery flagsQuery;
+
     protected override void OnCreate()
     {
         RequireForUpdate<GameTag>();
@@ -58,6 +60,8 @@ public partial class TurnSystem : SystemBase
         replayStartCopiesQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<ReplayStartCopyTag, LinkedEntityGroup>().WithOptions(EntityQueryOptions.IncludeDisabledEntities).Build(this);
         replayCopiesQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<ReplayCopyTag, LinkedEntityGroup>().WithOptions(EntityQueryOptions.IncludeDisabledEntities).Build(this);
         actualEntitiesQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<ActualEntityTag, LinkedEntityGroup>().WithOptions(EntityQueryOptions.IncludeDisabledEntities).Build(this);
+
+        flagsQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<FlagTag>().Build(this);
     }
 
     protected override void OnStartRunning()
@@ -101,6 +105,8 @@ public partial class TurnSystem : SystemBase
                 ///TODO: Create some animation to hide the changing players process
                 
                 SelectionSystem.needUpdateUIPanelInfo = true;
+
+                ecb.DestroyEntity(flagsQuery, EntityQueryCaptureMode.AtRecord);
 
                 switch (curTeam.ValueRO.value)
                 {

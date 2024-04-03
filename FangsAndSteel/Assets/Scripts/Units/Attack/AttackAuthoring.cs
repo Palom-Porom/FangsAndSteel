@@ -133,7 +133,7 @@ public struct ReloadComponent : IComponentData
 
     ///<value> If true then unit is ready to fire </value>
     public bool isReloaded() { return curBullets > 0 && bulletReloadElapsed >= bulletReloadLen; }
-    public bool isReloading() { return !isReloaded() && shootAnimElapsed >= shootAnimLen; }
+    public bool isReloading() { return curBullets == 0 && shootAnimElapsed >= shootAnimLen; }
 }
 
 

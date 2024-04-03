@@ -136,6 +136,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
+      propertyPath: drumReload
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
       propertyPath: timeToShoot
       value: 1.4
       objectReference: {fileID: 0}
@@ -279,6 +284,11 @@ PrefabInstance:
       propertyPath: maxHp
       value: 50
       objectReference: {fileID: 0}
+    - target: {fileID: 5973439578278865204, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: timeToDie
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7064979545767166671, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: m_Name
@@ -362,7 +372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 442e31c9b21679447b2de5306ecd98e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeOfUnit: 2
+  typeOfUnit: 1
 --- !u!114 &4051510577491241939
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -544,18 +544,27 @@ public partial struct AttackRotationJob : IJobEntity
         in ReloadComponent reload, in LocalToWorld localToWorld, Entity entity)
     {
         #region Update target and handle automatic return to default rotation
-        if (reload.isReloading())
+        //if (reload.curBullets == 0 && reload.shootAnimElapsed < reload.shootAnimLen)
+        //{
+        //    Debug.Log($"{rotation.newRotTarget}  =========  {rotation.curRotTarget}");
+        //    rotation.newRotTarget = rotation.curRotTarget;
+        //}
+        /*else*/ if (reload.isReloading())
         {
             if (!rotation.isRotatingToDefault)
             {
                 //rotation.newRotTarget = quaternion.LookRotationSafe(localToWorld.Forward, localToWorld.Up);
                 rotation.newRotTarget = quaternion.identity;
                 rotation.isRotatingToDefault = true;
+                //Debug.Log("what?");
             }
         }
         else if (attackChars.target != Entity.Null)
         {
-            rotation.newRotTarget = quaternion.LookRotationSafe(transformLookup[attackChars.target].Position - localToWorld.Position, localToWorld.Up);
+            //Debug.Log($"Updating rotation target to enemy === {rotation.rotTimeElapsed} || {rotation.isRotatingToDefault}  || {rotation.newRotTarget}");
+            //Debug.Log($"Updating rotation target to enemy === {transformLookup[attackChars.target].Position} || {localToWorld.Position}  || {transformLookup[attackChars.target].Position - localToWorld.Position} || {localToWorld.Up}");
+            rotation.newRotTarget = math.normalize(quaternion.LookRotationSafe(transformLookup[attackChars.target].Position - localToWorld.Position, localToWorld.Up));
+            rotation.newRotTarget = math.mul(math.inverse(localToWorld.Rotation), rotation.newRotTarget);
             rotation.isInDefaultState = false;
             rotation.isRotatingToDefault = false;
             rotation.noRotTimeElapsed = 0;
@@ -566,15 +575,17 @@ public partial struct AttackRotationJob : IJobEntity
                 return;
             if (!rotation.isRotatingToDefault)
             {
+                //Debug.Log("Kap");
                 rotation.noRotTimeElapsed += deltaTime;
-                if (rotation.noRotTimeElapsed >= rotation.timeToReturnRot)
+                if (rotation.noRotTimeElapsed >= rotation.timeToReturnRot && (reload.curBullets != 0 || reload.shootAnimElapsed >= reload.shootAnimLen))
                 {
+                    //Debug.Log($"AHTUNG! === {rotation.noRotTimeElapsed} || {rotation.timeToReturnRot}");
                     //rotation.newRotTarget = quaternion.LookRotationSafe(localToWorld.Forward, localToWorld.Up);
                     rotation.newRotTarget = quaternion.identity;
                     rotation.isRotatingToDefault = true;
                 }
-                else
-                    return;
+                //else
+                //    return;
             }
         }
         #endregion
@@ -582,6 +593,8 @@ public partial struct AttackRotationJob : IJobEntity
         #region Usual rotation logic, but for attackModels
         if (UtilityFuncs.Nearly_Equals(rotation.newRotTarget, rotation.curRotTarget))
         {
+            //if (reload.curBullets == 0)
+                //Debug.Log($"{rotation.rotTimeElapsed} || {rotation.isRotatingToDefault}  || {rotation.newRotTarget}");
             if (rotation.rotTimeElapsed < rotation.rotTime)
             {
                 rotation.rotTimeElapsed += deltaTime;
@@ -589,6 +602,7 @@ public partial struct AttackRotationJob : IJobEntity
                 foreach (var model in attackModelsBuf)
                 {
                     if (notRotateLookup.HasComponent(model)) continue;
+                    //transformLookup.GetRefRW(model).ValueRW.Rotation = math.mul(transformLookup[model].Rotation, resultRotation);
                     transformLookup.GetRefRW(model).ValueRW.Rotation = resultRotation;
                 }
             }
@@ -597,6 +611,7 @@ public partial struct AttackRotationJob : IJobEntity
                 foreach (var model in attackModelsBuf)
                 {
                     if (notRotateLookup.HasComponent(model)) continue;
+                    //transformLookup.GetRefRW(model).ValueRW.Rotation = math.mul(transformLookup[model].Rotation, rotation.newRotTarget);
                     transformLookup.GetRefRW(model).ValueRW.Rotation = rotation.newRotTarget;
                 }
                 if (rotation.isRotatingToDefault)
@@ -615,6 +630,7 @@ public partial struct AttackRotationJob : IJobEntity
             foreach (var model in attackModelsBuf)
             {
                 if (notRotateLookup.HasComponent(model)) continue;
+                //transformLookup.GetRefRW(model).ValueRW.Rotation = math.mul(transformLookup[model].Rotation, resultRotation);
                 transformLookup.GetRefRW(model).ValueRW.Rotation = resultRotation;
             }
         }

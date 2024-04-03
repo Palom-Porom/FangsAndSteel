@@ -16,7 +16,7 @@ PrefabInstance:
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: drumReload
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
@@ -26,7 +26,7 @@ PrefabInstance:
     - target: {fileID: 1014067441436641096, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: shootingAnimationLen
-      value: 3
+      value: 1.875
       objectReference: {fileID: 0}
     - target: {fileID: 1546917142724999845, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
@@ -182,6 +182,11 @@ PrefabInstance:
         type: 3}
       propertyPath: maxHp
       value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 5973439578278865204, guid: c743507d0fc900b45898c8e09289fb9b,
+        type: 3}
+      propertyPath: timeToDie
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7064979545767166671, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}

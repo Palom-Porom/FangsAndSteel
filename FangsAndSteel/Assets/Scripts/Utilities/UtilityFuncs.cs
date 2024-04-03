@@ -35,7 +35,7 @@ public static class UtilityFuncs
     }
 
 
-    const float LOW_FLOAT = 0.005f;
+    const float LOW_FLOAT = 0.01f;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Nearly_Equals(quaternion q1, quaternion q2)
     {

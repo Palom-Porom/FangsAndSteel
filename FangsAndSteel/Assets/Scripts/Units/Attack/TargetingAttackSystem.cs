@@ -266,6 +266,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             rest_deployedClips = rest_deployedClips,
 
             attackCharsTypeHandleRO = attackCharsTypeHandleRO,
+            battleModeSettsSettsTypeHandleRO = battleModeTypeHandleRO,
             pursuingModeSettsTypeHandleRO = pursuingModeTypeHandleRO,
             deployableTypeHandle = deployableTypeHandle,
             movementTypeHandle = movementTypeHandle,
@@ -570,7 +571,7 @@ public partial struct _CreateUsualAttackRequestsJob : IJobChunk
             for (int i = 0; i < chunk.Count; i++)
             {
                 //if has some target -> shoot
-                if (attackChars[i].target != Entity.Null)
+                if (attackChars[i].target != Entity.Null && !battleModeSetts[i].shootingDisabled)
                 {
                     if (!reloads[i].isReloaded()) // if not reloaded -> return
                         continue;
@@ -687,6 +688,7 @@ public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 
     public ComponentTypeHandle<Deployable> deployableTypeHandle;
     [ReadOnly] public ComponentTypeHandle<AttackCharsComponent> attackCharsTypeHandleRO;
+    [ReadOnly] public ComponentTypeHandle<BattleModeComponent> battleModeSettsSettsTypeHandleRO;
     [ReadOnly] public ComponentTypeHandle<PursuingModeComponent> pursuingModeSettsTypeHandleRO;
     public ComponentTypeHandle<MovementComponent> movementTypeHandle;
     [ReadOnly] public ComponentTypeHandle<LocalTransform> transformTypeHandleRO;
@@ -702,6 +704,7 @@ public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
         {
             Deployable* deployables = chunk.GetComponentDataPtrRW(ref deployableTypeHandle);
             AttackCharsComponent* attackChars = chunk.GetComponentDataPtrRO(ref attackCharsTypeHandleRO);
+            BattleModeComponent* battleModeSetts = chunk.GetComponentDataPtrRO(ref battleModeSettsSettsTypeHandleRO);
             PursuingModeComponent* pursuingModes = chunk.GetComponentDataPtrRO(ref pursuingModeSettsTypeHandleRO);
             MovementComponent* movements = chunk.GetComponentDataPtrRW(ref movementTypeHandle);
             LocalTransform* transforms = chunk.GetComponentDataPtrRO(ref transformTypeHandleRO);
@@ -718,7 +721,7 @@ public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 
             for (int i = 0; i < chunk.Count; i++)
             {
-                if (attackChars[i].target != Entity.Null)
+                if (attackChars[i].target != Entity.Null && !battleModeSetts[i].shootingDisabled)
                 {
                     deployables[i].waitingTimeCur = 0; // remove to other place (is it possible to null this value in some if - not every frame when unit has a target?)
 
@@ -771,9 +774,9 @@ public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
                                 
                                 RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
                                 animCmd.ValueRW.ClipIndex = attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex;
-                                Debug.Log(animStateLookup[modelBufElem.model].ModelIndex);
-                                Debug.Log(attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipName);
-                                Debug.Log(attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex);
+                                //Debug.Log(animStateLookup[modelBufElem.model].ModelIndex);
+                                //Debug.Log(attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipName);
+                                //Debug.Log(attackClips[animStateLookup[modelBufElem.model].ModelIndex].ClipIndex);
                                 animCmd.ValueRW.Cmd = AnimationCmd.PlayOnce;
                             }
                         }

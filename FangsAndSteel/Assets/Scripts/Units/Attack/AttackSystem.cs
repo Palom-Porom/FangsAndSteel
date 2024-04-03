@@ -18,6 +18,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     ComponentLookup<FillFloatOverride> fillBarLookup;
     ComponentLookup<UnitIconsComponent> unitsIconsLookup;
     ComponentLookup<SelectTag> selectLookup;
+    ComponentLookup<Deployable> deployableLookup;
     BufferLookup<Child> childrenLookup;
 
     ComponentLookup<LocalTransform> localTransformLookup;
@@ -25,6 +26,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
     ComponentLookup<AnimationStateData> animStateLookup;
     BufferLookup<ModelsBuffer> modelBufLookup;
     NativeArray<AnimDbEntry> deathClips;
+    NativeArray<AnimDbEntry> death_deployedClips;
 
     //[BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -36,6 +38,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
         unitsIconsLookup = state.GetComponentLookup<UnitIconsComponent>(true);
         selectLookup = state.GetComponentLookup<SelectTag>(true);
+        deployableLookup = state.GetComponentLookup<Deployable>(true);
         childrenLookup = state.GetBufferLookup<Child>(true);
 
         localTransformLookup = state.GetComponentLookup<LocalTransform>();
@@ -46,7 +49,8 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
 
     public void OnStartRunning(ref SystemState state)
     {
-        deathClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Death");        
+        deathClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Death");
+        death_deployedClips = SystemAPI.GetSingleton<AnimDbRefData>().FindClips("Death_Deployed");        
     }
 
     public void OnStopRunning(ref SystemState state)
@@ -61,6 +65,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
         fillBarLookup.Update(ref state);
         unitsIconsLookup.Update(ref state);
         selectLookup.Update(ref state);
+        deployableLookup.Update(ref state);
         childrenLookup.Update(ref state);
         localTransformLookup.Update(ref state);
         animCmdLookup.Update(ref state);
@@ -73,6 +78,7 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
             fillBarLookup = fillBarLookup, 
             unitsIconsLookup = unitsIconsLookup, 
             selectLookup = selectLookup,
+            deployableLookup = deployableLookup,
             childrenLookup = childrenLookup,
             ecb = ecb,
 
@@ -80,7 +86,8 @@ public partial struct AttackSystem : ISystem, ISystemStartStop
             animCmdLookup = animCmdLookup,
             animStateLookup = animStateLookup,
             modelBufLookup = modelBufLookup,
-            deathClips = deathClips
+            deathClips = deathClips,
+            death_deployedClips = death_deployedClips
         }.Schedule();
 
         //foreach((MovementComponent move, Entity entity) in SystemAPI.Query<MovementComponent>().WithEntityAccess() )
@@ -97,6 +104,7 @@ public partial struct DealingDamageJob : IJobEntity
     public ComponentLookup<FillFloatOverride> fillBarLookup;
     [ReadOnly] public ComponentLookup<UnitIconsComponent> unitsIconsLookup;
     [ReadOnly] public ComponentLookup<SelectTag> selectLookup;
+    [ReadOnly] public ComponentLookup<Deployable> deployableLookup;
     [ReadOnly] public BufferLookup<Child> childrenLookup;
     public EntityCommandBuffer.ParallelWriter ecb;
 
@@ -105,6 +113,7 @@ public partial struct DealingDamageJob : IJobEntity
     [ReadOnly] public ComponentLookup<AnimationStateData> animStateLookup;
     [ReadOnly] public BufferLookup<ModelsBuffer> modelBufLookup;
     public NativeArray<AnimDbEntry> deathClips;
+    public NativeArray<AnimDbEntry> death_deployedClips;
 
     public void Execute(in AttackRequestComponent attackRequest, Entity requestEntity, [ChunkIndexInQuery] int chunkIndexInQuery)
     {
@@ -141,13 +150,27 @@ public partial struct DealingDamageJob : IJobEntity
             float maxTimeToDie = float.MinValue;
             if (modelBufLookup.HasBuffer(attackRequest.target))
             {
-                foreach (var modelBufElem in modelBufLookup[attackRequest.target])
+                if (!deployableLookup.HasComponent(attackRequest.target))
                 {
-                    AnimDbEntry deathClip = deathClips[animStateLookup[modelBufElem.model].ModelIndex];
-                    RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
-                    animCmd.ValueRW.ClipIndex = deathClip.ClipIndex;
-                    animCmd.ValueRW.Cmd = AnimationCmd.PlayOnceAndStop;
-                    maxTimeToDie = math.max(maxTimeToDie, deathClip.GetLength());
+                    foreach (var modelBufElem in modelBufLookup[attackRequest.target])
+                    {
+                        AnimDbEntry deathClip = deathClips[animStateLookup[modelBufElem.model].ModelIndex];
+                        RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                        animCmd.ValueRW.ClipIndex = deathClip.ClipIndex;
+                        animCmd.ValueRW.Cmd = AnimationCmd.PlayOnceAndStop;
+                        maxTimeToDie = math.max(maxTimeToDie, deathClip.GetLength());
+                    }
+                }
+                else
+                {
+                    foreach (var modelBufElem in modelBufLookup[attackRequest.target])
+                    {
+                        AnimDbEntry deathClip = death_deployedClips[animStateLookup[modelBufElem.model].ModelIndex];
+                        RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
+                        animCmd.ValueRW.ClipIndex = deathClip.ClipIndex;
+                        animCmd.ValueRW.Cmd = AnimationCmd.PlayOnceAndStop;
+                        maxTimeToDie = math.max(maxTimeToDie, deathClip.GetLength());
+                    }
                 }
             }
             

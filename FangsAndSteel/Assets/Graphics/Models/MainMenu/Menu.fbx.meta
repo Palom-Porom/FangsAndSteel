@@ -3,7 +3,82 @@ guid: 0977d7a5e4c01dd428485081e54aebf6
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Barrel Base Color
+    second: {fileID: 2800000, guid: 2950cf631c7416144936d3a4cf9245c7, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Chair Base Color
+    second: {fileID: 2800000, guid: a803245840251f74995024a117fc4130, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: FirstRobotTexture_red (2)
+    second: {fileID: 2800000, guid: 10ce3d0230d10e347b72c5c6f9c969f0, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Playing_Board Base Color
+    second: {fileID: 2800000, guid: 314fbcd1d1684154881ebcf83ca048d7, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Rocket Base Color
+    second: {fileID: 2800000, guid: 40deb5b576ca964448266cebe70d12bf, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Room Base Color
+    second: {fileID: 2800000, guid: c2e1731e035605a4789984088e565b59, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Soon_Button Base Color
+    second: {fileID: 2800000, guid: 3d4649d093f01ed40884acbaf31017b5, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Table Base Color
+    second: {fileID: 2800000, guid: 87eca28c02afc7a40adec3a0804fce6d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Tool _Cabinet Base Color
+    second: {fileID: 2800000, guid: f1b264ff5d7f6e74ea26bd33b02fd8dc, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: ToolBox Base Color
+    second: {fileID: 2800000, guid: 95dee2143f424c944bd234d208d79b3d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Tool_1 Base Color
+    second: {fileID: 2800000, guid: b9b3ec265c9720f499db1978416a13b1, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Tool_2 Base Color
+    second: {fileID: 2800000, guid: 637f094ba2159f041b923875af462ddf, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Tool_3 Base Color
+    second: {fileID: 2800000, guid: b7ee9d5571a61124c8b3c9752e8d473e, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Tool_4 Base Color
+    second: {fileID: 2800000, guid: 092d2af961489eb49b71b7d82bff8689, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: White_Checkers Base Color
+    second: {fileID: 2800000, guid: 5b20e9de6fe5edc4fafeea484f451fb9, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
