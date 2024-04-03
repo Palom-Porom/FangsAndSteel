@@ -15,7 +15,7 @@ using UnityEngine.UI;
 public partial class TurnSystem : SystemBase
 {
     const float TURN_LEN = 10;
-    const float TIME_TO_CLOSE_NEW_TURN_PANEL = 1;
+    const float TIME_TO_CLOSE_NEW_TURN_PANEL = 0.4f;
     StaticUIData uiData;
     public static float timeToRun;
     public static float timeToClose_NewTurnPanel;
@@ -123,6 +123,7 @@ public partial class TurnSystem : SystemBase
 
                             //Change cur team
                             curTeam.ValueRW.value = 2;
+                            StaticUIRefs.Instance.NewTurnText.text = "Ход игрока 2";
 
                             //Disable actual units, copy and enable ReplayStartCopies (if no ReplayStartCopies -> no "copy and enable" as it is the first turn)
                             if (!replayStartCopiesQuery.IsEmpty)
@@ -169,6 +170,7 @@ public partial class TurnSystem : SystemBase
 
                             //Change cur team
                             curTeam.ValueRW.value = 1;
+                            StaticUIRefs.Instance.NewTurnText.text = "Ход игрока 1";
 
                             //Create new ReplayStartCopies
                             Dependency = new CreateNewReplayStartEntitiesJob

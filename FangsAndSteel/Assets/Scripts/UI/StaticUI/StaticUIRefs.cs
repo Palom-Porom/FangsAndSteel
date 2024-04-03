@@ -35,6 +35,8 @@ public class StaticUIRefs : MonoBehaviour
 
     public GameObject NewTurnPanel { get { return newTurnPanel; } }
     [SerializeField] private GameObject newTurnPanel;
+    public TextMeshProUGUI NewTurnText { get { return newTurnText; } }
+    [SerializeField] private TextMeshProUGUI newTurnText;
 
     void Awake()
     {
