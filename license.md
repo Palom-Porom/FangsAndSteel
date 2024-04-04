@@ -1,2 +1,5 @@
 https://gitlab.com/lclemens/animationcooker
-https://assetstore.unity.com/packages/2d/textures-materials/nature/terrain-textures-pack-free-139542#description
+
+https://assetstore.unity.com/packages/2d/textures-materials/water/stylize-water-texture-153577
+
+https://assetstore.unity.com/packages/2d/textures-materials/glovergames-free-ground-textures-135418
