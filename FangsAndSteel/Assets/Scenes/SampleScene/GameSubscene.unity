@@ -428,20 +428,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: First Robot Red (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 2347092019227322374, guid: 916e12f1481daef48b465e4998f3cee9,
+        type: 3}
+      propertyPath: curHp
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 2347092019227322374, guid: 916e12f1481daef48b465e4998f3cee9,
+        type: 3}
+      propertyPath: maxHp
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 2495709151011022997, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 77.100006
+      value: 6.43
       objectReference: {fileID: 0}
     - target: {fileID: 2495709151011022997, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 3.67
       objectReference: {fileID: 0}
     - target: {fileID: 2495709151011022997, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 27.300007
+      value: 19.5
       objectReference: {fileID: 0}
     - target: {fileID: 2495709151011022997, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
@@ -482,6 +492,11 @@ PrefabInstance:
         type: 3}
       propertyPath: teamInd
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8963799964249359994, guid: 916e12f1481daef48b465e4998f3cee9,
+        type: 3}
+      propertyPath: damage
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -791,17 +806,17 @@ PrefabInstance:
     - target: {fileID: 2495709151011022997, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -84.8
+      value: -19.8
       objectReference: {fileID: 0}
     - target: {fileID: 2495709151011022997, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 4.1
       objectReference: {fileID: 0}
     - target: {fileID: 2495709151011022997, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -17.300003
+      value: 49.3
       objectReference: {fileID: 0}
     - target: {fileID: 2495709151011022997, guid: 916e12f1481daef48b465e4998f3cee9,
         type: 3}
