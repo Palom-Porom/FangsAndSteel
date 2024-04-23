@@ -852,6 +852,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0f8880dd7d47ec349b3fad58ce3395c4, type: 3}
+--- !u!1 &1553328846 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 58653202911378601, guid: ecf47eede3abb274ea1e783f29462692,
+    type: 3}
+  m_PrefabInstance: {fileID: 3254771051149641933}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2027750251
 GameObject:
   m_ObjectHideFlags: 0
@@ -992,6 +998,11 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1883859969043900049, guid: ecf47eede3abb274ea1e783f29462692,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3250333850942499965, guid: ecf47eede3abb274ea1e783f29462692,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1007,6 +1018,11 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5571978083240006078, guid: ecf47eede3abb274ea1e783f29462692,
+        type: 3}
+      propertyPath: settingsWindow
+      value: 
+      objectReference: {fileID: 1553328846}
     - target: {fileID: 5928277428758596328, guid: ecf47eede3abb274ea1e783f29462692,
         type: 3}
       propertyPath: m_AnchorMax.y
