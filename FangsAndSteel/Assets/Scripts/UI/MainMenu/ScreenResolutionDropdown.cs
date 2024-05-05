@@ -7,17 +7,6 @@ using TMPro;
 public class ScreenResolutionDropdown : MonoBehaviour
 {
     public TMP_Dropdown dropdown;
-    
-    void Start()
-    {
-        Screen.fullScreen = true;
-    }
-
-
-    void Update()
-    {
-
-    }
 
     public void ChangeResolution()
     {
