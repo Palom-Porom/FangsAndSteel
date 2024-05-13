@@ -963,6 +963,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81f06c2784c1b7046934862eb6ceddfd, type: 3}
+--- !u!1 &233583915 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 58653202911378601, guid: ecf47eede3abb274ea1e783f29462692,
+    type: 3}
+  m_PrefabInstance: {fileID: 1128596959}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &239230113 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6444458018089525990, guid: 18ef5ae30f563ef4db59f7e46d765461,
@@ -4149,6 +4155,11 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5571978083240006078, guid: ecf47eede3abb274ea1e783f29462692,
+        type: 3}
+      propertyPath: settingsWindow
+      value: 
+      objectReference: {fileID: 233583915}
     - target: {fileID: 5705912115620853775, guid: ecf47eede3abb274ea1e783f29462692,
         type: 3}
       propertyPath: PointerRing1

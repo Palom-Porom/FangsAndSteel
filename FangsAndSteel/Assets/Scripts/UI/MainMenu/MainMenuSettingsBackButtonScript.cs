@@ -3,26 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SettingsButtonScript : MonoBehaviour
+public class MainMenuSettingsBackButtonScript : MonoBehaviour
 {
     Button button;
     public GameObject settingsWindow;
-    
-
-    public void OpenSettingWindow()
+   
+    public void CloseSettingsWindow()
     {
-        settingsWindow.SetActive(true);
+        settingsWindow.SetActive(false);
     }
 
     private void Awake()
     {
         button = GetComponent<Button>();
-        button.onClick.AddListener(OpenSettingWindow);
-
+        button.onClick.AddListener(CloseSettingsWindow);
     }
 
     private void OnDestroy()
     {
-        button.onClick.RemoveListener(OpenSettingWindow);
+        button.onClick.RemoveListener(CloseSettingsWindow);
     }
 }
