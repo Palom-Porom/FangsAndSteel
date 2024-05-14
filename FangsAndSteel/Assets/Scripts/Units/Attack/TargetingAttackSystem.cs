@@ -297,7 +297,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 
 
 ///<summary> Update all units' reloadTime values and reload bars </summary>
-[BurstCompile]
+//[BurstCompile]
 public partial struct _ReloadJob : IJobChunk
 {
     public float deltaTime;
@@ -363,7 +363,7 @@ public partial struct _ReloadJob : IJobChunk
                     }
 
                     reloads[i].drumReloadElapsed += deltaTime;
-                    if (reloads[i].drumReloadElapsed > reloads[i].drumReloadLen * (1 - reloads[i].curDebaff))
+                    if (reloads[i].drumReloadElapsed > reloads[i].drumReloadLen * (1 + reloads[i].curDebaff))
                     {
                         reloads[i].curBullets = reloads[i].maxBullets;
                         reloads[i].bulletReloadElapsed = reloads[i].bulletReloadLen;
@@ -372,7 +372,7 @@ public partial struct _ReloadJob : IJobChunk
                         reloads[i].shootAnimElapsed = 0f;
                         continue;
                     }
-                    fillBarLookup.GetRefRW(unitIcons[i].reloadBarEntity).ValueRW.Value = reloads[i].drumReloadElapsed / reloads[i].drumReloadLen;
+                    fillBarLookup.GetRefRW(unitIcons[i].reloadBarEntity).ValueRW.Value = reloads[i].drumReloadElapsed / (reloads[i].drumReloadLen * (1 + reloads[i].curDebaff));
 
                 }
 
@@ -462,6 +462,8 @@ public partial struct AttackTargetSearchJob : IJobEntity
         double bestScore = double.MinValue;
         Entity bestScoreEntity = Entity.Null;
 
+        bool hasPursueTarget = false;
+
         foreach (Entity potentialTarget in potentialTargetsArr)
         {
             //Check if they are in different teams
@@ -472,6 +474,8 @@ public partial struct AttackTargetSearchJob : IJobEntity
 
             float distanceToPotTargetSq = math.distancesq(localTransform.Position, localToWorldLookup[potentialTarget].Position);
             float targetHpPercentage = (hpLookup[potentialTarget].curHp / hpLookup[potentialTarget].maxHp) * 100;
+            if (modeSettings.isAutoTrigger)
+                Debug.Log($"maxHp = {targetHpPercentage} |||| unitTypes = {(uint)unitType.value & modeSettings.autoTriggerUnitTypes} |||| distToTar = {distanceToPotTargetSq} |||| maxDist = {modeSettings.autoTriggerRadiusSq}");
 
             #region auto-trigger and radius
             if ((modeSettings.isAutoTrigger /*|| (modeSettings.autoTriggerStatic && (!movement.hasMoveTarget || !movement.isAbleToMove))*/) // <-- suppose autoTriggerStatic is not so useful option for player
@@ -482,10 +486,8 @@ public partial struct AttackTargetSearchJob : IJobEntity
                 &&
                 ((uint)unitType.value & modeSettings.autoTriggerUnitTypes) != 0)
             {
-                curScore += 10000; // such targets has higher priority than other (auto-trigger has more priority than usual attack)
-                battleModeEnabledRefRW.ValueRW = false;
-                pursuingModeEnabledRefRW.ValueRW = true;
-                pursuingModeComponent.Target = attackChars.target;
+                curScore += 100000; // such targets has higher priority than other (auto-trigger has more priority than usual attack)
+                hasPursueTarget = true;
             }
             else if (distanceToPotTargetSq > attackChars.radiusSq)
                 continue; // if pot target is not in any of the radiuses - going to next potential target
@@ -513,13 +515,26 @@ public partial struct AttackTargetSearchJob : IJobEntity
         }
 
         attackChars.target = bestScoreEntity;
+
+        if (hasPursueTarget)
+        {
+            battleModeEnabledRefRW.ValueRW = false;
+            pursuingModeEnabledRefRW.ValueRW = true;
+            pursuingModeComponent.Target = attackChars.target;
+        }
+        //else <--- no need in this as such modeChange is done in the PursuingJob
+        //{
+        //    battleModeEnabledRefRW.ValueRW = true;
+        //    pursuingModeEnabledRefRW.ValueRW = false;
+        //}
+
     }
 }
 
 
 /// <summary> Creates attack requests if needed and do connected to this things (animation, etc.) </summary>
 /// <remarks> That Job is for NON Deployable units! </remarks>
-[BurstCompile]
+//[BurstCompile]
 public partial struct _CreateUsualAttackRequestsJob : IJobChunk
 {
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
@@ -578,7 +593,7 @@ public partial struct _CreateUsualAttackRequestsJob : IJobChunk
 
                     bool isPursuingEnabled = chunk.IsComponentEnabled(ref pursuingModeSettsTypeHandleRO, i);
                     if (isPursuingEnabled &&
-                        pursuingModes[i].maxShootDistanceSq > math.distancesq(localToWorldLookup[pursuingModes[i].Target].Position, transforms[i].Position))
+                        pursuingModes[i].maxShootDistanceSq < math.distancesq(localToWorldLookup[pursuingModes[i].Target].Position, transforms[i].Position))
                     {//if pursuing and not close to target enough -> not shoot
                         continue;
                     }
