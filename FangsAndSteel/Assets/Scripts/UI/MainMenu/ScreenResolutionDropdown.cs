@@ -3,41 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Text.RegularExpressions;
 
 public class ScreenResolutionDropdown : MonoBehaviour
 {
     public TMP_Dropdown dropdown;
-
-    public void ChangeResolution()
+    public void Awake()
     {
-        switch (dropdown.value)
-        {
-            case 0:
-                Screen.SetResolution(2560, 1440, Screen.fullScreen);
-                break;
-
-            case 1:
-                Screen.SetResolution(1920, 1080, Screen.fullScreen);
-                break;
-            case 2:
-                Screen.SetResolution(1600, 900, Screen.fullScreen);
-                break;
-            case 3:
-                Screen.SetResolution(1536, 864, Screen.fullScreen);
-                break;
-            case 4:
-                Screen.SetResolution(1440, 900, Screen.fullScreen);
-                break;
-            case 5:
-                Screen.SetResolution(1366, 768, Screen.fullScreen);
-                break;
-            case 6:
-                Screen.SetResolution(1280, 720, Screen.fullScreen);
-                break;
-
-
-        }
+        MenuGameResolutionCompound(dropdown);
+    }
+    public static void ChangeResolution(TMP_Dropdown dropdown)
+    {
+        var s = dropdown.options[dropdown.value].text;
+        //Debug.Log(Regex.Match(s, @"(\d{3,4})x").Groups[1].ToString());
+        //Debug.Log(Regex.Match(s, @"x(\d{3,4})").Groups[1].ToString());
+        var s1 = int.Parse(Regex.Match(s, @"(\d{3,4})x").Groups[1].ToString());
+        var s2 = int.Parse(Regex.Match(s, @"x(\d{3,4})").Groups[1].ToString());
+        Screen.SetResolution(s1,s2,Screen.fullScreen);
     }
 
-    
+    public static void MenuGameResolutionCompound(TMP_Dropdown dropdown)
+    {
+        var s = $"{Screen.currentResolution.width}" + "x" + $"{Screen.currentResolution.height}";
+        var i = 0;
+        foreach (var op in dropdown.options)
+        {
+            if (s == op.text)
+            {
+                dropdown.value = i;
+                break;
+            }
+            i++;
+        }
+    }
 }
