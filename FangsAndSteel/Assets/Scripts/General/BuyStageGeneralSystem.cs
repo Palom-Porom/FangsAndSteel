@@ -20,7 +20,7 @@ public partial class BuyStageGeneralSystem : SystemBase
         RequireForUpdate<BuyStageNotCompletedTag>();
 
         completedTagLookup = SystemAPI.GetComponentLookup<BuyStageCompletedTag>();
-        notCompletedTagQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<BuyStageNotCompletedTag>().Build(EntityManager);
+        notCompletedTagQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<BuyStageNotCompletedTag>().Build(EntityManager);
     }
 
     protected override void OnStartRunning()
@@ -33,6 +33,7 @@ public partial class BuyStageGeneralSystem : SystemBase
         ///TODO: Show the player buy zone
 
         //Set 1st as the current player
+        StaticUIRefs.Instance.NewTurnText.text = "Этап закупки игрока 1";
         SystemAPI.GetSingletonRW<CurrentTeamComponent>().ValueRW.value = 1;
         fstPlayerFinished = false;
         EnableSystems(false);
@@ -68,7 +69,7 @@ public partial class BuyStageGeneralSystem : SystemBase
 
             if (!fstPlayerFinished)
             {
-                StaticUIRefs.Instance.NewTurnText.text = "Ход игрока 2";
+                StaticUIRefs.Instance.NewTurnText.text = "Этап закупки игрока 2";
                 SystemAPI.GetSingletonRW<CurrentTeamComponent>().ValueRW.value = 2;
                 fstPlayerFinished = true;
             }
