@@ -1,0 +1,25 @@
+Model: FirstRobotFinal_Red
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone
+   24fps, 1024x512, 8388KB
+     0 Rest : 1,6667s 40f [0..39]
+     1 Move : 1,6667s 40f [40..79]
+     2 Attack : 1,4167s 34f [80..113]
+     3 Recharge : 1,6667s 40f [114..153]
+     4 Death_1 : 1,6667s 40f [154..193]
+     5 Death : 1,1667s 28f [194..221]
+   Frame Count> Expected: 222, Actual: 222
+   Point Count> Expected: 477214, Actual: 477214
+   Fill ratio: 91,21094%.
+   6 clips, 24fps, 9,25s, 222f
+Started: 5/16/2024 10:27:43 AM
+Output files were saved to: Assets/ExampleScene/Baked\FirstRobotFinal_Red
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 24,953 seconds.
