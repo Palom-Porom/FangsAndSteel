@@ -24,10 +24,12 @@ public class GameStartSetResolution : MonoBehaviour
         }
         if (!flag)
         {
-            dropdown.options.Add(new TMP_Dropdown.OptionData() { text = s });
-            dropdown.value = 18;
-            Screen.SetResolution(Screen.currentResolution.width,Screen.currentResolution.height, Screen.fullScreen);
-            //Debug.Log("ура");
+            //dropdown.options.Add(new TMP_Dropdown.OptionData() { text = s });
+            //dropdown.value = 18;
+            dropdown.options.Insert(0, new TMP_Dropdown.OptionData() { text = s });
+            dropdown.value = 0;
+            Screen.SetResolution(resolutions[resolutions.Length - 1].width, resolutions[resolutions.Length-1].height,Screen.fullScreen);
+            Debug.Log("ура");
         }
         
     }

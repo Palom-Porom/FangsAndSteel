@@ -76,5 +76,14 @@ public class StaticUIRefs : MonoBehaviour
     [HideInInspector] public bool newTurnStartBut;
 
 
+
+    [HideInInspector] public bool removeUnitButton;
+    [HideInInspector] public bool buyInfantryManButton;
+    [HideInInspector] public bool buyMachineGunnerButton;
+    [HideInInspector] public bool buyAntiTankButton;
+    [HideInInspector] public bool buyTankButton;
+    [HideInInspector] public bool buyArtilleryButton;
+    public TextMeshProUGUI BalanceText { get { return balanceText; } }
+    [SerializeField] private TextMeshProUGUI balanceText;
     public void SetNewTurnButton() { newTurnStartBut = true; }
 }
