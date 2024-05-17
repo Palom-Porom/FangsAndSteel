@@ -1,0 +1,28 @@
+Model: Machine_Gunner_Red
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.009
+   24fps, 2048x1024, 33554KB
+     0 Rest : 0,2083s 5f [0..4]
+     1 Move : 1,6667s 40f [5..44]
+     2 Attack : 0,2083s 5f [45..49]
+     3 Death : 2,6667s 64f [50..113]
+     4 Deploy : 1,75s 42f [114..155]
+     5 Rest_Deployed : 0,2083s 5f [156..160]
+     6 Death_Deployed : 1,75s 42f [161..202]
+     7 Undeploy : 2,6667s 64f [203..266]
+     8 Recharge : 5,1667s 124f [267..390]
+   Frame Count> Expected: 391, Actual: 391
+   Point Count> Expected: 1275926, Actual: 1275926
+   Fill ratio: 60,9375%.
+   9 clips, 24fps, 16,2917s, 391f
+Started: 5/17/2024 4:05:14 AM
+Output files were saved to: Assets/ExampleScene/Baked\Machine_Gunner_Red
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 111,643 seconds.

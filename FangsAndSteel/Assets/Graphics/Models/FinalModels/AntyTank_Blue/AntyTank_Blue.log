@@ -1,0 +1,25 @@
+Model: AntyTank_Blue
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.098
+   24fps, 4096x2048, 134217KB
+     0 Rest : 0,2083s 5f [0..4]
+     1 Move : 1,6667s 40f [5..44]
+     2 Death : 2,2917s 55f [45..99]
+     3 Recharge : 4,1667s 100f [100..199]
+     4 Attack : 5s 120f [200..319]
+     5 Action_Recharge : 6,25s 150f [320..469]
+   Frame Count> Expected: 470, Actual: 470
+   Point Count> Expected: 5780396, Actual: 5780396
+   Fill ratio: 68,94531%.
+   6 clips, 24fps, 19,5833s, 470f
+Started: 5/17/2024 3:45:26 PM
+Output files were saved to: Assets/ExampleScene/Baked\AntyTank_Blue
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 951,7851 seconds.

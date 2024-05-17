@@ -15,7 +15,7 @@ using UnityEngine.UI;
 public partial class TurnSystem : SystemBase
 {
     const float TURN_LEN = 10;
-    const float TIME_TO_CLOSE_NEW_TURN_PANEL = 0.4f;
+    public const float TIME_TO_CLOSE_NEW_TURN_PANEL = 0.4f;
     StaticUIData uiData;
     public static float timeToRun;
     public static float timeToClose_NewTurnPanel;
@@ -42,6 +42,7 @@ public partial class TurnSystem : SystemBase
     {
         RequireForUpdate<GameTag>();
         RequireForUpdate<StaticUIData>();
+        RequireForUpdate<BuyStageCompletedTag>();
         timeToRun = 0;
         timeToClose_NewTurnPanel = 0;
         orderPhase = true;
@@ -202,8 +203,8 @@ public partial class TurnSystem : SystemBase
                     //Enable EngageMode (= Start Replay if the 2 player's turn) (if no ReplayStartCopies -> no engageMode as it is the first turn)
                     if (!replayStartCopiesQuery.IsEmpty)
                         EnableEngage();
-                    else
-                        Debug.Log("First turn - no Engage phase");
+                    //else
+                        //Debug.Log("First turn - no Engage phase");
                 }
             }
         }
