@@ -9,10 +9,11 @@ public partial class BuyStageGeneralSystem : SystemBase
 {
     ComponentLookup<BuyStageCompletedTag> completedTagLookup;
     EntityQuery notCompletedTagQuery;
+    EntityQuery notBoughtYetQuery;
 
     bool fstPlayerFinished;
 
-    float timeToClose_NewTurnPanel;
+    //float timeToClose_NewTurnPanel;
 
     protected override void OnCreate()
     {
@@ -21,6 +22,7 @@ public partial class BuyStageGeneralSystem : SystemBase
 
         completedTagLookup = SystemAPI.GetComponentLookup<BuyStageCompletedTag>();
         notCompletedTagQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<BuyStageNotCompletedTag>().Build(EntityManager);
+        notBoughtYetQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<NotBoughtYetTag>().Build(EntityManager);
     }
 
     protected override void OnStartRunning()
@@ -29,14 +31,24 @@ public partial class BuyStageGeneralSystem : SystemBase
         if (completedTagLookup.HasComponent(SystemHandle))
             EntityManager.RemoveComponent<BuyStageCompletedTag>(SystemHandle);
 
-        ///TODO: Show the buy panel
-        ///TODO: Show the player buy zone
+        // Show the buy panel
+        StaticUIRefs.Instance.BuyPanel.SetActive(true);
+        // Show the player buy zone
+        StaticUIRefs.Instance.BuyBorders.SetActive(true);
 
         //Set 1st as the current player
         StaticUIRefs.Instance.NewTurnText.text = "Этап закупки игрока 1";
         SystemAPI.GetSingletonRW<CurrentTeamComponent>().ValueRW.value = 1;
         fstPlayerFinished = false;
         EnableSystems(false);
+    }
+
+    protected override void OnStopRunning()
+    {
+        // Hide the buy panel
+        StaticUIRefs.Instance.BuyPanel.SetActive(false);
+        // Hide the player buy zone
+        StaticUIRefs.Instance.BuyBorders.SetActive(false);
     }
 
     protected override void OnUpdate()
@@ -81,6 +93,8 @@ public partial class BuyStageGeneralSystem : SystemBase
                 EntityManager.RemoveComponent<BuyStageNotCompletedTag>(notCompletedTagQuery);
                 EnableSystems(true);
             }
+
+            EntityManager.DestroyEntity(notBoughtYetQuery);
         }
 
     }

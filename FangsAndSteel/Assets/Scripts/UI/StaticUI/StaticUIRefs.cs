@@ -38,6 +38,15 @@ public class StaticUIRefs : MonoBehaviour
     public TextMeshProUGUI NewTurnText { get { return newTurnText; } }
     [SerializeField] private TextMeshProUGUI newTurnText;
 
+    public GameObject BuyPanel { get { return buyPanel; } }
+    [SerializeField] private GameObject buyPanel;
+
+    public TextMeshProUGUI BalanceText { get { return balanceText; } }
+    [SerializeField] private TextMeshProUGUI balanceText;
+
+    public GameObject BuyBorders { get { return buyBorders; } }
+    [SerializeField] private GameObject buyBorders;
+
     void Awake()
     {
         Instance = this;
@@ -83,7 +92,6 @@ public class StaticUIRefs : MonoBehaviour
     [HideInInspector] public bool buyAntiTankButton;
     [HideInInspector] public bool buyTankButton;
     [HideInInspector] public bool buyArtilleryButton;
-    public TextMeshProUGUI BalanceText { get { return balanceText; } }
-    [SerializeField] private TextMeshProUGUI balanceText;
+
     public void SetNewTurnButton() { newTurnStartBut = true; }
 }

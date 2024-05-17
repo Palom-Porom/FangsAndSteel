@@ -91,7 +91,7 @@ public partial class StaticUISystem : SystemBase
         uiData.ValueRW.BuyMachineGunnerButton = StaticUIRefs.Instance.buyMachineGunnerButton;
         StaticUIRefs.Instance.buyMachineGunnerButton = false;
 
-        uiData.ValueRW.BuyAntiTankButton = StaticUIRefs.Instance.buyAntiTankButton;
+        uiData.ValueRW.BuyAntyTankButton = StaticUIRefs.Instance.buyAntiTankButton;
         StaticUIRefs.Instance.buyAntiTankButton = false;
 
         uiData.ValueRW.BuyTankButton = StaticUIRefs.Instance.buyTankButton;
@@ -128,7 +128,7 @@ public struct StaticUIData : IComponentData
     public bool RemoveUnitButton;
     public bool BuyInfantryManButton;
     public bool BuyMachineGunnerButton;
-    public bool BuyAntiTankButton;
+    public bool BuyAntyTankButton;
     public bool BuyTankButton;
     public bool BuyArtilleryButton;
 }
