@@ -7,6 +7,8 @@ using UnityEngine;
 
 public partial class BuyStageGeneralSystem : SystemBase
 {
+    const int STARTER_PLAYER_MONEY = 1500;
+
     ComponentLookup<BuyStageCompletedTag> completedTagLookup;
     EntityQuery notCompletedTagQuery;
     EntityQuery notBoughtYetQuery;
@@ -36,11 +38,14 @@ public partial class BuyStageGeneralSystem : SystemBase
         // Show the player buy zone
         StaticUIRefs.Instance.BuyBorders.SetActive(true);
 
+        StaticUIRefs.Instance.BalanceText.text = STARTER_PLAYER_MONEY.ToString();
+
         //Set 1st as the current player
         StaticUIRefs.Instance.NewTurnText.text = "Этап закупки игрока 1";
         SystemAPI.GetSingletonRW<CurrentTeamComponent>().ValueRW.value = 1;
         fstPlayerFinished = false;
         EnableSystems(false);
+
     }
 
     protected override void OnStopRunning()
@@ -49,6 +54,7 @@ public partial class BuyStageGeneralSystem : SystemBase
         StaticUIRefs.Instance.BuyPanel.SetActive(false);
         // Hide the player buy zone
         StaticUIRefs.Instance.BuyBorders.SetActive(false);
+
     }
 
     protected override void OnUpdate()
@@ -84,6 +90,7 @@ public partial class BuyStageGeneralSystem : SystemBase
                 StaticUIRefs.Instance.NewTurnText.text = "Этап закупки игрока 2";
                 SystemAPI.GetSingletonRW<CurrentTeamComponent>().ValueRW.value = 2;
                 fstPlayerFinished = true;
+                StaticUIRefs.Instance.BalanceText.text = STARTER_PLAYER_MONEY.ToString();
             }
             else
             {
