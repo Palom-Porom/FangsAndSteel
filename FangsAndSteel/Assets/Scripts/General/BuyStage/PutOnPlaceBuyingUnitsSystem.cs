@@ -16,6 +16,11 @@ public partial class PutOnPlaceBuyingUnitsSystem : SystemBase
     float3 cameraPosition;
     float3 mouseTargetingPoint;
 
+    float topBorder;
+    float bottomBorder;
+    float leftBorder;
+    float rightBorder;
+
     protected override void OnCreate()
     {
         RequireForUpdate<GameTag>();
@@ -23,6 +28,19 @@ public partial class PutOnPlaceBuyingUnitsSystem : SystemBase
         RequireForUpdate<NotBoughtYetTag>();
 
         notBoughtYetQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<NotBoughtYetTag>().Build(EntityManager);
+    }
+
+    protected override void OnStartRunning()
+    {
+        var temp = StaticUIRefs.Instance.BuyBorders.GetComponent<GetBuyBordersScript>().GetAllBorders(SystemAPI.GetSingleton<CurrentTeamComponent>().value);
+        rightBorder = temp[0];
+        topBorder = temp[1];
+        bottomBorder = temp[2];
+        leftBorder = temp[3];
+        Debug.Log(rightBorder);
+        Debug.Log(topBorder);
+        Debug.Log(bottomBorder);
+        Debug.Log(leftBorder);
     }
 
     protected override void OnUpdate()
@@ -52,10 +70,20 @@ public partial class PutOnPlaceBuyingUnitsSystem : SystemBase
             raycastResult = raycastResult
         }.Schedule(Dependency);
 
-        Dependency = new UpdateNotBoughtYetUnitsPosJob
+        var updateNotBoughtYetUnitsPosJobHandle = new UpdateNotBoughtYetUnitsPosJob
         {
-            raycastResult = raycastResult
+            raycastResult = raycastResult,
+
+            rightBorder = rightBorder,
+            topBorder = topBorder,
+            bottomBorder = bottomBorder,
+            leftBorder = leftBorder
         }.Schedule(targetRayCastJobHandle);
+
+        Dependency = new PutAllNotBuyedOnTerrainJob
+        {
+            collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld
+        }.Schedule(updateNotBoughtYetUnitsPosJobHandle);
 
     }
 }
@@ -65,6 +93,11 @@ public partial struct UpdateNotBoughtYetUnitsPosJob : IJobEntity
 {
     public NativeReference<RaycastResult> raycastResult;
 
+    public float topBorder;
+    public float bottomBorder;
+    public float leftBorder;
+    public float rightBorder;
+
     public void Execute(ref LocalTransform transform)
     {
         var result = raycastResult.Value;
@@ -72,7 +105,14 @@ public partial struct UpdateNotBoughtYetUnitsPosJob : IJobEntity
             return;
 
         //Debug.Log(result.raycastHitInfo.Position);
-        transform.Position = result.raycastHitInfo.Position;
+        var newPos = new float3(
+            math.clamp(result.raycastHitInfo.Position.x, leftBorder, rightBorder),
+            result.raycastHitInfo.Position.y,
+            math.clamp(result.raycastHitInfo.Position.z, bottomBorder, topBorder)
+            );
+        Debug.Log(newPos);
+        transform.Position = newPos;
+        
     }
 }
 
