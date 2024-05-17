@@ -82,19 +82,19 @@ public partial class StaticUISystem : SystemBase
 
 
         #region Buy/RemoveUnit
-        uiData.ValueRW.RemoveUnitButton = StaticUIRefs.Instance.removeUnitButton;
+        uiData.ValueRW.removeUnitButton = StaticUIRefs.Instance.removeUnitButton;
         StaticUIRefs.Instance.removeUnitButton = false;
         
-        uiData.ValueRW.BuyInfantryManButton = StaticUIRefs.Instance.buyInfantryManButton;
+        uiData.ValueRW.buyInfantryManButton = StaticUIRefs.Instance.buyInfantryManButton;
         StaticUIRefs.Instance.buyInfantryManButton = false;
 
-        uiData.ValueRW.BuyMachineGunnerButton = StaticUIRefs.Instance.buyMachineGunnerButton;
+        uiData.ValueRW.buyMachineGunnerButton = StaticUIRefs.Instance.buyMachineGunnerButton;
         StaticUIRefs.Instance.buyMachineGunnerButton = false;
 
-        uiData.ValueRW.BuyAntyTankButton = StaticUIRefs.Instance.buyAntiTankButton;
+        uiData.ValueRW.buyAntyTankButton = StaticUIRefs.Instance.buyAntiTankButton;
         StaticUIRefs.Instance.buyAntiTankButton = false;
 
-        uiData.ValueRW.BuyTankButton = StaticUIRefs.Instance.buyTankButton;
+        uiData.ValueRW.buyTankButton = StaticUIRefs.Instance.buyTankButton;
         StaticUIRefs.Instance.buyTankButton = false;
 
         uiData.ValueRW.BuyArtilleryButton = StaticUIRefs.Instance.buyArtilleryButton;
@@ -125,10 +125,10 @@ public struct StaticUIData : IComponentData
     public bool newTurnStartBut;
 
 
-    public bool RemoveUnitButton;
-    public bool BuyInfantryManButton;
-    public bool BuyMachineGunnerButton;
-    public bool BuyAntyTankButton;
-    public bool BuyTankButton;
+    public bool removeUnitButton;
+    public bool buyInfantryManButton;
+    public bool buyMachineGunnerButton;
+    public bool buyAntyTankButton;
+    public bool buyTankButton;
     public bool BuyArtilleryButton;
 }

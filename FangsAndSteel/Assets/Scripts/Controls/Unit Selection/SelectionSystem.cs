@@ -48,6 +48,7 @@ public partial class SelectionSystem : SystemBase
     private EntityQuery flagsQuery;
 
     private EntityQuery buyStageTagQuery;
+    private EntityQuery notBoughtYetQuery;
 
     private Entity unitStatsRqstEntity;
 
@@ -71,6 +72,7 @@ public partial class SelectionSystem : SystemBase
 
         flagsQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<FlagTag>().Build(this);
         buyStageTagQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<BuyStageCompletedTag>().WithOptions(EntityQueryOptions.IncludeSystems).Build(this);
+        notBoughtYetQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<NotBoughtYetTag>().Build(this);
 
         if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
             unitStatsRqstEntity = Entity.Null;
@@ -111,7 +113,7 @@ public partial class SelectionSystem : SystemBase
             }
         }
 
-        else if (Mouse.current.leftButton.wasReleasedThisFrame)
+        else if (Mouse.current.leftButton.wasReleasedThisFrame && notBoughtYetQuery.IsEmpty)
         {
             //If was clicked on UI, then nothing to do
             if (wasClickedOnUI)

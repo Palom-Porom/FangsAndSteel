@@ -44,6 +44,20 @@ public class StaticUIRefs : MonoBehaviour
     public TextMeshProUGUI BalanceText { get { return balanceText; } }
     [SerializeField] private TextMeshProUGUI balanceText;
 
+    #region Units' Prices
+
+    public TextMeshProUGUI FirstRobotPrice { get { return firstRobotPrice; } }
+    [SerializeField] private TextMeshProUGUI firstRobotPrice;
+    public TextMeshProUGUI MachineGunnerPrice { get { return machineGunnerPrice; } }
+    [SerializeField] private TextMeshProUGUI machineGunnerPrice;
+
+    public TextMeshProUGUI AntyTankPrice { get { return antyTankPrice; } }
+    [SerializeField] private TextMeshProUGUI antyTankPrice;
+    public TextMeshProUGUI TankPrice { get { return tankPrice; } }
+    [SerializeField] private TextMeshProUGUI tankPrice;
+
+    #endregion
+
     public GameObject BuyBorders { get { return buyBorders; } }
     [SerializeField] private GameObject buyBorders;
 
