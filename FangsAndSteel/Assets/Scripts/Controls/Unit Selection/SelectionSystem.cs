@@ -70,7 +70,7 @@ public partial class SelectionSystem : SystemBase
         allSelectable = new EntityQueryBuilder(Allocator.Persistent).WithAll<SelectTag, LocalTransform, TeamComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
 
         flagsQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<FlagTag>().Build(this);
-        buyStageTagQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<BuyStageCompletedTag>().Build(this);
+        buyStageTagQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<BuyStageCompletedTag>().WithOptions(EntityQueryOptions.IncludeSystems).Build(this);
 
         if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
             unitStatsRqstEntity = Entity.Null;
