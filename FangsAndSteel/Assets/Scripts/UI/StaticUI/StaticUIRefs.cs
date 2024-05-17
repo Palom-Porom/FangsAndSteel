@@ -38,6 +38,29 @@ public class StaticUIRefs : MonoBehaviour
     public TextMeshProUGUI NewTurnText { get { return newTurnText; } }
     [SerializeField] private TextMeshProUGUI newTurnText;
 
+    public GameObject BuyPanel { get { return buyPanel; } }
+    [SerializeField] private GameObject buyPanel;
+
+    public TextMeshProUGUI BalanceText { get { return balanceText; } }
+    [SerializeField] private TextMeshProUGUI balanceText;
+
+    #region Units' Prices
+
+    public TextMeshProUGUI FirstRobotPrice { get { return firstRobotPrice; } }
+    [SerializeField] private TextMeshProUGUI firstRobotPrice;
+    public TextMeshProUGUI MachineGunnerPrice { get { return machineGunnerPrice; } }
+    [SerializeField] private TextMeshProUGUI machineGunnerPrice;
+
+    public TextMeshProUGUI AntyTankPrice { get { return antyTankPrice; } }
+    [SerializeField] private TextMeshProUGUI antyTankPrice;
+    public TextMeshProUGUI TankPrice { get { return tankPrice; } }
+    [SerializeField] private TextMeshProUGUI tankPrice;
+
+    #endregion
+
+    public GameObject BuyBorders { get { return buyBorders; } }
+    [SerializeField] private GameObject buyBorders;
+
     void Awake()
     {
         Instance = this;
@@ -75,6 +98,14 @@ public class StaticUIRefs : MonoBehaviour
 
     [HideInInspector] public bool newTurnStartBut;
 
+
+
+    [HideInInspector] public bool removeUnitButton;
+    [HideInInspector] public bool buyInfantryManButton;
+    [HideInInspector] public bool buyMachineGunnerButton;
+    [HideInInspector] public bool buyAntiTankButton;
+    [HideInInspector] public bool buyTankButton;
+    [HideInInspector] public bool buyArtilleryButton;
 
     public void SetNewTurnButton() { newTurnStartBut = true; }
 }

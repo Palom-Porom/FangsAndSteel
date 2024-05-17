@@ -1,0 +1,24 @@
+Model: Tank_Turret_Red
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.002
+   24fps, 1024x512, 8388KB
+     0 Rest : 0,8333s 20f [0..19]
+     1 Move : 0,8333s 20f [20..39]
+     2 Death : 2,5s 60f [40..99]
+     3 Attack : 1,875s 45f [100..144]
+     4 Recharge : 5,2083s 125f [145..269]
+   Frame Count> Expected: 270, Actual: 270
+   Point Count> Expected: 521044, Actual: 521044
+   Fill ratio: 99,41406%.
+   5 clips, 24fps, 11,25s, 270f
+Started: 5/17/2024 3:06:02 PM
+Output files were saved to: Assets/ExampleScene/Baked\Tank_Turret_Red
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 15,4289 seconds.

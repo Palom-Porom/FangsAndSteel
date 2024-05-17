@@ -47,6 +47,9 @@ public partial class SelectionSystem : SystemBase
 
     private EntityQuery flagsQuery;
 
+    private EntityQuery buyStageTagQuery;
+    private EntityQuery notBoughtYetQuery;
+
     private Entity unitStatsRqstEntity;
 
     protected override void OnCreate()
@@ -68,6 +71,8 @@ public partial class SelectionSystem : SystemBase
         allSelectable = new EntityQueryBuilder(Allocator.Persistent).WithAll<SelectTag, LocalTransform, TeamComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState).Build(this);
 
         flagsQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<FlagTag>().Build(this);
+        buyStageTagQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<BuyStageCompletedTag>().WithOptions(EntityQueryOptions.IncludeSystems).Build(this);
+        notBoughtYetQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<NotBoughtYetTag>().Build(this);
 
         if (!SystemAPI.TryGetSingletonEntity<UnitStatsRequestTag>(out unitStatsRqstEntity))
             unitStatsRqstEntity = Entity.Null;
@@ -108,7 +113,7 @@ public partial class SelectionSystem : SystemBase
             }
         }
 
-        else if (Mouse.current.leftButton.wasReleasedThisFrame)
+        else if (Mouse.current.leftButton.wasReleasedThisFrame && notBoughtYetQuery.IsEmpty)
         {
             //If was clicked on UI, then nothing to do
             if (wasClickedOnUI)
@@ -223,7 +228,7 @@ public partial class SelectionSystem : SystemBase
     private void UpdateUIPanelInfo()
     {
         needUpdateUIPanelInfo = false;
-        StaticUIRefs.Instance.UnitsUI.SetActive(!allSelected.IsEmpty);
+        StaticUIRefs.Instance.UnitsUI.SetActive(!allSelected.IsEmpty && !buyStageTagQuery.IsEmpty);
         if (allSelected.IsEmpty) return; 
 
         bool isMultipleSelected = (allSelected.ToEntityArray(Allocator.Temp).Length > 1);

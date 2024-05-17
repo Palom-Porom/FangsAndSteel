@@ -80,6 +80,26 @@ public partial class StaticUISystem : SystemBase
         uiData.ValueRW.newTurnStartBut = StaticUIRefs.Instance.newTurnStartBut;
         StaticUIRefs.Instance.newTurnStartBut = false;
 
+
+        #region Buy/RemoveUnit
+        uiData.ValueRW.removeUnitButton = StaticUIRefs.Instance.removeUnitButton;
+        StaticUIRefs.Instance.removeUnitButton = false;
+        
+        uiData.ValueRW.buyInfantryManButton = StaticUIRefs.Instance.buyInfantryManButton;
+        StaticUIRefs.Instance.buyInfantryManButton = false;
+
+        uiData.ValueRW.buyMachineGunnerButton = StaticUIRefs.Instance.buyMachineGunnerButton;
+        StaticUIRefs.Instance.buyMachineGunnerButton = false;
+
+        uiData.ValueRW.buyAntyTankButton = StaticUIRefs.Instance.buyAntiTankButton;
+        StaticUIRefs.Instance.buyAntiTankButton = false;
+
+        uiData.ValueRW.buyTankButton = StaticUIRefs.Instance.buyTankButton;
+        StaticUIRefs.Instance.buyTankButton = false;
+
+        uiData.ValueRW.BuyArtilleryButton = StaticUIRefs.Instance.buyArtilleryButton;
+        StaticUIRefs.Instance.buyArtilleryButton = false;
+        #endregion
     }
 }
 
@@ -103,4 +123,12 @@ public struct StaticUIData : IComponentData
     public bool isNeededPrioritiesUpdate;
 
     public bool newTurnStartBut;
+
+
+    public bool removeUnitButton;
+    public bool buyInfantryManButton;
+    public bool buyMachineGunnerButton;
+    public bool buyAntyTankButton;
+    public bool buyTankButton;
+    public bool BuyArtilleryButton;
 }

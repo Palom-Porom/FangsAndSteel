@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4116815118997861717}
   - component: {fileID: 5628419983897131561}
   - component: {fileID: 1251305543534482702}
+  - component: {fileID: 9150234237781249981}
   m_Layer: 0
   m_Name: General
   m_TagString: Untagged
@@ -116,3 +117,31 @@ MonoBehaviour:
   flag7: {fileID: 8202652821416558563, guid: 04a1c293bd9cdf14da3cc3ddd7584dc6, type: 3}
   flag8: {fileID: 5500170004566309481, guid: 46c7eb3c39a4f8640b9ce0008298aea8, type: 3}
   flag9: {fileID: 4101951809526044627, guid: 900893c8c020664429bad028a9dba6fd, type: 3}
+  FirstRobot_Red: {fileID: 1188027894341469181, guid: 916e12f1481daef48b465e4998f3cee9,
+    type: 3}
+  FirstRobot_Blue: {fileID: 6774870443308373617, guid: b6b3985f06fb89b4a86d82eb59a76e6b,
+    type: 3}
+  MachineGunner_Red: {fileID: 4435082898504259574, guid: ba6c6a0960feff34989875f9fbdcab95,
+    type: 3}
+  MachineGunner_Blue: {fileID: 8995977564517815764, guid: 41dbe652e375e8d48a6c57b21a9b6553,
+    type: 3}
+  AntyTank_Red: {fileID: 786802153379231068, guid: a9e1c48e5b31cd140a0b7a8c2f0f56c4,
+    type: 3}
+  AntyTank_Blue: {fileID: 6482545239096908957, guid: d13680c4ed2dea54695860d2ccc6c613,
+    type: 3}
+  Tank_Red: {fileID: 7373040614559171967, guid: 51ee790ef3508b64a9c94f708dd05865,
+    type: 3}
+  Tank_Blue: {fileID: 2634953707689600067, guid: 4f85d6d92ef4c294a8833f674555b01f,
+    type: 3}
+--- !u!114 &9150234237781249981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071577303827733915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e1374be0949f8f4794aae25bc9d8382, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
