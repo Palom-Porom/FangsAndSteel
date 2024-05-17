@@ -1,0 +1,24 @@
+Model: Tank_Hands_Blue
+Enum Declaration: enabled
+Reset Rotation Before Bake: disabled
+Reset Position Before Bake: disabled
+Reset Scale Before Bake: disabled
+Ignore Bone Meshes: disabled
+Bone Adjust: disabled
+
+Post Domain Reload: enabledShader: AnimationCooker/VtxAnimSimpleLit
+SKIN [0], Root Bone: Bone.038
+   24fps, 2048x1024, 33554KB
+     0 Rest : 0,8333s 20f [0..19]
+     1 Move : 0,8333s 20f [20..39]
+     2 Death : 2,5s 60f [40..99]
+     3 Attack : 1,875s 45f [100..144]
+     4 Recharge : 5,2083s 125f [145..269]
+   Frame Count> Expected: 270, Actual: 270
+   Point Count> Expected: 1431968, Actual: 1431968
+   Fill ratio: 68,35938%.
+   5 clips, 24fps, 11,25s, 270f
+Started: 5/17/2024 2:30:25 PM
+Output files were saved to: Assets/ExampleScene/Baked\Tank_Hands_Blue
+Animation database was saved to: Assets/ExampleScene/Scripts/Generated/AnimDb.cs
+Completed in 210,9874 seconds.
