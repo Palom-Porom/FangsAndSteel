@@ -221,7 +221,8 @@ public partial class TurnSystem : SystemBase
                 //Stop all Engage systems
                 EnableEngageSystems(false);
 
-                StaticUIRefs.Instance.TurnIndicator.color = Color.red;
+                //StaticUIRefs.Instance.TurnIndicator.color = Color.red;
+                StaticUIRefs.Instance.TurnTimer.color = Color.red;
 
                 //If turn of 2nd player -> remove copies and enable actual entities
                 if (SystemAPI.GetSingleton<CurrentTeamComponent>().value == 2)
@@ -255,7 +256,8 @@ public partial class TurnSystem : SystemBase
         //Set Timer
         timeToRun = TURN_LEN;
 
-        StaticUIRefs.Instance.TurnIndicator.color = Color.green;
+        //StaticUIRefs.Instance.TurnIndicator.color = Color.green;
+        StaticUIRefs.Instance.TurnTimer.color = new Color(0, 0.8f, 0);
 
         orderPhase = false;
     }
@@ -546,7 +548,8 @@ public partial class TurnSystem_SinglePlayer : SystemBase
 
                 orderPhase = false;
 
-                StaticUIRefs.Instance.TurnIndicator.color = Color.green;
+                //StaticUIRefs.Instance.TurnIndicator.color = Color.green;
+                StaticUIRefs.Instance.TurnTimer.color = new Color(0, 0.8f, 0);
 
 
                 //RefRW<CurrentTeamComponent> curTeam = SystemAPI.GetSingletonRW<CurrentTeamComponent>();
@@ -678,7 +681,8 @@ public partial class TurnSystem_SinglePlayer : SystemBase
                 //Stop all Engage systems
                 EnableEngageSystems(false);
 
-                StaticUIRefs.Instance.TurnIndicator.color = Color.red;
+                //StaticUIRefs.Instance.TurnIndicator.color = Color.red;
+                StaticUIRefs.Instance.TurnTimer.color = Color.red;
 
                 orderPhase = true;
 

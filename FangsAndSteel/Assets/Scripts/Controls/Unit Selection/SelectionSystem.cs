@@ -54,7 +54,8 @@ public partial class SelectionSystem : SystemBase
 
     protected override void OnCreate()
     {
-        RequireForUpdate<SelectTag>();
+        //RequireForUpdate<SelectTag>();
+        RequireForUpdate<GameTag>();
 
         selectLookup = GetComponentLookup<SelectTag>();
         //attackSetsLookup = GetComponentLookup<AttackSettingsComponent>();
@@ -99,6 +100,8 @@ public partial class SelectionSystem : SystemBase
             wasClickedOnUI = EventSystem.current.IsPointerOverGameObject();
             if (!wasClickedOnUI)
                 mouseStartPos = Mouse.current.position.value;
+            else
+                Debug.Log("Clicked on UI");
         }
 
         else if (Mouse.current.leftButton.isPressed)
@@ -118,6 +121,7 @@ public partial class SelectionSystem : SystemBase
             //If was clicked on UI, then nothing to do
             if (wasClickedOnUI)
             {
+                Debug.Log("Clicked on UI 2");
                 wasClickedOnUI = false;
                 return;
             }
