@@ -126,6 +126,7 @@ public partial struct ChangeShootModeJob : IJobEntity
         battleModeSettings.shootingOnMove = !(battleModeSettings.shootingOnMove);
         reloadComponent.curDebaff += battleModeSettings.shootingOnMove ? reloadComponent.reload_SoM_Debaff : -reloadComponent.reload_SoM_Debaff;
         movement.curDebaff += battleModeSettings.shootingOnMove ? movement.movement_SoM_Debaff : -movement.movement_SoM_Debaff;
+        reloadComponent.isShootingOnMoveAnim = battleModeSettings.shootingOnMove;
     }
 }
 

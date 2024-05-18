@@ -307,12 +307,12 @@ PrefabInstance:
     - target: {fileID: 5973439578278865204, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: curHp
-      value: 50
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 5973439578278865204, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: maxHp
-      value: 50
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 5973439578278865204, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
@@ -332,7 +332,7 @@ PrefabInstance:
     - target: {fileID: 8818506933466611722, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: VisionRadius
-      value: 25
+      value: 60
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 510706356430527832, guid: c743507d0fc900b45898c8e09289fb9b, type: 3}

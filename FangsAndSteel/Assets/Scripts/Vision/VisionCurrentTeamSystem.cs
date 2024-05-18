@@ -23,8 +23,8 @@ public partial struct VisionCurrentTeamSystem : ISystem
     {
         // ≈сли нет ни единого экземпл€ра компонента, который мы указали в <>, то система не будет обновл€тьс€ вплоть до момента, пока не по€витс€ хот€ бы один экземпл€р
         state.RequireForUpdate<VisionMapBuffer>();
-        state.RequireForUpdate<TeamComponent>();
-        state.RequireForUpdate<VisibilityComponent>();
+        //state.RequireForUpdate<TeamComponent>();
+        //state.RequireForUpdate<VisibilityComponent>();
 
         children = SystemAPI.GetBufferLookup<Child>();
         disableRendLookup = SystemAPI.GetComponentLookup<DisableRendering>();

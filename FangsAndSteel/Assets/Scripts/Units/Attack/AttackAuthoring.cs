@@ -131,6 +131,10 @@ public struct ReloadComponent : IComponentData
     ///<remarks> Basically equals to the length of the attack animation </remarks>
     public float shootAnimLen; ///TODO: automatically get that value if it is possible
 
+
+    ///<value> Defines if it is needed to play Action_Recharge or simple Recharge </value>
+    public bool isShootingOnMoveAnim;
+
     ///<value> If true then unit is ready to fire </value>
     public bool isReloaded() { return curBullets > 0 && bulletReloadElapsed >= bulletReloadLen; }
     public bool isReloading() { return curBullets == 0 && shootAnimElapsed >= shootAnimLen; }
@@ -176,6 +180,9 @@ public struct PursuingModeComponent : IComponentData, IEnableableComponent
     public float maxShootDistanceSq;
     /// <summary> If distance (squared) to target is bigger than this - pursuing will be dropped </summary>
     public float dropDistanceSq;
+
+    /// <summary> The move target which was before the start of pursueing and to which unit will return when the pursue ends </summary>
+    public float3 moveTargetBeforePursue;
 }
 
 

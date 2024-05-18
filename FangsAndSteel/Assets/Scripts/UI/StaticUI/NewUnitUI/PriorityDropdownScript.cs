@@ -30,6 +30,7 @@ public class PriorityDropdownScript : MonoBehaviour
         priorityList.Add("Aртиллерия");
         priorityList.Add(" ");
         dropdownLST = new List<TMP_Dropdown>(7) { dropdown0, dropdown1, dropdown2, dropdown3, dropdown4, dropdown5, dropdown6 };
+        //Debug.Log(dropdownLST[0]);
 
         foreach (var priority in priorityList)
         {

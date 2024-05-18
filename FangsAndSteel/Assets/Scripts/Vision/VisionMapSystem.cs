@@ -33,8 +33,8 @@ public partial struct VisionMapSystem : ISystem, ISystemStartStop
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<VisionMapBuffer>();
-        state.RequireForUpdate<TeamComponent>();
-        state.RequireForUpdate<VisionCharsComponent>();
+        //state.RequireForUpdate<TeamComponent>();
+        //state.RequireForUpdate<VisionCharsComponent>();
 
         //Set true if need to visualize the views in the first frame
         needToDebug = false;
