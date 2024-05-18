@@ -393,6 +393,7 @@ public partial struct _ReloadJob : IJobChunk
                             }
                             else
                             {
+                                Debug.Log("Started Action_Recharge Animation");
                                 foreach (var modelBufElem in modelsBuffs[i])
                                 {
                                     RefRW<AnimationCmdData> animCmd = animCmdLookup.GetRefRW(modelBufElem.model);
@@ -597,10 +598,10 @@ public partial struct AttackTargetSearchJob : IJobEntity
                 movement.hasMoveTarget = true;
             }
 
-            if (notHaveOnMoveReload)
+            if (!notHaveOnMoveReload)
             {
-                movement.curDebaff = 1 + movement.movement_SoM_Debaff;
-                reload.curDebaff = 1 + reload.reload_SoM_Debaff;
+                movement.curDebaff = movement.movement_SoM_Debaff;
+                reload.curDebaff = reload.reload_SoM_Debaff;
                 reload.isShootingOnMoveAnim = true;
             }
 
@@ -678,10 +679,14 @@ public partial struct _CreateUsualAttackRequestsJob : IJobChunk
 
                     bool isPursuingEnabled = chunk.IsComponentEnabled(ref pursuingModeSettsTypeHandleRO, i);
                     if (isPursuingEnabled &&
-                        pursuingModes[i].maxShootDistanceSq < math.distancesq(localToWorldLookup[pursuingModes[i].Target].Position, transforms[i].Position))
+                        (pursuingModes[i].maxShootDistanceSq < math.distancesq(localToWorldLookup[pursuingModes[i].Target].Position, transforms[i].Position) ||
+                        attackChars[i].radiusSq < math.distancesq(localToWorldLookup[pursuingModes[i].Target].Position, transforms[i].Position)))
                     {//if pursuing and not close to target enough -> not shoot
                         continue;
                     }
+
+                    if (!isPursuingEnabled && attackChars[i].radiusSq < math.distancesq(localToWorldLookup[attackChars[i].target].Position, transforms[i].Position))
+                        continue;
 
                     if (battleModeSetts[i].shootingOnMove || hasSeparateAttackModels || isPursuingEnabled) //if can move while reload -> temp component added
                         ecb.AddComponent(unfilteredChunkIndex, entities[i], new NotAbleToMoveForTimeRqstComponent 
@@ -827,7 +832,7 @@ public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 
                     bool isPursuingEnabled = chunk.IsComponentEnabled(ref pursuingModeSettsTypeHandleRO, i);
                     if (isPursuingEnabled &&
-                        pursuingModes[i].maxShootDistanceSq > math.distancesq(localToWorldLookup[pursuingModes[i].Target].Position, transforms[i].Position))
+                        pursuingModes[i].maxShootDistanceSq < math.distancesq(localToWorldLookup[pursuingModes[i].Target].Position, transforms[i].Position))
                     {//if pursuing and not close to target enough -> not shoot
                         continue;
                     }
@@ -968,20 +973,22 @@ public partial struct PursuingJob : IJobChunk
             {
                 float3 targetPos = localToWorldLookup[pursuingSetts[i].Target].Position;
                 float distToTargetSq = math.distancesq(transforms[i].Position, targetPos);
-                if (reloads[i].isReloaded())
-                    pursuingSetts[i].dropTimeElapsed += deltaTime;
+                //if (reloads[i].isReloaded())
+                //    pursuingSetts[i].dropTimeElapsed += deltaTime;
                 //Check if the distance to target is too big OR too long time pusrueing OR target is not visible anymore 
                 if (distToTargetSq > pursuingSetts[i].dropDistanceSq ||
-                    pursuingSetts[i].dropTimeElapsed > pursuingSetts[i].dropTime ||
+                    //pursuingSetts[i].dropTimeElapsed > pursuingSetts[i].dropTime ||
                     (visibilityLookup[pursuingSetts[i].Target].visibleToTeams & teams[i].teamInd) == 0)
                 {// Turn off pursuing mode and return to BattleMode
+                    Debug.Log($"Stopped pursuing: distToTargetSq = {distToTargetSq} || dropTimeElapsed = {pursuingSetts[i].dropTimeElapsed} || visibleToTeams = {visibilityLookup[pursuingSetts[i].Target].visibleToTeams}");
+
                     chunk.SetComponentEnabled(ref battleModeSetsTypeHandle, i, true);
                     chunk.SetComponentEnabled(ref pursuingModeSettsTypeHandle, i, false);
                     movements[i].target = pursuingSetts[i].moveTargetBeforePursue;
                     if (!battleModeSetts[i].shootingOnMove)
                     {
-                        movements[i].curDebaff = 1;
-                        reloads[i].curDebaff = 1;
+                        movements[i].curDebaff = 0;
+                        reloads[i].curDebaff = 0;
                         reloads[i].isShootingOnMoveAnim = false;
                     }
                     continue;
@@ -996,8 +1003,8 @@ public partial struct PursuingJob : IJobChunk
                         if (!notHaveOnMoveReload)
                         {
                             reloads[i].isShootingOnMoveAnim = true;
-                            movements[i].curDebaff = 1 + movements[i].movement_SoM_Debaff;
-                            reloads[i].curDebaff = 1 + reloads[i].reload_SoM_Debaff;
+                            movements[i].curDebaff = movements[i].movement_SoM_Debaff;
+                            reloads[i].curDebaff = reloads[i].reload_SoM_Debaff;
                         }
                         //Move animation
                         foreach (var modelBufElem in modelsBufs[i])
@@ -1012,8 +1019,8 @@ public partial struct PursuingJob : IJobChunk
                 else if (movements[i].hasMoveTarget)
                 {
                     movements[i].hasMoveTarget = false;
-                    movements[i].curDebaff = 1;
-                    reloads[i].curDebaff = 1;
+                    movements[i].curDebaff = 0;
+                    reloads[i].curDebaff = 0;
                     reloads[i].isShootingOnMoveAnim = false;
                     ////Rest animation  <---- should be turned on in MovementSystem
                     //foreach (var modelBufElem in modelsBufs[i])

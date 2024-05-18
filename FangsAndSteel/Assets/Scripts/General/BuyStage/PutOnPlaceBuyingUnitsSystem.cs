@@ -37,10 +37,10 @@ public partial class PutOnPlaceBuyingUnitsSystem : SystemBase
         topBorder = temp[1];
         bottomBorder = temp[2];
         leftBorder = temp[3];
-        Debug.Log(rightBorder);
-        Debug.Log(topBorder);
-        Debug.Log(bottomBorder);
-        Debug.Log(leftBorder);
+        //Debug.Log(rightBorder);
+        //Debug.Log(topBorder);
+        //Debug.Log(bottomBorder);
+        //Debug.Log(leftBorder);
     }
 
     protected override void OnUpdate()
