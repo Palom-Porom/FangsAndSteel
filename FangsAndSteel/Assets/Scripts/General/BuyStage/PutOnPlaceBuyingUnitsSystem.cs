@@ -110,7 +110,7 @@ public partial struct UpdateNotBoughtYetUnitsPosJob : IJobEntity
             result.raycastHitInfo.Position.y,
             math.clamp(result.raycastHitInfo.Position.z, bottomBorder, topBorder)
             );
-        Debug.Log(newPos);
+        //Debug.Log(newPos);
         transform.Position = newPos;
         
     }
