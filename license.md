@@ -5,3 +5,4 @@ https://assetstore.unity.com/packages/2d/textures-materials/water/stylize-water-
 https://assetstore.unity.com/packages/2d/textures-materials/glovergames-free-ground-textures-135418
 
 https://fontesk.com/10-pixel-typeface/
+https://fontesk.com/haxorville-font/
