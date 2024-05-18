@@ -176,6 +176,9 @@ public struct PursuingModeComponent : IComponentData, IEnableableComponent
     public float maxShootDistanceSq;
     /// <summary> If distance (squared) to target is bigger than this - pursuing will be dropped </summary>
     public float dropDistanceSq;
+
+    /// <summary> The move target which was before the start of pursueing and to which unit will return when the pursue ends </summary>
+    public float3 moveTargetBeforePursue;
 }
 
 

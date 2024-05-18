@@ -23,6 +23,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
     ComponentLookup<HpComponent> hpLookup;
     ComponentLookup<LocalToWorld> localToWorldLookup;
     ComponentLookup<TeamComponent> teamLookup;
+    ComponentLookup<VisibilityComponent> visibilityLookup;
     ComponentLookup<FillFloatOverride> fillBarLookup;
 
 
@@ -43,6 +44,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
 
     ComponentTypeHandle<ReloadComponent> reloadTypeHandle;
     ComponentTypeHandle<ReloadComponent> reloadTypeHandleRO;
+    ComponentTypeHandle<TeamComponent> teamTypeHandleRO;
     ComponentTypeHandle<UnitIconsComponent> unitIconsTypeHandleRO;
     ComponentTypeHandle<MovementComponent> movementTypeHandle;
     ComponentTypeHandle<RotationComponent> rotationTypeHandle;
@@ -78,6 +80,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         hpLookup = state.GetComponentLookup<HpComponent>(true);
         localToWorldLookup = state.GetComponentLookup<LocalToWorld>(true);
         teamLookup = state.GetComponentLookup<TeamComponent>(true);
+        visibilityLookup = state.GetComponentLookup<VisibilityComponent>(true);
         fillBarLookup = state.GetComponentLookup<FillFloatOverride>();
 
 
@@ -88,7 +91,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             Build(ref state);
         potentialTargetsQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<HpComponent, LocalToWorld, TeamComponent>().Build(ref state);
         targetSearchersQuery = new EntityQueryBuilder(Allocator.Temp).
-            WithAllRW<AttackCharsComponent>().
+            WithAllRW<AttackCharsComponent, MovementComponent>().
             WithPresentRW<BattleModeComponent>().
             WithDisabledRW<PursuingModeComponent>().
             WithAll<LocalTransform, TeamComponent, UnitTypeComponent>().
@@ -112,12 +115,13 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             Build(ref state);
         pursuiers = new EntityQueryBuilder(Allocator.Temp).
             WithAllRW<PursuingModeComponent, MovementComponent>().
-            WithAllRW<BattleModeComponent>().
+            //WithAllRW<BattleModeComponent>(). 
             WithAll<LocalTransform, ReloadComponent>().
             Build(ref state);
 
         reloadTypeHandle = SystemAPI.GetComponentTypeHandle<ReloadComponent>();
         reloadTypeHandleRO = SystemAPI.GetComponentTypeHandle<ReloadComponent>(true);
+        teamTypeHandleRO = SystemAPI.GetComponentTypeHandle<TeamComponent>(true);
         unitIconsTypeHandleRO = SystemAPI.GetComponentTypeHandle<UnitIconsComponent>(true);
         movementTypeHandle = SystemAPI.GetComponentTypeHandle<MovementComponent>();
         rotationTypeHandle = SystemAPI.GetComponentTypeHandle<RotationComponent>();
@@ -164,12 +168,14 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         hpLookup.Update(ref state);
         localToWorldLookup.Update(ref state);
         teamLookup.Update(ref state);
+        visibilityLookup.Update(ref state);
         fillBarLookup.Update(ref state);
         animCmdLookup.Update(ref state);
         animStateLookup.Update(ref state);
 
         reloadTypeHandle.Update(ref state);
         reloadTypeHandleRO.Update(ref state);
+        teamTypeHandleRO.Update(ref state);
         unitIconsTypeHandleRO.Update(ref state);
         movementTypeHandle.Update(ref state);
         rotationTypeHandle.Update(ref state);
@@ -223,8 +229,9 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             hpLookup = hpLookup,
             localToWorldLookup = localToWorldLookup,
             potentialTargetsArr = potentialTargetsArr,
-            teamLookup = teamLookup
-        }.Schedule(targetSearchersQuery, state.Dependency);
+            teamLookup = teamLookup,
+            visibilityLookup = visibilityLookup
+        }.Schedule(targetSearchersQuery, deployJobHandle);
 
         JobHandle usualCreateAttackRequestsJobHandle = new _CreateUsualAttackRequestsJob
         {
@@ -249,7 +256,7 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
             modelsBuffTypeHandle = modelsBuffTypeHandle,
             attackModelsBuffTypeHandle = attackModelsBuffTypeHandle
 
-        }.Schedule(usualAttackers, JobHandle.CombineDependencies(deployJobHandle, targetSearchJobHandle));
+        }.Schedule(usualAttackers, targetSearchJobHandle);
 
         JobHandle deployableCreateAttackRequestsJobHandle = new _CreateDeployableAttackRequestsJob
         {
@@ -281,10 +288,12 @@ public partial struct TargetingAttackSystem : ISystem, ISystemStartStop
         {
             deltaTime = deltaTime,
             localToWorldLookup = localToWorldLookup,
+            visibilityLookup = visibilityLookup,
 
             pursuingModeSettsTypeHandle = pursuingModeTypeHandle,
             battleModeSetsTypeHandle = battleModeTypeHandle,
             reloadTypeHandleRO = reloadTypeHandleRO,
+            teamTypeHandleRO = teamTypeHandleRO,
             movementTypeHandle = movementTypeHandle,
             transformTypeHandleRO = transformTypeHandleRO
         }.Schedule(pursuiers, deployableCreateAttackRequestsJobHandle);
@@ -455,9 +464,10 @@ public partial struct AttackTargetSearchJob : IJobEntity
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
     [ReadOnly] public ComponentLookup<TeamComponent> teamLookup;
     [ReadOnly] public ComponentLookup<HpComponent> hpLookup;
+    [ReadOnly] public ComponentLookup<VisibilityComponent> visibilityLookup;
 
     public void Execute(ref AttackCharsComponent attackChars, ref BattleModeComponent modeSettings, ref PursuingModeComponent pursuingModeComponent, in LocalTransform localTransform, in TeamComponent team,
-        EnabledRefRW<PursuingModeComponent> pursuingModeEnabledRefRW, EnabledRefRW<BattleModeComponent> battleModeEnabledRefRW, in UnitTypeComponent unitType, AttackPrioritiesAspect attackPriorities)
+        EnabledRefRW<PursuingModeComponent> pursuingModeEnabledRefRW, EnabledRefRW<BattleModeComponent> battleModeEnabledRefRW, in UnitTypeComponent unitType, AttackPrioritiesAspect attackPriorities, ref MovementComponent movement)
     {
         double bestScore = double.MinValue;
         Entity bestScoreEntity = Entity.Null;
@@ -468,6 +478,9 @@ public partial struct AttackTargetSearchJob : IJobEntity
         {
             //Check if they are in different teams
             if (teamLookup[potentialTarget].teamInd - team.teamInd == 0)
+                continue;
+            //Check if target is visible
+            if ((team.teamInd & visibilityLookup[potentialTarget].visibleToTeams) == 0)
                 continue;
 
             double curScore = 0;
@@ -484,10 +497,11 @@ public partial struct AttackTargetSearchJob : IJobEntity
                 &&
                 targetHpPercentage <= modeSettings.autoTriggerMaxHpPercent
                 &&
-                ((uint)unitType.value & modeSettings.autoTriggerUnitTypes) != 0)
+                (((uint)unitType.value & modeSettings.autoTriggerUnitTypes) != 0 || modeSettings.autoTriggerUnitTypes == 0))
             {
                 curScore += 100000; // such targets has higher priority than other (auto-trigger has more priority than usual attack)
                 hasPursueTarget = true;
+                Debug.Log("Changed mode to PursueMode");
             }
             else if (distanceToPotTargetSq > attackChars.radiusSq)
                 continue; // if pot target is not in any of the radiuses - going to next potential target
@@ -520,6 +534,8 @@ public partial struct AttackTargetSearchJob : IJobEntity
         {
             battleModeEnabledRefRW.ValueRW = false;
             pursuingModeEnabledRefRW.ValueRW = true;
+            pursuingModeComponent.moveTargetBeforePursue = movement.target;
+            movement.hasMoveTarget = true;
             pursuingModeComponent.Target = attackChars.target;
         }
         //else <--- no need in this as such modeChange is done in the PursuingJob
@@ -839,19 +855,24 @@ public partial struct _CreateDeployableAttackRequestsJob : IJobChunk
 }
 
 
+
+
 ///<summary> Updates some pursuing info for all units with such mode enabled </summary>
 [BurstCompile]
 public partial struct PursuingJob : IJobChunk
 {
+    const float MIN_DIST_TO_UNIT = 4;
     public float deltaTime;
     
     [ReadOnly] public ComponentLookup<LocalToWorld> localToWorldLookup;
+    [ReadOnly] public ComponentLookup<VisibilityComponent> visibilityLookup;
 
     public ComponentTypeHandle<PursuingModeComponent> pursuingModeSettsTypeHandle;
     public ComponentTypeHandle<BattleModeComponent> battleModeSetsTypeHandle;
     public ComponentTypeHandle<MovementComponent> movementTypeHandle;
     [ReadOnly] public ComponentTypeHandle<LocalTransform> transformTypeHandleRO;
     [ReadOnly] public ComponentTypeHandle<ReloadComponent> reloadTypeHandleRO;
+    [ReadOnly] public ComponentTypeHandle<TeamComponent> teamTypeHandleRO;
 
     public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
     {
@@ -861,25 +882,34 @@ public partial struct PursuingJob : IJobChunk
             MovementComponent* movements = chunk.GetComponentDataPtrRW(ref movementTypeHandle);
             LocalTransform* transforms = chunk.GetComponentDataPtrRO(ref transformTypeHandleRO);
             ReloadComponent* reloads = chunk.GetComponentDataPtrRO(ref reloadTypeHandleRO);
+            TeamComponent* teams = chunk.GetComponentDataPtrRO(ref teamTypeHandleRO);
 
+            Debug.Log(chunk.Count);
             ChunkEntityEnumerator chunkEnum = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
             while (chunkEnum.NextEntityIndex(out int i))
             {
                 float3 targetPos = localToWorldLookup[pursuingSetts[i].Target].Position;
                 float distToTargetSq = math.distancesq(transforms[i].Position, targetPos);
+                Debug.Log(targetPos);
                 if (reloads[i].isReloaded())
                     pursuingSetts[i].dropTimeElapsed += deltaTime;
-                //Check if the distance to target is too big
+                //Check if the distance to target is too big OR too long time pusrueing OR target is not visible anymore 
                 if (distToTargetSq > pursuingSetts[i].dropDistanceSq ||
-                    pursuingSetts[i].dropTimeElapsed > pursuingSetts[i].dropTime)
+                    pursuingSetts[i].dropTimeElapsed > pursuingSetts[i].dropTime ||
+                    (visibilityLookup[pursuingSetts[i].Target].visibleToTeams & teams[i].teamInd) == 0)
                 {// Turn off pursuing mode and return to BattleMode
                     chunk.SetComponentEnabled(ref battleModeSetsTypeHandle, i, true);
                     chunk.SetComponentEnabled(ref pursuingModeSettsTypeHandle, i, false);
                     continue;
                 }
-
+                Debug.Log("Got there");
                 //Update target of moving
-                movements[i].target = targetPos;
+                if (distToTargetSq >= MIN_DIST_TO_UNIT * MIN_DIST_TO_UNIT)
+                    movements[i].target = targetPos;
+                else
+                {
+                    //Rest animation
+                }
             }
         }
     }
