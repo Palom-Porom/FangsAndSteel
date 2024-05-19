@@ -558,6 +558,7 @@ public partial class TurnSystem_SinglePlayer : SystemBase
     protected override void OnStartRunning()
     {
         EnableEngageSystems(!orderPhase);
+        StaticUIRefs.Instance.BuyPanel.SetActive(false);
     }
 
     protected override void OnUpdate()
