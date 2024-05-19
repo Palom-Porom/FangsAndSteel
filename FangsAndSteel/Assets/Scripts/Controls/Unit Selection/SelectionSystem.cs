@@ -33,6 +33,8 @@ public partial class SelectionSystem : SystemBase
     private ComponentLookup<SelectTag> selectLookup;
     //private ComponentLookup<AttackSettingsComponent> attackSetsLookup;
     private ComponentLookup<TeamComponent> teamLookup;
+    private ComponentLookup<VehicleMovementComponent> vehicleLookup;
+    private ComponentLookup<Deployable> deployableLookup;
 
     private EntityCommandBuffer ecb;
 
@@ -58,6 +60,8 @@ public partial class SelectionSystem : SystemBase
         RequireForUpdate<GameTag>();
 
         selectLookup = GetComponentLookup<SelectTag>();
+        vehicleLookup = GetComponentLookup<VehicleMovementComponent>();
+        deployableLookup = GetComponentLookup<Deployable>();
         //attackSetsLookup = GetComponentLookup<AttackSettingsComponent>();
         teamLookup = GetComponentLookup<TeamComponent>();
     }
@@ -65,6 +69,9 @@ public partial class SelectionSystem : SystemBase
     protected override void OnStartRunning()
     {
         selectLookup.Update(this);
+        vehicleLookup.Update(this);
+        deployableLookup.Update(this);
+        teamLookup.Update(this);
 
         ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
 
@@ -90,6 +97,11 @@ public partial class SelectionSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        selectLookup.Update(this);
+        vehicleLookup.Update(this);
+        deployableLookup.Update(this);
+        teamLookup.Update(this);
+
         allSelected.CompleteDependency();
         EntityManager.CompleteDependencyBeforeRO<SelectTag>();
         if (needUpdateUIPanelInfo) { UpdateUIPanelInfo(); }
@@ -233,7 +245,9 @@ public partial class SelectionSystem : SystemBase
     {
         needUpdateUIPanelInfo = false;
         StaticUIRefs.Instance.UnitsUI.SetActive(!allSelected.IsEmpty && !buyStageTagQuery.IsEmpty);
-        if (allSelected.IsEmpty) return; 
+        if (allSelected.IsEmpty) return;
+
+        NewUnitUIManager.Instance.ShootOnMoveButton.GetComponent<Button>().interactable = true;
 
         bool isMultipleSelected = (allSelected.ToEntityArray(Allocator.Temp).Length > 1);
 
@@ -271,13 +285,15 @@ public partial class SelectionSystem : SystemBase
         bool sameUnitType = true;
         ShowCloseUnitStats.UnitStats stats = new ShowCloseUnitStats.UnitStats();
 
-        foreach (var (battleModeSets, pursueModeSets, attackPriorities, selectTag_EnabledRO, unitType) 
-            in SystemAPI.Query<BattleModeComponent, PursuingModeComponent, AttackPrioritiesAspect, EnabledRefRO<SelectTag>, UnitTypeComponent>().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
+        foreach (var (battleModeSets, pursueModeSets, attackPriorities, selectTag_EnabledRO, unitType, entity) 
+            in SystemAPI.Query<BattleModeComponent, PursuingModeComponent, AttackPrioritiesAspect, EnabledRefRO<SelectTag>, UnitTypeComponent>().WithEntityAccess().WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
         {
             if (!selectTag_EnabledRO.ValueRO) continue;
 
             #region RightPanel
 
+            if (vehicleLookup.HasComponent(entity) || deployableLookup.HasComponent(entity))
+                NewUnitUIManager.Instance.ShootOnMoveButton.GetComponent<Button>().interactable = false;
             NewUnitUIManager.Instance.ShootOnMoveButton.color = battleModeSets.shootingOnMove ? Color.green : Color.red;
             diffVals_shootOnMove.Add(battleModeSets.shootingOnMove);
 
