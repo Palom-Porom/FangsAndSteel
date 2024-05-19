@@ -53,11 +53,14 @@ public partial class SelectionSystem : SystemBase
     private EntityQuery notBoughtYetQuery;
 
     private Entity unitStatsRqstEntity;
+    EntityQuery q;
 
     protected override void OnCreate()
     {
+        q = new EntityQueryBuilder(Allocator.Persistent).WithAny<GameTag, TutorialTag>().Build(this);
+        RequireAnyForUpdate(q);
         //RequireForUpdate<SelectTag>();
-        RequireForUpdate<GameTag>();
+        //RequireForUpdate<GameTag>();
 
         selectLookup = GetComponentLookup<SelectTag>();
         vehicleLookup = GetComponentLookup<VehicleMovementComponent>();
