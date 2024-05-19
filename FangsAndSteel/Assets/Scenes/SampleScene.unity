@@ -241,6 +241,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UICamera
       objectReference: {fileID: 0}
+    - target: {fileID: 4448455013630241836, guid: b00d356d8ce7500429155aef5ebb42a1,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4a2abd4f67aefc24b9c6cca2d197adc7, type: 2}
     - target: {fileID: 8135316781127468297, guid: b00d356d8ce7500429155aef5ebb42a1,
         type: 3}
       propertyPath: m_LocalPosition.x
