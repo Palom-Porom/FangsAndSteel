@@ -985,6 +985,7 @@ MonoBehaviour:
     m_Y: 157
     m_Width: 33
     m_Height: 354
+  m_FreeGlyphRects: []
   m_fontInfo:
     Name: Liberation Sans
     PointSize: 86
