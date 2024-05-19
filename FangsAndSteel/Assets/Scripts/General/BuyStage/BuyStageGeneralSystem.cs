@@ -46,6 +46,9 @@ public partial class BuyStageGeneralSystem : SystemBase
         fstPlayerFinished = false;
         EnableSystems(false);
 
+        CameraControlSystem.lastCameraPos = Camera.main.transform.position;
+        CameraControlSystem.lastPivotPos = Camera.main.transform.parent.position;
+        CameraControlSystem.lastPivotRotation = Camera.main.transform.parent.rotation;
     }
 
     protected override void OnStopRunning()
@@ -55,6 +58,12 @@ public partial class BuyStageGeneralSystem : SystemBase
         // Hide the player buy zone
         StaticUIRefs.Instance.BuyBorders.SetActive(false);
 
+        //CameraControlSystem.lastCameraPos = Camera.main.transform.position;
+        //CameraControlSystem.lastPivotPos = Camera.main.transform.parent.position;
+        //CameraControlSystem.lastPivotRotation = Camera.main.transform.parent.rotation;
+        //Debug.Log(CameraControlSystem.lastCameraPos);
+        //Debug.Log(CameraControlSystem.lastPivotPos);
+        //Debug.Log(CameraControlSystem.lastPivotRotation);
     }
 
     protected override void OnUpdate()
@@ -84,6 +93,7 @@ public partial class BuyStageGeneralSystem : SystemBase
         if (uiData.endTurnBut)
         {
             StaticUIRefs.Instance.NewTurnPanel.SetActive(true);
+            CameraControlSystem.StepUpdateCameraPos();
 
             if (!fstPlayerFinished)
             {

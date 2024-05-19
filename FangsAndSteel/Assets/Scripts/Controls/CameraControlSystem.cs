@@ -20,13 +20,17 @@ public partial class CameraControlSystem : SystemBase
     private const float MIN_ANGLE_X = 0f;
     private const float MAX_ANGLE_X = 60f;
     private const float ZOOM_STEP = 10f;
-    private const float MIN_DISTANCE_TO_PIVOT = 10-1f;
-    private const float MIN_HEIGHT= 45f;
+    private const float MIN_DISTANCE_TO_PIVOT = 10 - 1f;
+    private const float MIN_HEIGHT = 45f;
 
     private const float X_RIGHT_BORDER = 500f;
     private const float X_LEFT_BORDER = -500f;
     private const float Z_FWD_BORDER = 500f;
     private const float Z_BCK_BORDER = -500f;
+
+    public static float3 lastCameraPos;
+    public static Quaternion lastPivotRotation;
+    public static float3 lastPivotPos;
 
     protected override void OnCreate()
     {
@@ -39,6 +43,10 @@ public partial class CameraControlSystem : SystemBase
     {
         cameraTransform = Camera.main.transform;
         cameraPivotTransform = Camera.main.transform.parent;
+
+        //lastCameraPos = cameraTransform.position;
+        //lastPivotPos = cameraPivotTransform.position;
+        //lastPivotRotation = cameraPivotTransform.rotation;
     }
 
     protected override void OnUpdate()
@@ -68,7 +76,7 @@ public partial class CameraControlSystem : SystemBase
         if (!inputData.cameraBordersDisabled && cameraPivotTransform.position.y < MIN_HEIGHT)
             cameraPivotTransform.position = new float3(cameraPivotTransform.position.x, MIN_HEIGHT, cameraPivotTransform.position.z);
 
-        cameraPivotTransform.position = new Vector3 (
+        cameraPivotTransform.position = new Vector3(
             math.clamp(cameraPivotTransform.position.x, X_LEFT_BORDER, X_RIGHT_BORDER),
             cameraPivotTransform.position.y,
             math.clamp(cameraPivotTransform.position.z, Z_BCK_BORDER, Z_FWD_BORDER)
@@ -87,7 +95,20 @@ public partial class CameraControlSystem : SystemBase
 
     void SetCameraOffset(Vector3 newOffset)
     {
-        if (!(math.distancesq(cameraPivotTransform.position, newOffset) < MIN_DISTANCE_TO_PIVOT * MIN_DISTANCE_TO_PIVOT))
+        if (!(math.distancesq(cameraPivotTransform.position, newOffset) < MIN_DISTANCE_TO_PIVOT * MIN_DISTANCE_TO_PIVOT) && newOffset.z < 0)
             cameraTransform.position = newOffset;
+    }
+
+    public static void StepUpdateCameraPos()
+    {
+        var temp1 = lastCameraPos;
+        var temp2 = lastPivotPos;
+        var temp3 = lastPivotRotation;
+        lastCameraPos = Camera.main.transform.position;
+        lastPivotPos = Camera.main.transform.parent.position;
+        lastPivotRotation = Camera.main.transform.parent.rotation;
+        Camera.main.transform.position = temp1;
+        Camera.main.transform.parent.position = temp2;
+        Camera.main.transform.parent.rotation = temp3;
     }
 }

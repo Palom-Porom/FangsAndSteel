@@ -7,6 +7,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.UI;
 using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,8 @@ public partial class TurnSystem : SystemBase
     public static float timeToRun;
     public static float timeToClose_NewTurnPanel;
     bool orderPhase;
+
+    float3 lastTeamCameraPos;
 
     ComponentTypeHandle<Disabled> disabledHandle;
     ComponentTypeHandle<WasDisabledTag> wasDisabledHandle;
@@ -68,6 +71,7 @@ public partial class TurnSystem : SystemBase
     protected override void OnStartRunning()
     {
         EnableEngageSystems(!orderPhase);
+        lastTeamCameraPos = float3.zero;
     }
 
     protected override void OnUpdate()
@@ -101,6 +105,7 @@ public partial class TurnSystem : SystemBase
                 //    selectLookup = selectLookup
                 //}.Schedule(allSelected, Dependency);
 
+                CameraControlSystem.StepUpdateCameraPos();
                 //Open new turn button
                 StaticUIRefs.Instance.NewTurnPanel.SetActive(true);
                 ///TODO: Create some animation to hide the changing players process
