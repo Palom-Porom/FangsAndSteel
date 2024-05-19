@@ -42,6 +42,7 @@ public partial class BuyStageGeneralSystem : SystemBase
 
         //Set 1st as the current player
         StaticUIRefs.Instance.NewTurnText.text = "Этап закупки игрока 1";
+        StaticUIRefs.Instance.UnitPanelMat.color = new Color(0.4716981f, 0.4716981f, 0.4716981f);
         SystemAPI.GetSingletonRW<CurrentTeamComponent>().ValueRW.value = 1;
         fstPlayerFinished = false;
         EnableSystems(false);
@@ -98,6 +99,7 @@ public partial class BuyStageGeneralSystem : SystemBase
             if (!fstPlayerFinished)
             {
                 StaticUIRefs.Instance.NewTurnText.text = "Этап закупки игрока 2";
+                StaticUIRefs.Instance.UnitPanelMat.color = new Color(0, 0.3697583f, 0.9716981f);
                 SystemAPI.GetSingletonRW<CurrentTeamComponent>().ValueRW.value = 2;
                 fstPlayerFinished = true;
                 StaticUIRefs.Instance.BalanceText.text = STARTER_PLAYER_MONEY.ToString();
@@ -105,6 +107,7 @@ public partial class BuyStageGeneralSystem : SystemBase
             else
             {
                 StaticUIRefs.Instance.NewTurnText.text = "Ход игрока 1";
+                StaticUIRefs.Instance.UnitPanelMat.color = new Color(0.4716981f, 0.4716981f, 0.4716981f);
                 SystemAPI.GetSingletonRW<CurrentTeamComponent>().ValueRW.value = 1;
                 EntityManager.AddComponent<BuyStageCompletedTag>(SystemHandle);
                 EntityManager.RemoveComponent<BuyStageNotCompletedTag>(notCompletedTagQuery);

@@ -50,6 +50,8 @@ public class StaticUIRefs : MonoBehaviour
     public TextMeshProUGUI WinPanelText { get { return winPanelText; } }
     [SerializeField] private TextMeshProUGUI winPanelText;
 
+    public Material UnitPanelMat;
+
     #region Units' Prices
 
     public TextMeshProUGUI FirstRobotPrice { get { return firstRobotPrice; } }

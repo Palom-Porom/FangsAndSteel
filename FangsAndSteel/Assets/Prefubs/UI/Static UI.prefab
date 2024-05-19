@@ -3912,6 +3912,7 @@ MonoBehaviour:
   balanceText: {fileID: 2844122471772471717}
   winPanel: {fileID: 2351590877650236805}
   winPanelText: {fileID: 5272481632095789577}
+  UnitPanelMat: {fileID: 2100000, guid: 4a2abd4f67aefc24b9c6cca2d197adc7, type: 2}
   firstRobotPrice: {fileID: 1727843375376418118}
   machineGunnerPrice: {fileID: 6380462630553031943}
   antyTankPrice: {fileID: 697834843354868675}
@@ -21717,7 +21718,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -29501,7 +29502,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.92156863}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.6509804}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

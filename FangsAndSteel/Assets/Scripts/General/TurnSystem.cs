@@ -132,6 +132,7 @@ public partial class TurnSystem : SystemBase
                             //Change cur team
                             curTeam.ValueRW.value = 2;
                             StaticUIRefs.Instance.NewTurnText.text = "Ход игрока 2";
+                            StaticUIRefs.Instance.UnitPanelMat.color = new Color(0, 0.3697583f, 0.9716981f);
 
                             //Disable actual units, copy and enable ReplayStartCopies (if no ReplayStartCopies -> no "copy and enable" as it is the first turn)
                             if (!replayStartCopiesQuery.IsEmpty)
@@ -179,6 +180,7 @@ public partial class TurnSystem : SystemBase
                             //Change cur team
                             curTeam.ValueRW.value = 1;
                             StaticUIRefs.Instance.NewTurnText.text = "Ход игрока 1";
+                            StaticUIRefs.Instance.UnitPanelMat.color = new Color(0.4716981f, 0.4716981f, 0.4716981f);
 
                             //Create new ReplayStartCopies
                             Dependency = new CreateNewReplayStartEntitiesJob
