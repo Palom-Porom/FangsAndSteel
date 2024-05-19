@@ -7,6 +7,7 @@
     "com.unity.ide.vscode": "1.2.5",
     "com.unity.inputsystem": "1.7.0",
     "com.unity.physics": "1.2.0-pre.6",
+    "com.unity.postprocessing": "3.2.2",
     "com.unity.render-pipelines.universal": "14.0.9",
     "com.unity.terrain-tools": "5.0.3",
     "com.unity.test-framework": "1.1.33",
