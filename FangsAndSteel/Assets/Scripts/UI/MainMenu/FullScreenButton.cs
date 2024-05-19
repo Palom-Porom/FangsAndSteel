@@ -22,4 +22,5 @@ public class FullScreenButton : MonoBehaviour
     {
         fullScreenButton.onClick.RemoveAllListeners();
     }
+
 }

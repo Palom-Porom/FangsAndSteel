@@ -652,6 +652,7 @@ GameObject:
   - component: {fileID: 491065245}
   - component: {fileID: 491065244}
   - component: {fileID: 491065246}
+  - component: {fileID: 491065247}
   m_Layer: 5
   m_Name: Settings Window
   m_TagString: Untagged
@@ -735,6 +736,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropdown: {fileID: 857761580}
+--- !u!114 &491065247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 491065242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 059f16110399dba43aa06393c231feb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fullScreenButton: {fileID: 1978629791}
 --- !u!1 &560172665
 GameObject:
   m_ObjectHideFlags: 0
@@ -1233,7 +1247,7 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: 2564x1440
+    - m_Text: 2560x1440
       m_Image: {fileID: 0}
     - m_Text: 1920x1440
       m_Image: {fileID: 0}
