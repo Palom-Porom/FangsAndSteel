@@ -136,7 +136,7 @@ PrefabInstance:
     - target: {fileID: 5824819134941424039, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -300
       objectReference: {fileID: 0}
     - target: {fileID: 5824819134941424039, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
@@ -216,7 +216,7 @@ PrefabInstance:
     - target: {fileID: 8818506933466611722, guid: c743507d0fc900b45898c8e09289fb9b,
         type: 3}
       propertyPath: VisionRadius
-      value: 30
+      value: 40
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

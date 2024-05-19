@@ -7,7 +7,7 @@ using UnityEngine;
 
 public partial class BuyStageGeneralSystem : SystemBase
 {
-    const int STARTER_PLAYER_MONEY = 1500;
+    const int STARTER_PLAYER_MONEY = 1000;
 
     ComponentLookup<BuyStageCompletedTag> completedTagLookup;
     EntityQuery notCompletedTagQuery;
