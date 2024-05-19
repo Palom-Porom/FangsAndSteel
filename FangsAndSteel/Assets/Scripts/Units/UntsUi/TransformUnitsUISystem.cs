@@ -24,6 +24,7 @@ public partial class TransformUnitsUISystem : SystemBase
     {
         EntityQuery q = new EntityQueryBuilder(Allocator.TempJob).WithAny<AttackCharsComponent, HpComponent>().Build(this);
         RequireAnyForUpdate(q);
+        RequireForUpdate<BuyStageCompletedTag>();
         RequireForUpdate<UnitIconsComponent>();
 
 
