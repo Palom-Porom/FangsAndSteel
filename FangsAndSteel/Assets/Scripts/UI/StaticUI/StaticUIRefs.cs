@@ -44,6 +44,12 @@ public class StaticUIRefs : MonoBehaviour
     public TextMeshProUGUI BalanceText { get { return balanceText; } }
     [SerializeField] private TextMeshProUGUI balanceText;
 
+    public GameObject WinPanel { get { return winPanel; } }
+    [SerializeField] private GameObject winPanel;
+
+    public TextMeshProUGUI WinPanelText { get { return winPanelText; } }
+    [SerializeField] private TextMeshProUGUI winPanelText;
+
     #region Units' Prices
 
     public TextMeshProUGUI FirstRobotPrice { get { return firstRobotPrice; } }

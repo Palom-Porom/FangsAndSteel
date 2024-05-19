@@ -35,6 +35,7 @@ public partial class TurnSystem : SystemBase
     BufferLookup<LinkedEntityGroup> linkedEntityGroupLookup;
 
     EntityQuery allSelected;
+    EntityQuery allTeamUnits;
     EntityQuery replayStartCopiesQuery;
     EntityQuery replayCopiesQuery;
     EntityQuery actualEntitiesQuery;
@@ -61,6 +62,7 @@ public partial class TurnSystem : SystemBase
         linkedEntityGroupLookup = GetBufferLookup<LinkedEntityGroup>();
 
         allSelected = new EntityQueryBuilder(Allocator.Persistent).WithAll<SelectTag>().Build(this);
+        allTeamUnits = new EntityQueryBuilder(Allocator.Persistent).WithAll<TeamComponent>().Build(this);
         replayStartCopiesQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<ReplayStartCopyTag, LinkedEntityGroup>().WithOptions(EntityQueryOptions.IncludeDisabledEntities).Build(this);
         replayCopiesQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<ReplayCopyTag, LinkedEntityGroup>().WithOptions(EntityQueryOptions.IncludeDisabledEntities).Build(this);
         actualEntitiesQuery = new EntityQueryBuilder(Allocator.Persistent).WithAll<ActualEntityTag, LinkedEntityGroup>().WithOptions(EntityQueryOptions.IncludeDisabledEntities).Build(this);
@@ -245,6 +247,8 @@ public partial class TurnSystem : SystemBase
                 }
 
                 orderPhase = true;
+
+                CheckForWin(SystemAPI.GetSingleton<CurrentTeamComponent>().value);
             }
         }
     }
@@ -276,6 +280,34 @@ public partial class TurnSystem : SystemBase
         World.Unmanaged.GetExistingSystemState<TargetingMoveSystem>().Enabled = !enable;
         World.Unmanaged.GetExistingSystemState<BasicButtonSystem>().Enabled = !enable;
     }
+
+    private bool CheckForWin(int currentTeam)
+    {
+        int[] numOfUnits = new int[2];
+        numOfUnits[0] = numOfUnits[1]  = 0;
+        var teamComps = allTeamUnits.ToComponentDataArray<TeamComponent>(Allocator.Temp);
+        foreach(var team in teamComps)
+        {
+            numOfUnits[team.teamInd - 1]++;
+        }
+        if (numOfUnits[1] == 0)
+        {
+            StaticUIRefs.Instance.WinPanel.SetActive(true);
+            StaticUIRefs.Instance.WinPanelText.text = "Красные победили!";
+            StaticUIRefs.Instance.WinPanelText.color = Color.red;
+            return true;
+        }
+        if (numOfUnits[0] == 0)
+        {
+            StaticUIRefs.Instance.WinPanel.SetActive(true);
+            StaticUIRefs.Instance.WinPanelText.text = "Синие победили!";
+            StaticUIRefs.Instance.WinPanelText.color = Color.blue;
+            return true;
+        }
+        return false;
+
+    }
+
 }
 
 
