@@ -15,7 +15,7 @@ public class PriorityDropdownScript : MonoBehaviour
     public TMP_Dropdown dropdown3;
     public TMP_Dropdown dropdown4;
     public TMP_Dropdown dropdown5;
-    public TMP_Dropdown dropdown6;
+    //public TMP_Dropdown dropdown6;
 
     public static List<TMP_Dropdown> dropdownLST;
     public void Start()
@@ -27,9 +27,9 @@ public class PriorityDropdownScript : MonoBehaviour
         priorityList.Add("Пулеметчик");
         priorityList.Add("Противотанковый пехотинец");
         priorityList.Add("Танк");
-        priorityList.Add("Aртиллерия");
+        //priorityList.Add("Aртиллерия");
         priorityList.Add(" ");
-        dropdownLST = new List<TMP_Dropdown>(7) { dropdown0, dropdown1, dropdown2, dropdown3, dropdown4, dropdown5, dropdown6 };
+        dropdownLST = new List<TMP_Dropdown>(6) { dropdown0, dropdown1, dropdown2, dropdown3, dropdown4, dropdown5 };
         //Debug.Log(dropdownLST[0]);
 
         foreach (var priority in priorityList)
@@ -48,7 +48,7 @@ public class PriorityDropdownScript : MonoBehaviour
         DropdownItemSelected(3, (int)priorityItems.MachineGunner);
         DropdownItemSelected(4, (int)priorityItems.AntiTankInf);
         DropdownItemSelected(5, (int)priorityItems.Tank);
-        DropdownItemSelected(6, (int)priorityItems.Artillery);     
+            
     }
     public void DropdownItemSelected(TMP_Dropdown dropdown)
     {
@@ -107,10 +107,6 @@ public class PriorityDropdownScript : MonoBehaviour
             {
                 unitPrioritiesLST.Add((UnitTypes.Tank, dropdownLST.IndexOf(dropdown)));
             }
-            else if (dropdown.value == (int)priorityItems.Artillery)
-            {
-                unitPrioritiesLST.Add((UnitTypes.Artillery, dropdownLST.IndexOf(dropdown)));
-            }
             else if (dropdown.value == (int)priorityItems.Nearest)
             {
                 distancePriority = dropdownLST.IndexOf(dropdown);
@@ -128,12 +124,11 @@ public class PriorityDropdownScript : MonoBehaviour
     public enum priorityItems
     {
         Nearest,
-        ByMinHp,
+        ByMinHp,    
         Infantry,
         MachineGunner,
         AntiTankInf,
         Tank,
-        Artillery,
         Empty
     }
 

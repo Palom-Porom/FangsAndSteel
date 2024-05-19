@@ -17,7 +17,7 @@ public class ShowCloseUnitStats : MonoBehaviour
     public static void ShowStats(UnitStats unitStats)
     {
         var hp = StatsPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-        hp.text = $"Здоровье: {unitStats.hp}";
+        hp.text = $"3доровье: {unitStats.hp}";
 
         var speed = StatsPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
         speed.text = $"Скорость: {unitStats.speed}";
