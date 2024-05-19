@@ -91,11 +91,13 @@ public partial class CameraControlSystem : SystemBase
 
         if (inputData.cameraZoomInputs != 0 && !EventSystem.current.IsPointerOverGameObject())
             SetCameraOffset(cameraTransform.position + cameraTransform.forward * ZOOM_STEP * inputData.cameraZoomInputs);
+        //else if (EventSystem.current.IsPointerOverGameObject()) Debug.Log("IsOverGO");
     }
 
     void SetCameraOffset(Vector3 newOffset)
     {
-        if (!(math.distancesq(cameraPivotTransform.position, newOffset) < MIN_DISTANCE_TO_PIVOT * MIN_DISTANCE_TO_PIVOT) && newOffset.z < 0)
+        //Debug.Log(newOffset);
+        if (!(math.distancesq(cameraPivotTransform.position, newOffset) < MIN_DISTANCE_TO_PIVOT * MIN_DISTANCE_TO_PIVOT) /*&& newOffset.z < 0*/)
             cameraTransform.position = newOffset;
     }
 
@@ -104,11 +106,11 @@ public partial class CameraControlSystem : SystemBase
         var temp1 = lastCameraPos;
         var temp2 = lastPivotPos;
         var temp3 = lastPivotRotation;
-        lastCameraPos = Camera.main.transform.position;
+        lastCameraPos = Camera.main.transform.localPosition;
         lastPivotPos = Camera.main.transform.parent.position;
         lastPivotRotation = Camera.main.transform.parent.rotation;
-        Camera.main.transform.position = temp1;
         Camera.main.transform.parent.position = temp2;
+        Camera.main.transform.localPosition = temp1;
         Camera.main.transform.parent.rotation = temp3;
     }
 }

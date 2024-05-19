@@ -46,7 +46,7 @@ public partial class BuyStageGeneralSystem : SystemBase
         fstPlayerFinished = false;
         EnableSystems(false);
 
-        CameraControlSystem.lastCameraPos = Camera.main.transform.position;
+        CameraControlSystem.lastCameraPos = Camera.main.transform.localPosition;
         CameraControlSystem.lastPivotPos = Camera.main.transform.parent.position;
         CameraControlSystem.lastPivotRotation = Camera.main.transform.parent.rotation;
     }
